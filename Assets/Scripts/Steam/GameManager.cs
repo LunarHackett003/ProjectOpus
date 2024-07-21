@@ -7,10 +7,6 @@ using TMPro;
 using HeathenEngineering.SteamworksIntegration;
 using Eflatun.SceneReference;
 using FishNet.Managing;
-
-
-
-
 public class GameManager : MonoBehaviour
 {
     protected static GameManager instance;
@@ -27,6 +23,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    #region Manager Prefabs
+    public GameObject GameManagerPrefab;
+    public GameObject ChatManagerPrefab;
+    public GameObject MessageProxyPrefab;
+    /// <summary>
+    /// Reference to the singleton instance of the Chat Manager. This is also accessible via ChatManager.Instance, but can also be found here.
+    /// </summary>
+    public static ChatManager ChatManager;
+    /// <summary>
+    /// Reference to the singleton instance of the Message Proxy. This is also accessible via MessageProxy.Instance, but can also be found here.<br></br>
+    /// The Message Proxy will ONLY ever exist while in a game. Text chat will be unavailable if not connected to a server.
+    /// </summary>
+    public static MessageProxy MessageProxy;
+    #endregion
     #region Scene Management
     public SceneReference menuScene, gameScene;
 
@@ -36,6 +46,8 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Fishnet
+    public bool ConnectedToServer { get; private set; }
+
     public FishySteamworks.FishySteamworks fishySteamworks;
 
     public void Disconnect()
@@ -44,6 +56,8 @@ public class GameManager : MonoBehaviour
             fishySteamworks.StopConnection(false);
         if(FishNet.InstanceFinder.NetworkManager.IsServerStarted)
             fishySteamworks.StopConnection(true);
+        ConnectedToServer = false;
+        ChatManager.gameObject.SetActive(false);
     }
 
     public void StartHost()
@@ -54,10 +68,13 @@ public class GameManager : MonoBehaviour
             hostHex = user.ToString();
 
             print(hostHex);
-
-            //Starts a connection as both a server AND client
-            fishySteamworks.StartConnection(true);
-            fishySteamworks.StartConnection(false);
+            if (user.IsValid)
+            {
+                //Starts a connection as both a server AND client
+                fishySteamworks.StartConnection(true);
+                fishySteamworks.StartConnection(false);
+                ConnectionComplete();
+            }
         }
     }
 
@@ -73,9 +90,25 @@ public class GameManager : MonoBehaviour
             }
             fishySteamworks.SetClientAddress(hostUser.id.ToString());
             fishySteamworks.StartConnection(false);
+            ConnectionComplete();
         }
     }
+
+    void ConnectionComplete()
+    {
+        ConnectedToServer = true;
+        if (ChatManager)
+        {
+            ChatManager.gameObject.SetActive(true);
+        }
+    }
+
+
+
     #endregion
+
+
+
 
     #region Unity Callbacks
 
@@ -99,6 +132,21 @@ public class GameManager : MonoBehaviour
         print("");
         instance = this;
         DontDestroyOnLoad(gameObject);
+
+
+        fishySteamworks.OnClientConnectionState += ClientConnected;
+    }
+
+    private void ClientConnected(FishNet.Transporting.ClientConnectionStateArgs obj)
+    {
+        if(obj.ConnectionState == FishNet.Transporting.LocalConnectionState.Started)
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(gameScene.BuildIndex);
+        }
+        else if(obj.ConnectionState == FishNet.Transporting.LocalConnectionState.Stopped)
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene(menuScene.BuildIndex);
+        }
     }
 
     private void Start()
@@ -107,5 +155,5 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-
+    public string HostHex => hostHex;
 }

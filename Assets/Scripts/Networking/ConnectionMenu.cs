@@ -7,7 +7,13 @@ public class ConnectionMenu : MonoBehaviour
     public bool isMenu;
     public TMP_InputField inputField;
     public TMP_Text hostCodeDisplay;
-
+    private void Start()
+    {
+        if (hostCodeDisplay)
+        {
+            hostCodeDisplay.text = GameManager.Instance.HostHex;
+        }
+    }
     public void TryJoinGame()
     {
         if(inputField && !string.IsNullOrWhiteSpace(inputField.text) && GameManager.Instance)
