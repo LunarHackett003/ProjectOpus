@@ -1,5 +1,23 @@
 {
   "dependencies": {
+    "com.community.netcode.extensions": {
+      "version": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/com.community.netcode.extensions",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.netcode.gameobjects": "1.0.2"
+      },
+      "hash": "0eda04fc2146a4f907a61de6403315bce705279e"
+    },
+    "com.community.netcode.transport.facepunch": {
+      "version": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.facepunch",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.netcode.gameobjects": "1.0.0-pre.4"
+      },
+      "hash": "0eda04fc2146a4f907a61de6403315bce705279e"
+    },
     "com.eflatun.scenereference": {
       "version": "https://github.com/starikcetin/Eflatun.SceneReference.git#4.1.1",
       "depth": 0,
@@ -10,35 +28,12 @@
       },
       "hash": "b849990020c30ac6ead4e4fb4881428f86dcde0d"
     },
-    "com.heathen.steamworksfoundation": {
-      "version": "https://github.com/heathen-engineering/Toolkit-for-Steamworks-Foundation.git?path=Unity/com.heathen.steamworksfoundation",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "9611575e8294020c00e96296dde0db9f82235918"
-    },
-    "com.heathen.systemcore": {
-      "version": "https://github.com/heathen-engineering/SystemCore.git?path=/com.heathen.systemcore",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.unity.mathematics": "1.2.5"
-      },
-      "hash": "6d58a14fd74c493bdad1476051e5cd48d3553499"
-    },
     "com.pierotechnical.buildandpublishtool": {
       "version": "https://github.com/PieroTechnical/com.pierotechnical.buildandpublishtool.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
       "hash": "b75790bf0a8cf4194fffff2055d9b5fcc6e0d0a9"
-    },
-    "com.rlabrecque.steamworks.net": {
-      "version": "https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "4a54dc77a56fa37f195e5344422cff30a2805f3c"
     },
     "com.unity.ai.navigation": {
       "version": "2.0.0",
@@ -129,9 +124,19 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.netcode.gameobjects": {
+      "version": "1.9.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.nuget.mono-cecil": "1.10.1",
+        "com.unity.transport": "1.4.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.4",
-      "depth": 3,
+      "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -239,6 +244,17 @@
         "com.unity.modules.animation": "1.0.0",
         "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.transport": {
+      "version": "2.1.0",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.collections": "2.2.1",
+        "com.unity.burst": "1.8.8",
+        "com.unity.mathematics": "1.3.1"
       },
       "url": "https://packages.unity.com"
     },
