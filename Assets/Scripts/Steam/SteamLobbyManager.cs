@@ -1,6 +1,7 @@
 using Netcode.Transports.Facepunch;
 using Steamworks;
 using Steamworks.Data;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -23,7 +24,11 @@ namespace opus.SteamIntegration {
         FacepunchTransport transport;
         Lobby? currentLobby;
         public ulong hostID;
+        public uint maxMembers;
+        public GameObject disconnectButton;
+        public GameObject hostGameButton;
 
+        public GameObject gameJoinedDisplay;
         private void Awake()
         {
             if (_instance == null)
@@ -55,6 +60,10 @@ namespace opus.SteamIntegration {
             SteamMatchmaking.OnLobbyInvite += LobbyInvite;
             SteamMatchmaking.OnLobbyGameCreated += LobbyGameCreated;
             SteamFriends.OnGameLobbyJoinRequested += GameLobbyJoinRequested;
+
+            disconnectButton.SetActive(false);
+            gameJoinedDisplay.SetActive(false);
+            hostGameButton.SetActive(true);
         }
         private void OnDestroy()
         {
@@ -109,6 +118,7 @@ namespace opus.SteamIntegration {
 
         private void LobbyMemberJoined(Lobby arg1, Friend arg2)
         {
+            print($"{arg2.Name} joined!");
         }
 
         private void LobbyEntered(Lobby obj)
@@ -133,13 +143,13 @@ namespace opus.SteamIntegration {
             _lobby.SetGameServer(_lobby.Owner.Id);
         }
 
-        public async void StartHost(int maxMembers)
+        public async void StartHost()
         {
             NetworkManager.Singleton.OnServerStarted += NetworkManager_ServerStarted;
             try
             {
                 NetworkManager.Singleton.StartHost();
-                currentLobby = await SteamMatchmaking.CreateLobbyAsync(maxMembers);
+                currentLobby = await SteamMatchmaking.CreateLobbyAsync((int)maxMembers);
             }
             catch (System.Exception)
             {
@@ -147,6 +157,7 @@ namespace opus.SteamIntegration {
                     NetworkManager.Singleton.Shutdown();
                 throw;
             }
+            PostConnection();
 
         }
         public void StartClient(SteamId sID)
@@ -158,9 +169,15 @@ namespace opus.SteamIntegration {
             if (NetworkManager.Singleton.StartClient())
             {
                 print("Client has started!");
+                PostConnection();
             }
         }
-
+        private void PostConnection()
+        {
+            disconnectButton.SetActive(true);
+            hostGameButton.SetActive(false);
+            gameJoinedDisplay.SetActive(true);
+        }
         private void NetworkManager_ClientDisconnected(ulong obj)
         {
 
@@ -187,6 +204,10 @@ namespace opus.SteamIntegration {
                 NetworkManager.Singleton.OnClientConnectedCallback -= NetworkManager_ClientConnected;
             }
             NetworkManager.Singleton.Shutdown(true);
+            disconnectButton.SetActive(false);
+            hostGameButton.SetActive(true);
+            gameJoinedDisplay.SetActive(false);
+
             print("Disconnected from game");
         }
 
