@@ -1,9 +1,12 @@
+using Eflatun.SceneReference;
 using Netcode.Transports.Facepunch;
+using opus.Gameplay;
 using Steamworks;
 using Steamworks.Data;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace opus.SteamIntegration {
     public class SteamLobbyManager : MonoBehaviour
@@ -22,13 +25,17 @@ namespace opus.SteamIntegration {
         }
 
         FacepunchTransport transport;
-        Lobby? currentLobby;
+        public Lobby? CurrentLobby { get; private set; }
+        public bool InLobby => CurrentLobby != null;
         public ulong hostID;
         public uint maxMembers;
-        public GameObject disconnectButton;
-        public GameObject hostGameButton;
-
+        public GameObject[] buttonsInMenu, buttonsInGame;
         public GameObject gameJoinedDisplay;
+        public bool GetNamesOfTeamMembersAutomatically = true;
+        public GameObject lobbySettingsButton;
+        public GameObject lobbySettingsPanel;
+        public SceneReference lobbyScene;
+        public SceneReference menuScene;
         private void Awake()
         {
             if (_instance == null)
@@ -61,10 +68,37 @@ namespace opus.SteamIntegration {
             SteamMatchmaking.OnLobbyGameCreated += LobbyGameCreated;
             SteamFriends.OnGameLobbyJoinRequested += GameLobbyJoinRequested;
 
-            disconnectButton.SetActive(false);
-            gameJoinedDisplay.SetActive(false);
-            hostGameButton.SetActive(true);
+
+            NetworkManager.Singleton.OnServerStarted += NetworkManager_OnServerStarted;
+            NetworkManager.Singleton.OnServerStopped += NetworkManager_OnServerStopped;
+
+            SetButtonsActive();
+            lobbySettingsPanel.SetActive(false);
         }
+        void SetButtonsActive()
+        {
+            for (int i = 0; i < buttonsInGame.Length; i++)
+            {
+                buttonsInGame[i].SetActive(InLobby);
+            }
+            for (int i = 0; i < buttonsInMenu.Length; i++)
+            {
+                buttonsInMenu[i].SetActive(!InLobby);
+            }
+            gameJoinedDisplay.SetActive(InLobby);
+        }
+        private void NetworkManager_OnServerStopped(bool obj)
+        {
+            print("server stopped");
+            if(CurrentLobby != null)
+                Disconnected();
+        }
+
+        private void NetworkManager_OnServerStarted()
+        {
+            print("server started");
+        }
+
         private void OnDestroy()
         {
             SteamMatchmaking.OnLobbyCreated -= LobbyCreated;
@@ -97,10 +131,10 @@ namespace opus.SteamIntegration {
             else
             {
                 print("Game Lobby Join Requested - success!");
-                currentLobby = arg1;
+                CurrentLobby = arg1;
             }
         }
-
+        public bool IsHost {  get; private set; }
         private void LobbyGameCreated(Lobby arg1, uint arg2, ushort arg3, SteamId arg4)
         {
             print("lobby was created!");
@@ -127,7 +161,7 @@ namespace opus.SteamIntegration {
             {
                 return;
             }
-            StartClient(currentLobby.Value.Owner.Id);
+            StartClient(CurrentLobby.Value.Owner.Id);
         }
 
         private void LobbyCreated(Result arg1, Lobby _lobby)
@@ -149,7 +183,8 @@ namespace opus.SteamIntegration {
             try
             {
                 NetworkManager.Singleton.StartHost();
-                currentLobby = await SteamMatchmaking.CreateLobbyAsync((int)maxMembers);
+                CurrentLobby = await SteamMatchmaking.CreateLobbyAsync((int)maxMembers);
+
             }
             catch (System.Exception)
             {
@@ -157,8 +192,13 @@ namespace opus.SteamIntegration {
                     NetworkManager.Singleton.Shutdown();
                 throw;
             }
-            PostConnection();
 
+
+            NetworkManager.Singleton.SceneManager.LoadScene(lobbyScene.Name, LoadSceneMode.Single);
+            
+            PostConnection();
+            IsHost = true;
+            lobbySettingsButton.SetActive(true);
         }
         public void StartClient(SteamId sID)
         {
@@ -170,17 +210,18 @@ namespace opus.SteamIntegration {
             {
                 print("Client has started!");
                 PostConnection();
+                lobbySettingsButton.SetActive(false);
+                IsHost = false;
             }
         }
         private void PostConnection()
         {
-            disconnectButton.SetActive(true);
-            hostGameButton.SetActive(false);
-            gameJoinedDisplay.SetActive(true);
+            SetButtonsActive();
+            PlayerManager.Instance.SetPause(false);
         }
         private void NetworkManager_ClientDisconnected(ulong obj)
         {
-
+            
         }
 
         private void NetworkManager_ClientConnected(ulong obj)
@@ -190,7 +231,7 @@ namespace opus.SteamIntegration {
 
         public void Disconnected()
         {
-            currentLobby?.Leave();
+            CurrentLobby?.Leave();
             if(NetworkManager.Singleton == null)
             {
                 return;
@@ -204,11 +245,11 @@ namespace opus.SteamIntegration {
                 NetworkManager.Singleton.OnClientConnectedCallback -= NetworkManager_ClientConnected;
             }
             NetworkManager.Singleton.Shutdown(true);
-            disconnectButton.SetActive(false);
-            hostGameButton.SetActive(true);
-            gameJoinedDisplay.SetActive(false);
-
             print("Disconnected from game");
+            SceneManager.LoadScene(menuScene.Name, LoadSceneMode.Single);
+            CurrentLobby = null;
+            SetButtonsActive();
+            lobbySettingsPanel.SetActive(false);
         }
 
         private void NetworkManager_ServerStarted()

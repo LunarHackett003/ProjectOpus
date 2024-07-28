@@ -15,19 +15,16 @@ public class MenuFlyout : MonoBehaviour
     }
     public void ToggleFlyout()
     {
-        print("Toggled Flyout");
         StopCoroutine(Flyout());
         StartCoroutine(Flyout());
     }
     public IEnumerator Flyout()
     {
-        print("Wooosh says the menu!");
         float t = 0;
         while (t < 1)
         {
             t += Time.unscaledDeltaTime * speed;
             rect.anchoredPosition = Vector2.Lerp(closedPosition, openPosition, closed ? t : (1 - t));
-            print(t);
             yield return null;
         }
         
