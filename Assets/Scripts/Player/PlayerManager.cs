@@ -32,7 +32,7 @@ namespace opus.Gameplay {
 
         [SerializeField] protected bool paused;
         public bool InGame => !paused && SteamLobbyManager.Instance.InLobby;
-
+        public PlayerCharacter pc;
 
         public Vector2 lookSpeed;
         public bool invertLookY;
@@ -93,7 +93,8 @@ namespace opus.Gameplay {
         {
             if (InGame)
             {
-
+                if (context.performed && pc)
+                    pc.TryJump();
             }
             else
             {

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-public class LadderBuilder : MonoBehaviour
+public class Ladder : MonoBehaviour
 {
 
     public GameObject ladderSegment;

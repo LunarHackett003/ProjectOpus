@@ -6,11 +6,12 @@ using Unity.Netcode.Components;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using opus.SteamIntegration;
 
 public class PlayerCharacter : NetworkBehaviour
 {
 
-    Rigidbody rb;
+    [SerializeField] Rigidbody rb;
     [SerializeField] Transform lookTransform;
     [SerializeField] Transform clientRotationRoot;
     [SerializeField] Transform weaponSwayTransform;
@@ -38,15 +39,17 @@ public class PlayerCharacter : NetworkBehaviour
 
     public List<Behaviour> remoteDisableComponents;
     public List<Behaviour> localDisableComponents;
-
-    private void Awake()
+    public float groundDrag;
+    public float airDrag;
+    private void OnDisable()
     {
-        if(IsServer || IsOwner)
+        if (IsServer || IsOwner)
         {
-            currentHealth.OnValueChanged += OnHealthChanged;
+            currentHealth.OnValueChanged -= OnHealthChanged;
+            currentShields.OnValueChanged -= OnShieldChanged;
+            SceneManager.sceneLoaded -= NewSceneLoaded;
         }
     }
-
     private void NewSceneLoaded(Scene arg0, LoadSceneMode arg1)
     {
         print("Scene loaded, player is in game.");
@@ -54,12 +57,14 @@ public class PlayerCharacter : NetworkBehaviour
         if (IsOwner)
         {
             Respawn(true);
+            rb.isKinematic = false;
         }
+        ResetHealth();
+
     }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
         if (!IsOwner)
         {
             remoteDisableComponents.ForEach(x =>
@@ -75,7 +80,16 @@ public class PlayerCharacter : NetworkBehaviour
             {
                 x.enabled = false;
             });
+            PlayerManager.Instance.pc = this;
         }
+
+        if (IsServer || IsOwner)
+        {
+            currentHealth.OnValueChanged += OnHealthChanged;
+            currentShields.OnValueChanged += OnShieldChanged;
+            rb.isKinematic = true;
+        }
+        rb = GetComponent<Rigidbody>();
     }
     private void FixedUpdate()
     {
@@ -84,12 +98,10 @@ public class PlayerCharacter : NetworkBehaviour
         {
             return;
         }
-
         //Checks if the player hit the ground.
         CheckGround(out RaycastHit hit);
         float dot = Vector3.Dot(hit.normal, Vector3.up);
-        grounded = hit.collider && (dot > -0.7f && dot < 0.7f);
-
+        grounded = hit.collider && (dot >= 0.5f);
 
         if (hit.collider)
         {
@@ -100,6 +112,7 @@ public class PlayerCharacter : NetworkBehaviour
             groundNormal = Vector3.up;
         }
 
+        rb.linearDamping = grounded ? groundDrag : airDrag;
         //Checks if the network transform is client or server auth. If server auth, it uses the server's synchronised move input.
         //This prevents some cheating methods, but also increases latency. If player's network transform is client auth, then it'll use the client's own move input.
         //This is a little more responsive, but can enable cheating or visual disparity between players.
@@ -180,19 +193,27 @@ public class PlayerCharacter : NetworkBehaviour
         {
             moveInput *= GameplayManager.BaseAirControl * GameplayManager.Instance.airControlMultiplier.Value;
         }
-        transform.position += Time.fixedDeltaTime * GameplayManager.BaseMoveSpeed * GameplayManager.BaseMoveSpeed * GameplayManager.Instance.moveSpeedMultiplier.Value 
-            * (clientRotationRoot.rotation * Vector3.ProjectOnPlane(new Vector3(moveInput.x, 0, moveInput.y), groundNormal));
+        else
+        {
+            moveInput *= GameplayManager.BaseMoveSpeed * GameplayManager.Instance.moveSpeedMultiplier.Value;
+        }
+        
+        Vector3 forward = Vector3.Cross(groundNormal, -clientRotationRoot.right);
+        Vector3 right = Vector3.Cross(groundNormal, clientRotationRoot.forward);
+        Debug.DrawRay(transform.position, forward, Color.blue);
+        Debug.DrawRay(transform.position, right, Color.red);
+        Debug.DrawRay(transform.position, groundNormal, Color.green);
+        Vector3 moveVec = (forward * moveInput.y) + (right * moveInput.x);
+        rb.AddForce(moveVec, mode: ForceMode.Acceleration);
     }
     private void Update()
     {
-
         if (!IsOwner)
             return;
         if (nt.IsServerAuthoritative())
         {
             MoveInput.Value = PlayerManager.Instance.moveInput;
         }
-
         if (PlayerManager.Instance.InGame)
         {
             aimPitch = Mathf.Clamp(aimPitch - (PlayerManager.Instance.lookSpeed.y * PlayerManager.Instance.lookInput.y * (PlayerManager.Instance.invertLookY ? -1 : 1) * Time.deltaTime), -89, 89);
@@ -216,10 +237,26 @@ public class PlayerCharacter : NetworkBehaviour
     }
     void Respawn(bool firstSpawn)
     {
+        if(!GameplayManager.Instance || !SteamLobbyManager.Instance.InLobby)
+        {
+            return;
+        }
         ResetHealth_ServerRPC();
         bool bravoTeam = GameplayManager.Instance.QueryTeam(SteamClient.SteamId);
-        Transform spawnpoint = FindAnyObjectByType<MapSceneData>().GetSpawnPoint(bravoTeam, firstSpawn);
-        transform.SetPositionAndRotation(spawnpoint.position, spawnpoint.rotation);
+        MapSceneData msd = FindAnyObjectByType<MapSceneData>();
+        if (msd != null)
+        {
+            Transform spawnpoint = FindAnyObjectByType<MapSceneData>().GetSpawnPoint(bravoTeam, firstSpawn);
+            transform.SetPositionAndRotation(spawnpoint.position, spawnpoint.rotation);
+        }
+    }
+    void ResetHealth()
+    {
+        if (IsServer && GameplayManager.Instance)
+        {
+            currentHealth.Value = GameplayManager.BaseHealth * GameplayManager.Instance.healthMultiplier.Value;
+            currentShields.Value = GameplayManager.BaseShields * GameplayManager.Instance.shieldsMultiplier.Value;
+        }
     }
     [ServerRpc]
     void ResetHealth_ServerRPC()
@@ -232,5 +269,32 @@ public class PlayerCharacter : NetworkBehaviour
         Gizmos.matrix = transform.localToWorldMatrix;
         Gizmos.DrawWireSphere(groundCheckOffset, groundCheckRadius);
         Gizmos.DrawWireSphere(groundCheckOffset + (Vector3.down * groundCheckDistance), groundCheckRadius);
+    }
+    public void TryJump()
+    {
+        if (!grounded)
+        {
+            return;
+        }
+        if (nt.IsServerAuthoritative())
+        {
+            Jump_ServerRPC();
+        }
+        else
+        {
+            ApplyJumpForce(PlayerManager.Instance.moveInput);
+        }
+    }
+    void ApplyJumpForce(Vector2 moveInput)
+    {
+        rb.AddForce((transform.rotation * new Vector3(moveInput.x, GameplayManager.BaseJumpHeight, moveInput.y)), ForceMode.Impulse);
+    }
+    [ServerRpc]
+    void Jump_ServerRPC()
+    {
+        if (IsServer && GameplayManager.Instance)
+        {
+            ApplyJumpForce(MoveInput.Value);
+        }
     }
 }

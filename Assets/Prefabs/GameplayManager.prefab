@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 458574836
+  GlobalObjectIdHash: 327420051
   InScenePlacedSourceGlobalObjectIdHash: 327420051
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -117,9 +117,9 @@ MonoBehaviour:
   TeamMembers:
     m_InternalValue: []
   teamMembers: []
-  playerSpeed: 5
+  playerSpeed: 20
   playerHealth: 100
-  playerJumpHeight: 40
+  playerJumpHeight: 10
   fireDamage: 5
   playerShield: 50
   gameTime: 600

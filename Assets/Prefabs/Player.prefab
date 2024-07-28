@@ -1066,7 +1066,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1597105355
+  GlobalObjectIdHash: 3405719093
   InScenePlacedSourceGlobalObjectIdHash: 3405719093
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1153,13 +1153,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b796abb9aadbf3b4e90779d4b89236a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 4366110980947905479}
   lookTransform: {fileID: 1229337262382758863}
   clientRotationRoot: {fileID: 6427651466939792621}
   weaponSwayTransform: {fileID: 3519633034149178710}
   groundNormal: {x: 0, y: 0, z: 0}
   groundCheckRadius: 0.4
-  groundCheckOffset: {x: 0, y: 0, z: 0}
-  groundCheckDistance: 1.4
+  groundCheckOffset: {x: 0, y: 0.5, z: 0}
+  groundCheckDistance: 0.5
   groundMask:
     serializedVersion: 2
     m_Bits: 129
@@ -1170,7 +1171,7 @@ MonoBehaviour:
   netAnimator: {fileID: 0}
   animator: {fileID: 0}
   aimPitch: 0
-  lookTransformOffset: {x: 0, y: 0, z: 0, w: 0}
+  aimPitchOffset: 0
   currentHealth:
     m_InternalValue: 0
   currentShields:
@@ -1178,6 +1179,8 @@ MonoBehaviour:
   remoteDisableComponents:
   - {fileID: 7346823446519321472}
   localDisableComponents: []
+  groundDrag: 2
+  airDrag: 0
 --- !u!1 &7167254604772109393
 GameObject:
   m_ObjectHideFlags: 0

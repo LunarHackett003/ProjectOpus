@@ -34,23 +34,6 @@ public class LobbySettingsSetter : MonoBehaviour
             shieldRegenDelay.value = GameplayManager.Instance.shieldRegenDelay.Value;
             shieldRegenSpeed.value = GameplayManager.Instance.shieldRegenPerSec.Value;
 
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-
-
             infiniteTimeToggle.isOn = GameplayManager.Instance.infiniteTime.Value;
             headshotToggle.isOn = GameplayManager.Instance.headshotsOnly.Value;
             friendlyFireToggle.isOn = GameplayManager.Instance.friendlyFire.Value;
@@ -75,21 +58,21 @@ public class LobbySettingsSetter : MonoBehaviour
             return;
 
         GameplayManager.Instance.moveSpeedMultiplier.Value = ClampAmount(amount);
-        moveSpeedText.text = "Move Speed: x" + amount;
+        moveSpeedText.text = $"Move Speed: x{amount:0.00}";
     }
     public void SetGravityMultiplier(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.gravityMultiplier.Value = ClampAmount(amount);
-        gravityText.text = "Gravity: x" + amount;
+        gravityText.text = $"Gravity: x{amount:0.00}";
     }
     public void SetReloadSpeedMultiplier(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.reloadSpeedMultiplier.Value = ClampAmount(amount);
-        reloadSpeedText.text = "Reload Speed: x" + amount;
+        reloadSpeedText.text = $"Reload Speed: x{amount:0.00}";
 
     }
     public void SetFireRateMultiplier(float amount)
@@ -97,49 +80,49 @@ public class LobbySettingsSetter : MonoBehaviour
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.fireRateMultiplier.Value = ClampAmount(amount);
-        fireRateText.text = "Fire Rate: x" + amount;
+        fireRateText.text = $"Fire Rate: x{amount:0.00}";
     }
     public void SetRecoilMultiplier(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.recoilMultiplier.Value = ClampAmount(amount);
-        recoilText.text = "Recoil: x" + amount;
+        recoilText.text = $"Recoil: x{amount:0.00}";
     }
     public void SetInaccuracyMultiplier(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.inaccuracyMultiplier.Value = ClampAmount(amount);
-        inaccuracyText.text = "Inaccuracy : x" + amount;
+        inaccuracyText.text = $"Inaccuracy : x{amount:0.00}";
     }
     public void SetDamageMultiplier(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.damageMultiplier.Value = ClampAmount(amount);
-        damageText.text = "Weapon Damage: x" + amount;
+        damageText.text = $"Weapon Damage: x{amount:0.00}";
     }
     public void SetFireDamageMultiplier(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.fireDamageMultiplier.Value = ClampAmount(amount);
-        fireDamageText.text = "Fire Damage: x" + amount;
+        fireDamageText.text = $"Fire Damage: x{amount:0.00}";
     }
     public void SetShieldsMultiplier(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.shieldsMultiplier.Value = ClampAmount(amount);
-        shieldText.text = "Max Shield: x"+amount;
+        shieldText.text = $"Max Shield: x {amount:0.00}";
     }
     public void SetHealthMultiplier(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.healthMultiplier.Value = ClampAmount(amount);
-        healthText.text = "Max Health: x" + amount;
+        healthText.text = $"Max Health: x{amount:0.00}";
 
     }
     public void SetAirControlMultiplier(float amount)
@@ -147,7 +130,7 @@ public class LobbySettingsSetter : MonoBehaviour
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.airControlMultiplier.Value = ClampAmount(amount);
-        airControlText.text = "Air Control: x" + amount;
+        airControlText.text = $"Air Control: x{amount:0.00}";
     }
     public void SetHealthRegenDelay(float amount)
     {
@@ -168,14 +151,14 @@ public class LobbySettingsSetter : MonoBehaviour
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.shieldRegenPerSec.Value = ClampAmount(amount);
-        shieldRegenSpeedText.text = $"Shield Regen Speed: {amount}Shields/sec";
+        shieldRegenSpeedText.text = $"Shield Regen: {amount:0.00}Shields/sec";
     }
     public void SetHealthRegenSpeed(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.healthRegenPerSec.Value = ClampAmount(amount);
-        healthRegenSpeedText.text = $"Health Regen Speed: {amount}HP/sec";
+        healthRegenSpeedText.text = $"Health Regen: {amount:0.00}HP/sec";
     }
 
     public void SetInfiniteTime(bool value)
@@ -195,5 +178,17 @@ public class LobbySettingsSetter : MonoBehaviour
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.friendlyFire.Value = value;
+    }
+    public void SetShieldRegen(bool value)
+    {
+        if (!SteamLobbyManager.Instance.IsHost)
+            return;
+        GameplayManager.Instance.regenShield.Value = value;
+    }
+    public void SetHealthRegen(bool value)
+    {
+        if (!SteamLobbyManager.Instance.IsHost)
+            return;
+        GameplayManager.Instance.regenHealth.Value = value;
     }
 }
