@@ -19,7 +19,7 @@ public class BaseEquipment : BaseGear
     [SerializeField] Renderer[] renderers;
     [SerializeField] AnimatorOverrideController overrideController;
     AnimationClipOverrides clipOverrides;
-    [SerializeField] internal bool currentGear;
+    public NetworkVariable<bool> currentGear = new(writePerm: NetworkVariableWritePermission.Owner);
     [SerializeField] internal Vector3 blockedPosition, blockedRotation, blockingCheckSize, blockingCheckOffset;
     protected override void Start()
     {
@@ -50,7 +50,7 @@ public class BaseEquipment : BaseGear
     }
     protected virtual void CheckStillUsable()
     {
-        if(currentStoredUses.Value <= 0 && currentGear)
+        if(currentStoredUses.Value <= 0 && currentGear.Value)
         {
             PlayerManager.Instance.pc.wm.SwitchWeaponDirectly(0);
         }

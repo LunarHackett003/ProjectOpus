@@ -74,7 +74,17 @@ public class Deployable : BaseEquipment
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-
+        if (IsServer) {
+            if (currentDeployable.Count > 0) {
+                for (int i = 0; i < currentDeployable.Count; i++)
+                {
+                    if (!currentDeployable[i].TryGet(out NetworkObject n))
+                    {
+                        currentDeployable.RemoveAt(i);
+                    }
+                }
+            }
+        }
         if (currentDeployable.Count > 0)
         {
             canCooldown = !(cooldownBlockedByPlacement && currentDeployable.Count >= maxDeployables);
@@ -102,7 +112,7 @@ public class Deployable : BaseEquipment
             canCooldown = true;
         }
         tabletPickupImage.fillAmount = Mathf.InverseLerp(0, tabletPickupTime, currentTabletPickupTime);
-        if (currentGear && currentStoredUses.Value > 0)
+        if (currentGear.Value && currentStoredUses.Value > 0)
         {
             if ((cooldownBlockedByPlacement && currentDeployable.Count < maxDeployables) || !cooldownBlockedByPlacement)
             {
@@ -135,8 +145,7 @@ public class Deployable : BaseEquipment
     {
         if (IsServer)
         {
-            var net = NetworkManager.SpawnManager.InstantiateAndSpawn(deployablePrefab, OwnerClientId, position: targetedPoint, rotation: turretOrientation);
-            net.transform.up = normal;
+            var net = NetworkManager.SpawnManager.InstantiateAndSpawn(deployablePrefab, OwnerClientId, position: targetedPoint, rotation: deploymentOrientation);
             currentDeployable.Add(net);
             currentStoredUses.Value--;
             localCooldown = cooldownDuration;
@@ -144,7 +153,7 @@ public class Deployable : BaseEquipment
         }
     }
 
-    [SerializeField] internal Quaternion turretOrientation = Quaternion.identity;
+    [SerializeField] internal Quaternion deploymentOrientation = Quaternion.identity;
     bool CheckPlacement()
     {
         if (IsOwner)
@@ -155,11 +164,11 @@ public class Deployable : BaseEquipment
                 {
                         CreateHologram();
                     //We can show the hologram preview here
-                    turretOrientation = Quaternion.LookRotation(Vector3.ProjectOnPlane(wm.fireDirectionReference.forward, hit.normal).normalized, hit.normal);
-                    obstructed = Physics.CheckBox(hit.point + turretOrientation * placementObstructionBoxOffset, placementObstructionBoxBounds / 2, turretOrientation, obstructionLayermask);
+                    deploymentOrientation = Quaternion.LookRotation(Vector3.ProjectOnPlane(wm.fireDirectionReference.forward, hit.normal).normalized, hit.normal);
+                    obstructed = Physics.CheckBox(hit.point + deploymentOrientation * placementObstructionBoxOffset, placementObstructionBoxBounds / 2, deploymentOrientation, obstructionLayermask);
                     if (hologramInstance)
                     {
-                        hologramInstance.transform.SetPositionAndRotation(hit.point, turretOrientation);
+                        hologramInstance.transform.SetPositionAndRotation(hit.point, deploymentOrientation);
                     }
                     if (hologramRenderer)
                     {

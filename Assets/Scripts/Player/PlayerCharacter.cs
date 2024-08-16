@@ -17,10 +17,13 @@ using TMPro;
 
 public class PlayerCharacter : Damageable
 {
+    public static readonly HashSet<PlayerCharacter> players = new HashSet<PlayerCharacter>();
+
+
 
     public NetworkVariable<ulong> mySteamID;
 
-    [SerializeField] Rigidbody rb;
+    [SerializeField] internal Rigidbody rb;
     [SerializeField] Transform lookTransform;
     [SerializeField] internal Transform clientRotationRoot;
     [SerializeField] Transform weaponSwayTransform;
@@ -99,6 +102,11 @@ public class PlayerCharacter : Damageable
     float aimPitchRecoil;
     Vector3 weaponRecoilLinear, weaponRecoilAngular, cameraRecoilLinear, cameraRecoilAngular, 
         vel_weaponRecoilLinear, vel_weaponRecoilAngular, vel_cameraRecoilLinear, vel_cameraRecoilAngular;
+    private void OnEnable()
+    {
+        players.Add(this);
+    }
+
     private void OnDisable()
     {
         if (IsServer || IsOwner)
@@ -107,6 +115,7 @@ public class PlayerCharacter : Damageable
             currentShields.OnValueChanged -= OnShieldChanged;
             SceneManager.sceneLoaded -= NewSceneLoaded;
         }
+        players.Remove(this);
     }
     private void NewSceneLoaded(Scene arg0, LoadSceneMode arg1)
     {
@@ -600,7 +609,7 @@ public class PlayerCharacter : Damageable
         }
         Dead.Value = false;
         ResetHealth_ServerRPC();
-        bool bravoTeam = GameplayManager.Instance.QueryTeam(SteamClient.SteamId);
+        bool bravoTeam = GameplayManager.Instance.IsBravoTeam(SteamClient.SteamId);
         MapSceneData msd = FindAnyObjectByType<MapSceneData>();
         Transform spawnpoint = msd.GetSpawnPoint(bravoTeam, firstSpawn);
 

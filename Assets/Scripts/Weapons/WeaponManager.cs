@@ -178,7 +178,7 @@ namespace opus.Weapons
                     {
                         e.transform.SetPositionAndRotation(holsterPoint.position, holsterPoint.rotation);
                     }
-                    e.currentGear = equipmentIndex == i;
+                    e.currentGear.Value = equipmentIndex == i;
                 }
             }
         }

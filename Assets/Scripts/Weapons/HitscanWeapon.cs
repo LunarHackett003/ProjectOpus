@@ -29,19 +29,7 @@ namespace opus.Weapons
             public Vector3 start, end;
             public float increment;
         }
-        
 
-        [ServerRpc()]
-        void SetFireModeIndex_ServerRPC(int fireModeIndex)
-        {
-            this.fireModeIndex = fireModeIndex;
-        }
-        public void UpdateFireMode()
-        {
-            fireModeIndex++;
-            fireModeIndex %= allowedFireModes.Length;
-            SetFireModeIndex_ServerRPC(fireModeIndex);
-        }
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -77,16 +65,34 @@ namespace opus.Weapons
         }
         protected override void FireWeaponOnServer()
         {
+            Vector3 start;
+            Vector3 end;
             base.FireWeaponOnServer();
-            Vector3 start = wm.fireDirectionReference.position;
-            Vector3 spread = SpreadVector(minBaseSpread, maxBaseSpread, maxRange) + ((1 - wm.aimAmount) * wm.accumulatedSpread * SpreadVector(minHipSpread, maxHipSpread, 0));
-            Vector3 end = wm.fireDirectionReference.TransformPoint(spread);
+            if (wm)
+            {
+                start = wm.fireDirectionReference.position;
+                Vector3 spread = SpreadVector(minBaseSpread, maxBaseSpread, maxRange) + ((1 - wm.aimAmount) * wm.accumulatedSpread * SpreadVector(minHipSpread, maxHipSpread, 0));
+                end = wm.fireDirectionReference.TransformPoint(spread);
+            }
+            else
+            {
+                start = transform.position;
+                end = transform.TransformPoint(Vector3.forward * maxRange);
+            }
             if (Physics.Linecast(start, end, out RaycastHit hit, GameplayManager.Instance.bulletLayermask))
             {
-                if (hit.rigidbody && hit.rigidbody.TryGetComponent<Damageable>(out var d))
+                if (hit.collider.TryGetComponent<Hitbox>(out var d))
                 {
-                    float damage = Mathf.Lerp(minDamage, maxDamage, Mathf.InverseLerp(damageDropoffStart, damageDropoffEnd, hit.distance));
-                    d.TakeDamage(damage);
+                    float damage = Mathf.Lerp(maxDamage, minDamage, Mathf.InverseLerp(damageDropoffStart, damageDropoffEnd, hit.distance));
+                    d.TakeDamage(damage * (d.isHead ? headshotDamageMultiplier : 1));
+                }
+                else
+                {
+                    if(hit.collider.TryGetComponent<Damageable>(out var d1))
+                    {
+                        float damage = Mathf.Lerp(minDamage, maxDamage, Mathf.InverseLerp(damageDropoffStart, damageDropoffEnd, hit.distance));
+                        d.TakeDamage(damage);
+                    }
                 }
                 end = hit.point;
             }

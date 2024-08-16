@@ -53,7 +53,7 @@ public class BaseWeapon : BaseEquipment
     [SerializeField] internal Transform aimTransform;
     [SerializeField] internal float aimedWorldFOV = 70, aimedViewFOV = 30;
 
-
+    [SerializeField] bool playerWeapon = true;
     public NetworkVariable<NetworkBehaviourReference> ownerWeaponManager;
     internal WeaponManager wm;
     public int CurrentAmmo => currentAmmo.Value;
@@ -76,15 +76,8 @@ public class BaseWeapon : BaseEquipment
     }
     protected virtual void FireWeaponOnServer()
     {
-        if (!wm)
-        {
-            if (ownerWeaponManager.Value.TryGet(out WeaponManager wm))
-            {
-                this.wm = wm;
-            }
-            else
-                return;
-        }
+        if (!CheckWeaponManager())
+            return;
     }
     public override void OnSelected()
     {
@@ -98,18 +91,23 @@ public class BaseWeapon : BaseEquipment
     {
         delayDone = true;
     }
-    protected override void FixedUpdate()
+    bool CheckWeaponManager()
     {
-        base.FixedUpdate();
-        if (!wm)
+        if (!wm && playerWeapon)
         {
             if (ownerWeaponManager.Value.TryGet(out WeaponManager wm))
             {
                 this.wm = wm;
             }
-            else
-                return;
         }
+        return wm || !playerWeapon;
+    }
+    protected override void FixedUpdate()
+    {
+        base.FixedUpdate();
+        if (!CheckWeaponManager())
+            return;
+
         canFire = CanFireWeapon;
         if (IsServer || IsOwner)
         {
@@ -214,15 +212,7 @@ public class BaseWeapon : BaseEquipment
     }
     public virtual void FireWeapon(Vector3 end)
     {
-        if (!wm)
-        {
-            if (ownerWeaponManager.Value.TryGet(out WeaponManager wm))
-            {
-                this.wm = wm;
-            }
-            else
-                return;
-        }
+        CheckWeaponManager();
         print("fired weapon locally");
         fireEvents?.Invoke();
         if(wm && wm.pc && wm.pc.netAnimator && !(delayBeforeFire > 0 && playFireAnimationOnDelay))
@@ -246,4 +236,17 @@ public class BaseWeapon : BaseEquipment
             z = z
         };
     }
+        public void UpdateFireMode()
+        {
+            fireModeIndex++;
+            fireModeIndex %= allowedFireModes.Length;
+            SetFireModeIndex_ServerRPC(fireModeIndex);
+        }
+        
+
+        [ServerRpc()]
+        void SetFireModeIndex_ServerRPC(int fireModeIndex)
+        {
+            this.fireModeIndex = fireModeIndex;
+        }
 }

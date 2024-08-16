@@ -116,7 +116,7 @@ MonoBehaviour:
     m_InternalValue: 1
   bulletLayermask:
     serializedVersion: 2
-    m_Bits: 7923
+    m_Bits: 69633
   TeamMembers:
     m_InternalValue: []
   teamMembers: []

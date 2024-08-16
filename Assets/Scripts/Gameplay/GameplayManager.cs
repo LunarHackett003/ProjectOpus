@@ -3,6 +3,7 @@ using Steamworks;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameplayManager : NetworkBehaviour
@@ -31,20 +32,30 @@ public class GameplayManager : NetworkBehaviour
     public NetworkVariable<bool> pregameLobby = new(true);
 
     [SerializeField] internal LayerMask bulletLayermask;
-    public bool QueryTeam(ulong ID)
+    public bool IsBravoTeam(ulong ID)
     {
-        return teamMembers.Find(x => x.ID == ID).BravoTeam;
+        return teamMembers.Find(x => x.steamID == ID).BravoTeam;
     }
-
+    /// <summary>
+    /// Checks if two players are on another team.
+    /// </summary>
+    /// <param name="id_A">The ID of the first player</param>
+    /// <param name="id_B">The ID of the second player</param>
+    /// <returns></returns>
+    public bool IsOppositeTeam(ulong id_A, ulong id_B)
+    {
+        return teamMembers.Find(x => x.steamID == id_A).BravoTeam != teamMembers.Find(x => x.steamID == id_B).BravoTeam;
+    }
     public NetworkVariable<List<TeamMember>> TeamMembers = new();
     [System.Serializable]
     public struct TeamMember
     {
-        public ulong ID;
+        public ulong steamID;
         public string Name;
         public bool BravoTeam;
+        public NetworkObjectReference player;
     }
-    public List<TeamMember> teamMembers;
+    public List<TeamMember> teamMembers = new();
 
     protected static GameplayManager instance;
     public static GameplayManager Instance { get
@@ -84,6 +95,7 @@ public class GameplayManager : NetworkBehaviour
 
     public NetworkVariable<bool> allowRespawns = new(writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<float> respawnTime = new(writePerm: NetworkVariableWritePermission.Server);
+
     public List<GameObject> grenadeTypes;
     private void Awake()
     {
@@ -109,27 +121,7 @@ public class GameplayManager : NetworkBehaviour
     }
     void TeamMembersChanged(List<TeamMember> previous, List<TeamMember> current)
     {
-        foreach (var item in current)
-        {
-            TeamMember t = new()
-            {
-                BravoTeam = item.BravoTeam,
-                ID = item.ID
-            };
-            if (SteamLobbyManager.Instance.GetNamesOfTeamMembersAutomatically)
-            {
-                IEnumerable<Friend> friends = SteamLobbyManager.Instance.CurrentLobby.Value.Members;
-                if (friends.Count() > 0)
-                {
-                    foreach (var friend in friends)
-                    {
-                        if (friend.Id.Value == item.ID)
-                            t.Name = friend.Name;
-                    }
-                }
-            }
-            teamMembers.Add(t);
-        }
+        teamMembers = current;
     }
     private void OnEnable()
     {
@@ -144,7 +136,7 @@ public class GameplayManager : NetworkBehaviour
 
     private void LobbyMemberDisconnected(Steamworks.Data.Lobby arg1, Friend arg2)
     {
-        TeamMember t = TeamMembers.Value.Find(x => x.ID == arg2.Id);
+        TeamMember t = TeamMembers.Value.Find(x => x.steamID == arg2.Id);
         TeamMembers.Value.Remove(t);
         print($"removed player {arg2.Name} from team {(t.BravoTeam ? "Bravo" : "Alpha")}");
     }
@@ -180,11 +172,13 @@ public class GameplayManager : NetworkBehaviour
     }
     public void AssignTeam(Friend f)
     {
+        
         TeamMember t = new()
         {
-            ID = f.Id,
+            steamID = f.Id,
             Name = f.Name,
-            BravoTeam = CheckTeamNumbers()
+            BravoTeam = CheckTeamNumbers(),
+            
         };
         TeamMembers.Value.Add(t);
         print($"Added player to {t.BravoTeam}");

@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 32
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: TurretVis
+  m_Shader: {fileID: -6465566751694194690, guid: 8c80d851fc3cb94499d7f02566d3f694, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _RECEIVE_SHADOWS_OFF
+  m_InvalidKeywords: []
+  m_LightmapFlags: 1
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  - SHADOWCASTER
+  m_LockedProperties: _CastShadows
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _BOOLEAN: 0
+    - _Blend: 0
+    - _BlendModePreserveSpecular: 1
+    - _CastShadows: 0
+    - _Cull: 2
+    - _DstBlend: 0
+    - _NoiseScale: 50000
+    - _NoiseSpeed: 0.1
+    - _QueueControl: 1
+    - _QueueOffset: 0
+    - _ReceiveShadows: 0
+    - _RimOffset: 0
+    - _RimPower: 0.04
+    - _ScanFrequency: 0.16
+    - _ScanNoiseScale: 20000
+    - _ScanSize: 0.98
+    - _ScanSpeed: 0.2
+    - _ScanlineSize: 0.14
+    - _ScanlineSpeed: 0.05
+    - _SrcBlend: 1
+    - _Surface: 0
+    - _UseScanNoise: 1
+    - _Valid: 0
+    - _Validity: 0
+    - _WorkflowMode: 1
+    - _ZTest: 4
+    - _ZWrite: 1
+    - _ZWriteControl: 0
+    m_Colors:
+    - _BaseColour: {r: 0.33490568, g: 1, b: 0.95400953, a: 0.59607846}
+    - _InvalidColour: {r: 0.8962264, g: 0.02113741, b: 0.02113741, a: 1}
+    - _InvalidNoiseColour: {r: 1.7924528, g: 0.04227482, b: 0.04227482, a: 0}
+    - _InvalidRimColour: {r: 2, g: 0, b: 0, a: 1}
+    - _InvalidScanColour: {r: 3.5849056, g: 0.08454964, b: 0.08454964, a: 1}
+    - _NoiseTime: {r: 0.01, g: 0.01, b: 0.01, a: 0}
+    - _ScanlineColour: {r: 0.2028302, g: 1, b: 0.91782165, a: 1}
+    - _ValidColour: {r: 0, g: 0.10334301, b: 2, a: 0.59607846}
+    - _ValidNoiseColour: {r: 0.3867924, g: 2, b: 1.904342, a: 1}
+    - _ValidRimColour: {r: 0, g: 0.75003755, b: 1.9999998, a: 1}
+    - _ValidScanColour: {r: 0.7748689, g: 1.1048695, b: 3.9999995, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
+--- !u!114 &558632841138255304
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 9

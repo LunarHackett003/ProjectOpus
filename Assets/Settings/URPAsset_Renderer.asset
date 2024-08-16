@@ -128,10 +128,9 @@ MonoBehaviour:
   - {fileID: -4633656645432227005}
   - {fileID: 6622218163308840707}
   - {fileID: 460793330202575955}
-  - {fileID: 3481640990799802758}
   - {fileID: -5774216373003429313}
   - {fileID: -2258101082212302749}
-  m_RendererFeatureMap: fca498fc8fd84661f7e50b2eb7f16454434be2c5d4f1b1bf03c7296155d8e65b530498a91711650686b10fdc084651303fdae246cddcddaf6380cf97079da9e0
+  m_RendererFeatureMap: fca498fc8fd84661f7e50b2eb7f16454434be2c5d4f1b1bf03c7296155d8e65b530498a9171165063fdae246cddcddaf6380cf97079da9e0
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -178,24 +177,6 @@ MonoBehaviour:
       surfaceData: 2
     screenSpaceSettings:
       normalBlend: 0
---- !u!114 &3481640990799802758
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8826dbbd2f20a84180629a9ae196e22, type: 3}
-  m_Name: ScreenSpaceGlobalIlluminationURP
-  m_EditorClassIdentifier: 
-  m_Active: 0
-  m_Shader: {fileID: 4800000, guid: 052b080a79c052c4993acc96081d70b1, type: 3}
-  m_RenderingDebugger: 0
-  m_ReflectionProbes: 1
-  m_OverrideAmbientLighting: 0
-  m_BackfaceLighting: 0
 --- !u!114 &6081251165910853111
 MonoBehaviour:
   m_ObjectHideFlags: 0

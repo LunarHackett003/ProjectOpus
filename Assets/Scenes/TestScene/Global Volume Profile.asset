@@ -1,68 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-9087123384520922569
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fd03cbbfa7b7fe4dbc3d7709b42d662, type: 3}
-  m_Name: ScreenSpaceGlobalIlluminationVolume
-  m_EditorClassIdentifier: 
-  active: 0
-  enable:
-    m_OverrideState: 1
-    m_Value: 1
-  thicknessMode:
-    m_OverrideState: 1
-    m_Value: 1
-  depthBufferThickness:
-    m_OverrideState: 0
-    m_Value: 0.1
-  quality:
-    m_OverrideState: 1
-    m_Value: 3
-  fullResolutionSS:
-    m_OverrideState: 0
-    m_Value: 0
-  resolutionScaleSS:
-    m_OverrideState: 1
-    m_Value: 0.5
-  sampleCount:
-    m_OverrideState: 1
-    m_Value: 2
-  maxRaySteps:
-    m_OverrideState: 1
-    m_Value: 32
-  denoiseSS:
-    m_OverrideState: 0
-    m_Value: 1
-  denoiserAlgorithmSS:
-    m_OverrideState: 1
-    m_Value: 1
-  denoiseIntensitySS:
-    m_OverrideState: 1
-    m_Value: 0.95
-  denoiserRadiusSS:
-    m_OverrideState: 0
-    m_Value: 0.001
-  secondDenoiserPassSS:
-    m_OverrideState: 1
-    m_Value: 1
-  rayMiss:
-    m_OverrideState: 1
-    m_Value: 1
-  indirectDiffuseLightingMultiplier:
-    m_OverrideState: 1
-    m_Value: 3
-  indirectDiffuseRenderingLayers:
-    m_OverrideState: 0
-    m_Value:
-      serializedVersion: 0
-      m_Bits: 65535
 --- !u!114 &-2658136050436465407
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -167,7 +104,6 @@ MonoBehaviour:
   - {fileID: 7730297300349566820}
   - {fileID: -1174467485591032532}
   - {fileID: 2843985618485850504}
-  - {fileID: -9087123384520922569}
 --- !u!114 &2843985618485850504
 MonoBehaviour:
   m_ObjectHideFlags: 3
