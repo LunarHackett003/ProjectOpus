@@ -30,7 +30,7 @@ public class GameplayManager : NetworkBehaviour
     public NetworkVariable<uint> timeLeft = new(600);
     public NetworkVariable<bool> pregameLobby = new(true);
 
-
+    [SerializeField] internal LayerMask bulletLayermask;
     public bool QueryTeam(ulong ID)
     {
         return teamMembers.Find(x => x.ID == ID).BravoTeam;
@@ -67,7 +67,7 @@ public class GameplayManager : NetworkBehaviour
     /// <summary>
     /// How high the player jumps. Not a measure of the actual jump height itself, but the force applied, in newtons/KG, when the player jumps.
     /// </summary>
-    public static float BaseJumpHeight { get; private set; } = 45;
+    public static float BaseJumpSpeed { get; private set; } = 45;
     /// <summary>
     /// How much damage the player takes per second from fire
     /// </summary>
@@ -78,6 +78,13 @@ public class GameplayManager : NetworkBehaviour
     public static float BaseAirControl { get; private set; } = 0.2f;
     public float playerSpeed, playerHealth, playerJumpHeight, fireDamage, playerShield;
     public uint gameTime = 600;
+
+    public static float MaxHealth => BaseHealth * instance.healthMultiplier.Value;
+    public static float MaxShield => BaseShields * instance.shieldsMultiplier.Value;
+
+    public NetworkVariable<bool> allowRespawns = new(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<float> respawnTime = new(writePerm: NetworkVariableWritePermission.Server);
+    public List<GameObject> grenadeTypes;
     private void Awake()
     {
         if (instance)
@@ -90,7 +97,7 @@ public class GameplayManager : NetworkBehaviour
 
         BaseMoveSpeed = playerSpeed;
         BaseHealth = playerHealth;
-        BaseJumpHeight = playerJumpHeight;
+        BaseJumpSpeed = playerJumpHeight;
         BaseFireDamage = fireDamage;
         BaseShields = playerShield;
         if (NetworkManager.IsServer && !IsSpawned)
@@ -176,9 +183,9 @@ public class GameplayManager : NetworkBehaviour
         TeamMember t = new()
         {
             ID = f.Id,
-            Name = f.Name
+            Name = f.Name,
+            BravoTeam = CheckTeamNumbers()
         };
-        t.BravoTeam = CheckTeamNumbers();
         TeamMembers.Value.Add(t);
         print($"Added player to {t.BravoTeam}");
 
@@ -206,5 +213,4 @@ public class GameplayManager : NetworkBehaviour
     {
 
     }
-    
 }

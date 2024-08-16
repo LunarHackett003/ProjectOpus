@@ -72,9 +72,17 @@ namespace opus.SteamIntegration {
             NetworkManager.Singleton.OnServerStarted += NetworkManager_OnServerStarted;
             NetworkManager.Singleton.OnServerStopped += NetworkManager_OnServerStopped;
 
+            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+
             SetButtonsActive();
             lobbySettingsPanel.SetActive(false);
         }
+
+        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            Camera.main.cullingMask = PlayerManager.Instance.cameraMask;
+        }
+
         void SetButtonsActive()
         {
             for (int i = 0; i < buttonsInGame.Length; i++)
@@ -154,7 +162,7 @@ namespace opus.SteamIntegration {
         {
             print($"{arg2.Name} joined!");
         }
-
+        
         private void LobbyEntered(Lobby obj)
         {
             if (NetworkManager.Singleton.IsHost)

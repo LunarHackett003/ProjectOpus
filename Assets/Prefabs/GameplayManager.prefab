@@ -114,12 +114,22 @@ MonoBehaviour:
     m_InternalValue: 600
   pregameLobby:
     m_InternalValue: 1
+  bulletLayermask:
+    serializedVersion: 2
+    m_Bits: 7923
   TeamMembers:
     m_InternalValue: []
   teamMembers: []
   playerSpeed: 20
   playerHealth: 100
-  playerJumpHeight: 10
+  playerJumpHeight: 3.5
   fireDamage: 5
   playerShield: 50
   gameTime: 600
+  allowRespawns:
+    m_InternalValue: 1
+  respawnTime:
+    m_InternalValue: 5
+  grenadeTypes:
+  - {fileID: 8488737032286484038, guid: f913c228d2ca56349b14c7376490c714, type: 3}
+  - {fileID: 8488737032286484038, guid: fe5e113954ef2924f9ab3395449e6032, type: 3}

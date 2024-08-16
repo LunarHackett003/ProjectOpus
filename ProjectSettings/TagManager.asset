@@ -19,12 +19,12 @@ TagManager:
   - RemotePlayer
   - IgnoreBullet
   - IgnorePlayer
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - LocalPlayer_NoRender
+  - Distortion
+  - Grenade
+  - Player
+  - Ladder
+  - UI_OnTop
   - 
   - 
   - 

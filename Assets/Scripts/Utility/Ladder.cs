@@ -10,6 +10,7 @@ public class Ladder : MonoBehaviour
     public BoxCollider ladderCollider;
     public Vector3 startPosition;
     public Vector3 endPosition;
+    public float ladderLength;
     [ContextMenu("Build Ladder")]
     public void BuildLadder()
     {
@@ -35,7 +36,6 @@ public class Ladder : MonoBehaviour
         ladderCollider.transform.SetLocalPositionAndRotation(Vector3.Lerp(startPosition, endPosition, 0.5f),
             Quaternion.LookRotation(Vector3.forward, endPosition - startPosition));
     }
-
     private void OnDrawGizmosSelected()
     {
         Gizmos.matrix = transform.localToWorldMatrix;

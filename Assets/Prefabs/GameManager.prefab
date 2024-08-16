@@ -8644,7 +8644,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000030517578}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &5934776285611023143
@@ -9083,8 +9083,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuCanvas: {fileID: 3883154345208404096}
   paused: 0
+  pc: {fileID: 0}
   lookSpeed: {x: 10, y: 10}
   invertLookY: 0
+  worldFOV: 90
+  viewFOV: 50
+  baseWorldFOV: 90
+  baseViewFOV: 50
+  affectedRenderObjects:
+  - {fileID: -4633656645432227005, guid: 7f4fbfbb957be634f9723a88a27f5605, type: 2}
+  - {fileID: 6081251165910853111, guid: 7f4fbfbb957be634f9723a88a27f5605, type: 2}
   moveInput: {x: 0, y: 0}
   lookInput: {x: 0, y: 0}
   sprintInput: 0
@@ -9092,6 +9100,12 @@ MonoBehaviour:
   fireInput: 0
   aimInput: 0
   jumpInput: 0
+  holdCrouch: 0
+  holdSprint: 0
+  holdAim: 0
+  cameraMask:
+    serializedVersion: 2
+    m_Bits: 7159
 --- !u!114 &5631587053869344758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9150,7 +9164,19 @@ MonoBehaviour:
     m_ActionId: 3239dde7-5abd-4995-bffa-b8e89c24c56d
     m_ActionName: 'Player/Look[/Mouse/delta,/Pen/delta]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 5546705151008446972}
+        m_TargetAssemblyTypeName: opus.Gameplay.PlayerManager, Assembly-CSharp
+        m_MethodName: GetFireInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: ca0bafb2-aaed-4616-957c-99ff9cd82a26
     m_ActionName: 'Player/Fire[/Mouse/leftButton]'
   - m_PersistentCalls:
@@ -9225,6 +9251,62 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 4aaa9003-a74e-4167-a16a-03b92b10e829
     m_ActionName: 'Player/Jump[/Keyboard/space]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5546705151008446972}
+        m_TargetAssemblyTypeName: opus.Gameplay.PlayerManager, Assembly-CSharp
+        m_MethodName: GetPrimaryGrenadeInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 45e6d242-af56-4b4d-8888-cc529c69f0a3
+    m_ActionName: 'Player/PrimaryGrenade[/Keyboard/4]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e2b8c379-0e57-4084-9a77-cb62c08ea4fb
+    m_ActionName: 'Player/SecondaryGrenade[/Keyboard/5]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5546705151008446972}
+        m_TargetAssemblyTypeName: opus.Gameplay.PlayerManager, Assembly-CSharp
+        m_MethodName: GetEquipmentSwitchInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: e2ada848-e67a-4732-92af-9a24bbcbf14f
+    m_ActionName: 'Player/SwitchWeapon[/Keyboard/1,/Keyboard/2,/Keyboard/3,/Keyboard/4]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: bfbd05e9-8815-43c8-a52d-f683f3cf3e72
+    m_ActionName: 'Player/CycleWeapon[/Mouse/scroll/y]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5546705151008446972}
+        m_TargetAssemblyTypeName: opus.Gameplay.PlayerManager, Assembly-CSharp
+        m_MethodName: GetSecondaryInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: e255a62f-4a39-412c-98f6-3c6b88a406b5
+    m_ActionName: 'Player/SecondaryInput[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
