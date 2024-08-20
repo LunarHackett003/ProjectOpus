@@ -1,7 +1,8 @@
 using Unity.Netcode;
 using UnityEngine;
-
-public abstract class Damageable : NetworkBehaviour
+public interface IDamageable
 {
-    public abstract void TakeDamage(float damageAmount);
+    public NetworkObject NetObject { get; }
+    public Transform ThisTransform { get; }
+    public void TakeDamage(float damageAmount);
 }

@@ -29,6 +29,14 @@ public class BaseEquipment : BaseGear
             UpdateAnimations();
         }
     }
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        if (IsServer)
+        {
+            currentStoredUses.Value = storedUses;
+        }
+    }
     protected virtual void UpdateAnimations()
     {
         if (overrideController == null)

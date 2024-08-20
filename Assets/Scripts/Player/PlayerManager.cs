@@ -7,6 +7,7 @@ using UnityEngine.Rendering.Universal;
 namespace opus.Gameplay {
     public class PlayerManager : MonoBehaviour
     {
+        public ScreenEffectsController sec;
         protected static PlayerManager instance;
         public static PlayerManager Instance { 
             get
@@ -45,7 +46,7 @@ namespace opus.Gameplay {
         public RenderObjects[] affectedRenderObjects;
 
         public Vector2 moveInput, lookInput;
-        public bool sprintInput, crouchInput, fireInput, aimInput, jumpInput;
+        public bool sprintInput, crouchInput, fireInput, aimInput, jumpInput, reloadInput;
         public bool holdCrouch, holdSprint, holdAim;
 
         bool PlayerAlive => InGame && pc && !pc.Dead.Value;
@@ -98,6 +99,7 @@ namespace opus.Gameplay {
         {
             SetPause(!paused);
         }
+        #region InputCallbacks
         public void GetFireInput(InputAction.CallbackContext context)
         {
             if (InGame && PlayerAlive)
@@ -107,7 +109,13 @@ namespace opus.Gameplay {
             else
                 fireInput = false;
         }
-        #region InputCallbacks
+        public void GetReloadInput(InputAction.CallbackContext context)
+        {
+            if(InGame && PlayerAlive)
+            {
+                reloadInput = context.ReadValueAsButton();
+            }
+        }
         public void GetMoveInput(InputAction.CallbackContext context)
         {
             if (InGame)
@@ -243,6 +251,16 @@ namespace opus.Gameplay {
                     }
                 }
             }
+        }
+        internal bool carryInput;
+        public void GetCarryInput(InputAction.CallbackContext context)
+        {
+            carryInput = context.ReadValueAsButton();
+        }
+        internal bool interactInput;
+        public void GetInteractInput(InputAction.CallbackContext context)
+        {
+            interactInput = context.ReadValueAsButton();
         }
         #endregion
     }

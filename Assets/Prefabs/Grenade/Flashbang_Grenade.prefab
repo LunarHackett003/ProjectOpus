@@ -451,7 +451,7 @@ MonoBehaviour:
   flashViewDotThreshold: 1
   layermask:
     serializedVersion: 2
-    m_Bits: 12279
+    m_Bits: 139265
   viewDirectionModifier: 0.7
 --- !u!114 &4703191940333403500
 MonoBehaviour:

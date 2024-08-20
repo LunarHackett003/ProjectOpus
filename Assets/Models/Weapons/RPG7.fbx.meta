@@ -3,10 +3,20 @@ guid: 9e736e3f7fa995e448d1c82050c4e191
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: VertexColour
+    second: {fileID: 2100000, guid: 59f80817dce3b364f9ecb39b0ae4b80c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: VertexColourMetal
+    second: {fileID: 2100000, guid: 8e114f675f01cd546ac6067a9b6dd58f, type: 2}
   materials:
     materialImportMode: 2
-    materialName: 0
+    materialName: 1
     materialSearch: 1
     materialLocation: 1
   animations:

@@ -67,6 +67,13 @@ public class Deployable : BaseEquipment
 
         if (IsServer)
         {
+
+            for (int i = 0; i < currentDeployable.Count; i++)
+            {
+                if (currentDeployable[i].TryGet(out var nob))
+                    nob.Despawn();
+            }
+
             currentDeployable.OnListChanged -= CurrentDeployable_OnListChanged;
         }
     }
@@ -116,23 +123,19 @@ public class Deployable : BaseEquipment
         {
             if ((cooldownBlockedByPlacement && currentDeployable.Count < maxDeployables) || !cooldownBlockedByPlacement)
             {
-                print("Able to place turret");
                 if (CheckPlacement() && !obstructed && primaryInput.Value)
                 {
-                    print("placed turret!");
                     PlaceDeployable();
                     CheckStillUsable();
                 }
             }
             else
             {
-                print("deployment is blocked due to existing deployable");
                 RemoveHologram();
             }
         }
         else
         {
-            print("deployable not selected, removing hologram and ignoring");
             RemoveHologram();
         }
         
@@ -172,7 +175,7 @@ public class Deployable : BaseEquipment
                     }
                     if (hologramRenderer)
                     {
-                        hologramRenderer.material.SetFloat("_Validity", obstructed ? 0 : 1);
+                        hologramRenderer.material.SetFloat(Shader.PropertyToID("_Validity"), obstructed ? 0 : 1);
                     }
                     targetedPoint = hit.point;
                     normal = hit.normal;
@@ -187,13 +190,11 @@ public class Deployable : BaseEquipment
                 }
                 else
                 {
-                    print("removing hologram");
                     RemoveHologram();
                 }
             }
             else
             {
-                print("removing hologram");
                 RemoveHologram();
             }
         }

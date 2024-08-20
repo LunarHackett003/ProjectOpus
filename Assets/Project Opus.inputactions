@@ -51,24 +51,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "PrimaryGrenade",
-                    "type": "Button",
-                    "id": "45e6d242-af56-4b4d-8888-cc529c69f0a3",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "SecondaryGrenade",
-                    "type": "Button",
-                    "id": "e2b8c379-0e57-4084-9a77-cb62c08ea4fb",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "SwitchWeapon",
                     "type": "Value",
                     "id": "e2ada848-e67a-4732-92af-9a24bbcbf14f",
@@ -93,6 +75,42 @@
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Scoreboard",
+                    "type": "Button",
+                    "id": "6bd73062-6946-4d17-ba1f-685fde25fda6",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "f6e02b81-8ddc-498d-bffe-e0c49ff47d84",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PickUp",
+                    "type": "Button",
+                    "id": "f1bd7dcd-6506-4329-b408-db43451b6037",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Reload",
+                    "type": "Button",
+                    "id": "9d8ab580-0a55-467f-878d-4ca0d9791fdf",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Tap",
                     "initialStateCheck": false
                 }
             ],
@@ -363,50 +381,6 @@
                 },
                 {
                     "name": "",
-                    "id": "40da4514-7cb3-4160-85c8-a4deadd3944f",
-                    "path": "<Keyboard>/4",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "PrimaryGrenade",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "48064fa5-5110-4867-b918-04683d6aa8d5",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Gamepad",
-                    "action": "PrimaryGrenade",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "2683d7fa-ba89-4dcd-9624-d12009483a82",
-                    "path": "<Keyboard>/5",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard&Mouse",
-                    "action": "SecondaryGrenade",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "430c2a1e-dcb7-4e62-ba05-48c6cf906157",
-                    "path": "<Gamepad>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Gamepad",
-                    "action": "SecondaryGrenade",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "5f2c925d-cf67-4440-b4ff-834187217d6c",
                     "path": "<Gamepad>/dpad",
                     "interactions": "",
@@ -441,7 +415,7 @@
                 {
                     "name": "down",
                     "id": "228d5910-b49c-4de1-bbf9-ab64e9e89939",
-                    "path": "<Keyboard>/3",
+                    "path": "<Keyboard>/4",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
@@ -452,7 +426,7 @@
                 {
                     "name": "left",
                     "id": "5e94f2b4-2f90-40f2-a477-be17e68d0ec4",
-                    "path": "<Keyboard>/4",
+                    "path": "<Keyboard>/3",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -501,6 +475,94 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "SecondaryInput",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8328927b-42e6-4332-bc7c-a523b358f377",
+                    "path": "<Gamepad>/{Back}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "204af27b-3a03-4340-a35d-a01395dbf8f7",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f9b81684-4f5e-4df2-9de0-abf42557e51a",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e9592488-fd2c-4501-8377-28e169dd9b84",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "94ecb729-3353-4014-8eec-ba7f868cc9ba",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "PickUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2060ac6e-068e-465e-a572-7febcc9db69d",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "PickUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "199609e3-84c5-48c7-bce7-66a0fedbe02c",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "Reload",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "88603a5e-9685-4f4e-9614-47cf8051e83e",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Reload",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Grenade : Damageable
+public class Grenade : NetworkBehaviour
 {
     [SerializeField] protected float fuseTime;
     [SerializeField] protected bool fuseOnStart;
@@ -16,6 +16,9 @@ public class Grenade : Damageable
     [SerializeField] protected float explosionDestroyTime = 10;
     [SerializeField] protected bool explodeWhenShot;
     bool hit;
+
+    public NetworkObject NetObject => NetworkObject;
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -33,8 +36,7 @@ public class Grenade : Damageable
     protected void Explode_ClientRPC()
     {
         print("Exploded on client");
-        GameObject g = Instantiate(explosionPrefab, transform.position, transform.rotation);
-        Destroy(g, explosionDestroyTime);
+
         explosionEvents?.Invoke();
     }
     public void SetFuse()
@@ -45,7 +47,13 @@ public class Grenade : Damageable
             print("Setting fuse!");
         }
     }
-    [ServerRpc]
+    public void Explode()
+    {
+        ExplodeServerSide();
+        NetworkManager.SpawnManager.InstantiateAndSpawn(explosionPrefab.GetComponent<NetworkObject>(), position: transform.position, rotation: Quaternion.identity);
+
+    }
+    [ServerRpc(DeferLocal = true)]
     protected void SetFuse_ServerRPC()
     {
         print("fuse set!");
@@ -54,7 +62,7 @@ public class Grenade : Damageable
     IEnumerator DelayExplosion()
     {
         yield return new WaitForSeconds(fuseTime);
-        ExplodeServerSide();
+        Explode();
     }
     protected virtual void ExplodeServerSide()
     {
@@ -66,7 +74,7 @@ public class Grenade : Damageable
         }
     }
 
-    public override void TakeDamage(float damageAmount)
+    public void TakeDamage(float damageAmount)
     {
         if (explodeWhenShot && !hit)
         {

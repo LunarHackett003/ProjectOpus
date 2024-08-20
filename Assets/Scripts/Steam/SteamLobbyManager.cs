@@ -36,6 +36,8 @@ namespace opus.SteamIntegration {
         public GameObject lobbySettingsPanel;
         public SceneReference lobbyScene;
         public SceneReference menuScene;
+
+        public Scoreboard scoreboard;
         private void Awake()
         {
             if (_instance == null)

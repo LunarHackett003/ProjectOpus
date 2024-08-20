@@ -14,6 +14,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 0
   m_Shader: {fileID: 4800000, guid: 0f854b35a0cf61a429bd5dcfea30eddd, type: 3}
+--- !u!114 &-4780137520910263041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b00045f12942b46c698459096c89274e, type: 3}
+  m_Name: ScreenGlitch
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  injectionPoint: 600
+  fetchColorBuffer: 1
+  requirements: 4
+  passMaterial: {fileID: 2100000, guid: e5fd482bba38dee498b83800c3cdb913, type: 2}
+  passIndex: 0
+  bindDepthStencilAttachment: 0
+  m_Version: 1
 --- !u!114 &-4633656645432227005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,6 +143,7 @@ MonoBehaviour:
     probeSamplingDebugTexture: {fileID: 0}
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
+  - {fileID: -4780137520910263041}
   - {fileID: 7009527982978540796}
   - {fileID: 6081251165910853111}
   - {fileID: -4633656645432227005}
@@ -130,7 +151,7 @@ MonoBehaviour:
   - {fileID: 460793330202575955}
   - {fileID: -5774216373003429313}
   - {fileID: -2258101082212302749}
-  m_RendererFeatureMap: fca498fc8fd84661f7e50b2eb7f16454434be2c5d4f1b1bf03c7296155d8e65b530498a9171165063fdae246cddcddaf6380cf97079da9e0
+  m_RendererFeatureMap: ff9ca040408aa9bdfca498fc8fd84661f7e50b2eb7f16454434be2c5d4f1b1bf03c7296155d8e65b530498a9171165063fdae246cddcddaf6380cf97079da9e0
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}

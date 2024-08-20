@@ -273,6 +273,7 @@ GameObject:
   - component: {fileID: 7051919478096396715}
   - component: {fileID: -8483855570354050433}
   - component: {fileID: 546544722424615555}
+  - component: {fileID: 4015973778318589838}
   m_Layer: 12
   m_Name: Frag_Grenade
   m_TagString: Untagged
@@ -339,7 +340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 346143777
+  GlobalObjectIdHash: 24368115
   InScenePlacedSourceGlobalObjectIdHash: 346143777
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -360,6 +361,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 386a640015197354d989be7ec700d731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  withOwnership: 0
 --- !u!114 &7051919478096396715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -382,10 +384,10 @@ MonoBehaviour:
   explosionPrefab: {fileID: 8197885461795339566, guid: f7c84d8b12104c64b9f5a87ecd4e67b9, type: 3}
   explosionDestroyTime: 10
   explodeWhenShot: 1
-  maxExplosionDamage: 110
+  maxExplosionDamage: 180
   minExplosionDamage: 5
-  damageDropOffStart: 1.1
-  damageMaxRange: 15
+  damageDropOffStart: 1
+  damageMaxRange: 10
   damageDropOffCurve:
     serializedVersion: 2
     m_Curve:
@@ -421,10 +423,10 @@ MonoBehaviour:
     m_RotationOrder: 4
   damageableLayerMask:
     serializedVersion: 2
-    m_Bits: 12480
+    m_Bits: 143360
   losLayerMask:
     serializedVersion: 2
-    m_Bits: 15059
+    m_Bits: 139265
 --- !u!114 &-8483855570354050433
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -468,6 +470,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!135 &4015973778318589838
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8488737032286484038}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.13
+  m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!1 &8561211563201835867
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,7 +502,6 @@ GameObject:
   - component: {fileID: 6730222102740641061}
   - component: {fileID: 1682048254575094307}
   - component: {fileID: 3199512410942674098}
-  - component: {fileID: 8487570804486222467}
   m_Layer: 12
   m_Name: Cylinder
   m_TagString: Untagged
@@ -555,27 +577,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &8487570804486222467
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8561211563201835867}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.61089236
-  m_Center: {x: 0, y: 0.11089233, z: 0}
 --- !u!1 &8787364249679284126
 GameObject:
   m_ObjectHideFlags: 0

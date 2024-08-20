@@ -19,13 +19,11 @@ public class GameplayManager : NetworkBehaviour
         shieldsMultiplier = new(1),
         healthMultiplier = new(1),
         airControlMultiplier = new(1),
-        healthRegenPerSec = new(1),
-        shieldRegenPerSec = new(2),
+        healthRegenPerSec = new(50),
         healthRegenDelay = new(10),
         shieldRegenDelay = new(5)
         ;
-    public NetworkVariable<bool> infiniteTime = new(false), headshotsOnly = new(false), friendlyFire = new(false),
-        regenShield = new(true), regenHealth = new(true);
+    public NetworkVariable<bool> infiniteTime = new(false), headshotsOnly = new(false), friendlyFire = new(false), regenHealth = new(true);
 
     public NetworkVariable<float> teamAlphaScore = new(0), teamBetaScore = new(0);
     public NetworkVariable<uint> timeLeft = new(600);
@@ -72,10 +70,6 @@ public class GameplayManager : NetworkBehaviour
     /// </summary>
     public static float BaseHealth { get; private set; } = 100;
     /// <summary>
-    /// How much shields the player has at max shields
-    /// </summary>
-    public static float BaseShields { get; private set; } = 50;
-    /// <summary>
     /// How high the player jumps. Not a measure of the actual jump height itself, but the force applied, in newtons/KG, when the player jumps.
     /// </summary>
     public static float BaseJumpSpeed { get; private set; } = 45;
@@ -91,12 +85,12 @@ public class GameplayManager : NetworkBehaviour
     public uint gameTime = 600;
 
     public static float MaxHealth => BaseHealth * instance.healthMultiplier.Value;
-    public static float MaxShield => BaseShields * instance.shieldsMultiplier.Value;
 
     public NetworkVariable<bool> allowRespawns = new(writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<float> respawnTime = new(writePerm: NetworkVariableWritePermission.Server);
-
     public List<GameObject> grenadeTypes;
+    public LayerMask fireMask;
+    public float fireTickTime = 0.5f, fireDamagePerTick = 10f;
     private void Awake()
     {
         if (instance)
@@ -111,7 +105,6 @@ public class GameplayManager : NetworkBehaviour
         BaseHealth = playerHealth;
         BaseJumpSpeed = playerJumpHeight;
         BaseFireDamage = fireDamage;
-        BaseShields = playerShield;
         if (NetworkManager.IsServer && !IsSpawned)
         {
             NetworkObject.Spawn(gameObject);
@@ -122,6 +115,7 @@ public class GameplayManager : NetworkBehaviour
     void TeamMembersChanged(List<TeamMember> previous, List<TeamMember> current)
     {
         teamMembers = current;
+        SteamLobbyManager.Instance.scoreboard.TeamsUpdated(previous, current);
     }
     private void OnEnable()
     {

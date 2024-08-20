@@ -8,6 +8,7 @@ TagManager:
   - Weapon
   - Grenade
   - Objective
+  - Carriable
   layers:
   - Default
   - TransparentFX
@@ -26,9 +27,9 @@ TagManager:
   - Ladder
   - UI_OnTop
   - Hitbox
-  - 
-  - 
-  - 
+  - Carriable
+  - Flames
+  - Interactable
   - pp
   - 
   - 

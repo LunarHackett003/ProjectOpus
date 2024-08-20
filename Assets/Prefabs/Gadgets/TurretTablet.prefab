@@ -135,7 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1540084451
+  GlobalObjectIdHash: 3012208765
   InScenePlacedSourceGlobalObjectIdHash: 3012208765
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -162,7 +162,7 @@ MonoBehaviour:
   storedUses: 1
   currentStoredUses:
     m_InternalValue: 1
-  cooldownDuration: 45
+  cooldownDuration: 5
   syncedCooldown:
     m_InternalValue: 0
   localCooldown: 0
@@ -178,7 +178,8 @@ MonoBehaviour:
   networkAnimator: {fileID: 0}
   renderers: []
   overrideController: {fileID: 0}
-  currentGear: 0
+  currentGear:
+    m_InternalValue: 0
   blockedPosition: {x: 0, y: -0.15, z: 0}
   blockedRotation: {x: -21.14, y: 0, z: 0}
   blockingCheckSize: {x: 0.43, y: 0.27, z: 0.16}
@@ -209,6 +210,7 @@ MonoBehaviour:
   cooldownBlockedByPlacement: 1
   tabletPickupImage: {fileID: 1780895895171053083}
   deployablecount: 0
+  deploymentOrientation: {x: 0, y: 0, z: 0, w: 1}
 --- !u!114 &-3983446549563778908
 MonoBehaviour:
   m_ObjectHideFlags: 0

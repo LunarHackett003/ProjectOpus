@@ -57,13 +57,19 @@ VisualEffect:
       - m_Value: 0.01
         m_Name: RingFresnelOffset
         m_Overridden: 1
+      - m_Value: 0.2
+        m_Name: BaseSize
+        m_Overridden: 1
     m_Vector2f:
       m_Array: []
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 0, y: 0.6, z: 0}
+        m_Name: RingVelocity
+        m_Overridden: 1
     m_Vector4f:
       m_Array:
-      - m_Value: {x: 0, y: 21.361254, z: 20.49835, w: 1}
+      - m_Value: {x: 12.763219, y: 23.945154, z: 23.535345, w: 1}
         m_Name: RingColour
         m_Overridden: 1
     m_Uint:
@@ -123,6 +129,96 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1 &812943580158131382
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6291328383853393964}
+  - component: {fileID: 5067853051027870415}
+  - component: {fileID: 9027932710041159658}
+  - component: {fileID: 1253850458496281971}
+  m_Layer: 16
+  m_Name: Hitbox
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6291328383853393964
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812943580158131382}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.048, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6327749820990569146}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5067853051027870415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812943580158131382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3acd6f9085fee844fabe6236b5c987bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isHead: 0
+  ownerFound: 0
+--- !u!65 &9027932710041159658
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812943580158131382}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.07468134, y: 0.15104297, z: 0.43149182}
+  m_Center: {x: 0, y: 0.067814305, z: 0.048646998}
+--- !u!65 &1253850458496281971
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812943580158131382}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.20202713, y: 0.1461753, z: 0.14074239}
+  m_Center: {x: 0, y: 0.045126338, z: 0.00093801296}
 --- !u!1 &965742551493246523
 GameObject:
   m_ObjectHideFlags: 0
@@ -347,9 +443,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   recoilProfile: {fileID: 0}
-  roundsPerMinute: 600
-  roundsPerSecond: 10
-  timeBetweenRounds: 0.1
+  roundsPerMinute: 300
+  roundsPerSecond: 5
+  timeBetweenRounds: 0.2
   canFire: 0
   allowedFireModes: 03000000
   fireModeIndex: 0
@@ -364,7 +460,7 @@ MonoBehaviour:
   aimTransform: {fileID: 0}
   aimedWorldFOV: 70
   aimedViewFOV: 30
-  playerWeapon: 1
+  playerWeapon: 0
   maxDamage: 5
   minDamage: 0
   headshotDamageMultiplier: 1
@@ -420,8 +516,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3acd6f9085fee844fabe6236b5c987bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  owner: {fileID: 5621728390989980148}
   isHead: 0
+  ownerFound: 0
 --- !u!65 &4544027059755891863
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1113,16 +1209,28 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -10.541178
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 13.000004
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.935
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1285,6 +1393,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -7584742961594306483, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7588995642684619659}
+    - targetCorrespondingSourceObject: {fileID: -7584742961594306483, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6291328383853393964}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ffbbd1e23efcac24b9add3619c0f1d5d, type: 3}
       insertIndex: -1
@@ -1430,19 +1541,19 @@ MonoBehaviour:
   turretWeapon: {fileID: 1221551609407563992}
   currentHealth:
     m_InternalValue: 0
-  maxHealth: 125
+  maxHealth: 500
   turretTransform: {fileID: 6327749820990569146}
   pitchAngle: 0
   yawAngle: 0
   viewFOV: 35
   viewRange: 15
-  rotateSpeed: 20
+  rotateSpeed: 1
   detectionTryMask:
     serializedVersion: 2
     m_Bits: 0
   detectionBlockMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 131073
   visLineRenderer: {fileID: 17414129618137621}
   pointer: {fileID: 4886978392758494373}
   ignoreTeams: 0

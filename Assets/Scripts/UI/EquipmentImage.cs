@@ -10,6 +10,41 @@ public class EquipmentImage : MonoBehaviour
     public TMP_Text textDisplay;
     public BaseEquipment equipment;
     int _numUses;
+    private void Start()
+    {
+        if(equipment is BaseWeapon b)
+        {
+            b.currentAmmo.OnValueChanged += TextUpdate;
+            _numUses = b.currentAmmo.Value;
+        }
+        else
+        {
+            equipment.currentStoredUses.OnValueChanged += TextUpdate;
+            _numUses = equipment.currentStoredUses.Value;
+        }
+        TextUpdate(0, _numUses);
+    }
+    public void TextUpdate(int previous, int current)
+    {
+        if (useTextDisplay)
+        {
+            if (!textDisplay.isActiveAndEnabled)
+            {
+                textDisplay.enabled = true;
+                textDisplay.gameObject.SetActive(true);
+            }
+
+            if (equipment is BaseWeapon b)
+            {
+                textDisplay.text = $"{b.currentAmmo.Value}/{b.maxAmmo}";
+            }
+            else
+            {
+                textDisplay.text = $"{equipment.currentStoredUses.Value}/{equipment.storedUses}";
+            }
+
+        }
+    }
     private void LateUpdate()
     {
         if (equipment.hasCooldown)
@@ -19,28 +54,6 @@ public class EquipmentImage : MonoBehaviour
         else
         {
             fill = 1;
-        }
-
-        if(useTextDisplay)
-        {
-            if (!textDisplay.isActiveAndEnabled)
-            {
-                textDisplay.enabled = true;
-                textDisplay.gameObject.SetActive(true);
-            }
-
-            if(_numUses != equipment.currentStoredUses.Value)
-            {
-                _numUses = equipment.currentStoredUses.Value;
-                if (equipment.isWeapon && equipment is BaseWeapon w)
-                {
-                    textDisplay.text = $"{w.CurrentAmmo}/{w.maxAmmo}";
-                }
-                else
-                {
-                    textDisplay.text = $"{equipment.currentStoredUses.Value}/{equipment.storedUses}";
-                }
-            }
         }
         image.fillAmount = fill;
     }

@@ -1,20 +1,22 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class Hitbox : Damageable
+public class Hitbox : NetworkBehaviour, IDamageable
 {
 
-    [SerializeField] Damageable owner;
+    [SerializeField] IDamageable owner;
     [SerializeField] internal bool isHead;
-    public override void TakeDamage(float damageAmount)
+    public NetworkObject NetObject => NetworkObject;
+
+    public Transform ThisTransform => transform;
+
+    public void TakeDamage(float damageAmount)
     {
         owner.TakeDamage(damageAmount);
     }
-
-    private void OnValidate()
+    private void Awake()
     {
-        if (!owner)
-        {
-            owner = GetComponentInParent<Damageable>();
-        }
+        owner ??= transform.parent.GetComponentInParent<IDamageable>();
     }
+
 }

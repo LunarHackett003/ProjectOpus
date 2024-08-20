@@ -11,10 +11,11 @@ GameObject:
   - component: {fileID: 8319596129259386829}
   - component: {fileID: 4545903001352920263}
   - component: {fileID: 1229052595515749153}
+  - component: {fileID: 1595582153161282591}
   m_Layer: 0
   m_Name: GameplayManager
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5938655980376293919, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -45,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 327420051
+  GlobalObjectIdHash: 4252469150
   InScenePlacedSourceGlobalObjectIdHash: 327420051
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -89,9 +90,7 @@ MonoBehaviour:
   airControlMultiplier:
     m_InternalValue: 1
   healthRegenPerSec:
-    m_InternalValue: 1
-  shieldRegenPerSec:
-    m_InternalValue: 2
+    m_InternalValue: 50
   healthRegenDelay:
     m_InternalValue: 10
   shieldRegenDelay:
@@ -102,8 +101,6 @@ MonoBehaviour:
     m_InternalValue: 0
   friendlyFire:
     m_InternalValue: 0
-  regenShield:
-    m_InternalValue: 1
   regenHealth:
     m_InternalValue: 1
   teamAlphaScore:
@@ -116,12 +113,12 @@ MonoBehaviour:
     m_InternalValue: 1
   bulletLayermask:
     serializedVersion: 2
-    m_Bits: 69633
+    m_Bits: 200705
   TeamMembers:
     m_InternalValue: []
   teamMembers: []
   playerSpeed: 20
-  playerHealth: 100
+  playerHealth: 250
   playerJumpHeight: 3.5
   fireDamage: 5
   playerShield: 50
@@ -133,3 +130,40 @@ MonoBehaviour:
   grenadeTypes:
   - {fileID: 8488737032286484038, guid: f913c228d2ca56349b14c7376490c714, type: 3}
   - {fileID: 8488737032286484038, guid: fe5e113954ef2924f9ab3395449e6032, type: 3}
+  fireMask:
+    serializedVersion: 2
+    m_Bits: 139265
+  fireTickTime: 0.5
+  fireDamagePerTick: 10
+--- !u!114 &1595582153161282591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6758422646386620018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c0a998a7c20be044a82713799eb45bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  barrelSpawnpoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  barrels:
+  - {fileID: 5548346576246866392, guid: 1f4c1523f9eba1a478cb268848e01577, type: 3}
+  - {fileID: 7972995105500606960, guid: 9dc4c007c3afe214b8b4592463dbb8ab, type: 3}

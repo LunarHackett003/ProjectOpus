@@ -9,8 +9,8 @@ public class BaseWeapon : BaseEquipment
     public bool semiFired;
     public bool rofLimited;
     [SerializeField, Tooltip("How much ammo this weapon has by default")] internal int maxAmmo = 30;
-    [SerializeField] protected NetworkVariable<int> currentAmmo = new();
-    [SerializeField, Tooltip("Does this weapon use ammo?")] protected bool useAmmo;
+    [SerializeField] internal NetworkVariable<int> currentAmmo = new(writePerm:NetworkVariableWritePermission.Server);
+    [SerializeField, Tooltip("Does this weapon use ammo?")] internal bool useAmmo;
 
     [SerializeField] protected UnityEvent fireEvents;
 
@@ -50,16 +50,19 @@ public class BaseWeapon : BaseEquipment
     [SerializeField] protected Vector2 minHipSpread, maxHipSpread;
     [SerializeField] protected Vector2 minBaseSpread, maxBaseSpread;
 
-    [SerializeField] internal Transform aimTransform;
     [SerializeField] internal float aimedWorldFOV = 70, aimedViewFOV = 30;
+
+    [SerializeField] internal Vector3 aimPosition;
 
     [SerializeField] bool playerWeapon = true;
     public NetworkVariable<NetworkBehaviourReference> ownerWeaponManager;
     internal WeaponManager wm;
     public int CurrentAmmo => currentAmmo.Value;
     protected bool CanFireWeapon => (!useAmmo || (useAmmo && currentAmmo.Value > 0)) && !semiFired && !rofLimited;
+
+    [SerializeField] internal float reloadTime = 2;
     //Sends the fire stuff to everyone
-    [Rpc(SendTo.ClientsAndHost)]
+    [Rpc(SendTo.ClientsAndHost, DeferLocal = true)]
     protected virtual void FireWeapon_RPC(Vector3 end)
     {
         print("received remote fire from a client");
@@ -74,8 +77,12 @@ public class BaseWeapon : BaseEquipment
         roundsPerSecond = roundsPerMinute / 60;
         timeBetweenRounds = 1 / roundsPerSecond;
     }
-    protected virtual void FireWeaponOnServer()
+    protected virtual void FireWeaponOnServer(NetworkObject ownerObject)
     {
+        if (useAmmo)
+        {
+            currentAmmo.Value--;
+        }
         if (!CheckWeaponManager())
             return;
     }
@@ -108,7 +115,7 @@ public class BaseWeapon : BaseEquipment
         if (!CheckWeaponManager())
             return;
 
-        canFire = CanFireWeapon;
+        canFire = CanFireWeapon && (!useAmmo || currentAmmo.Value > 0);
         if (IsServer || IsOwner)
         {
             FireMode fm = allowedFireModes[fireModeIndex];
@@ -154,25 +161,40 @@ public class BaseWeapon : BaseEquipment
         {
             if(delayBeforeFire > 0)
             {
-                if(delayDone)
+                if (delayDone)
+                {
+                    print("firing with delay");
                     StartCoroutine(DelayFire());
+                }
             }
             else
             {
-                FireWeaponOnServer();
+                if (wm)
+                {
+                    FireWeaponOnServer(wm.NetworkObject);
+                }
+                else
+                {
+                    FireWeaponOnServer(NetworkObject);
+                }
             }
         }
-        if (IsOwner || IsServer)
+        if (IsOwner)
         {
-            if(delayBeforeFire < 0)
+            wm.CancelReload();
+            if(delayBeforeFire > 0)
             {
                 if(delayDone)
                     StartCoroutine(DelayFire());
+                if (playFireAnimationOnDelay)
+                    networkAnimator.SetTrigger("Fire");
             }
             else
             {
                 rofLimited = true;
                 Invoke(nameof(ResetROFLimit), timeBetweenRounds / GameplayManager.Instance.fireRateMultiplier.Value);
+                if (!playFireAnimationOnDelay)
+                    networkAnimator.SetTrigger("Fire");
             }
         }
     }
@@ -185,7 +207,7 @@ public class BaseWeapon : BaseEquipment
         {
             b++;
             if (IsServer)
-                FireWeaponOnServer();
+                FireWeaponOnServer(wm? wm.NetworkObject : NetworkObject);
             yield return new WaitForSeconds(timeBetweenRounds);
         }
         yield return new WaitForSeconds(delayAfterBurst);
@@ -202,17 +224,17 @@ public class BaseWeapon : BaseEquipment
         yield return new WaitForSeconds(delayBeforeFire / GameplayManager.Instance.fireRateMultiplier.Value);
         if (IsServer)
         {
-            FireWeaponOnServer();
+            FireWeaponOnServer(wm ? wm.NetworkObject : NetworkObject);
         }
         if (IsOwner || IsServer)
         {
             rofLimited = true;
         }
+        Invoke(nameof(ResetROFLimit), timeBetweenRounds / GameplayManager.Instance.fireRateMultiplier.Value);
         delayDone = true;
     }
     public virtual void FireWeapon(Vector3 end)
     {
-        CheckWeaponManager();
         print("fired weapon locally");
         fireEvents?.Invoke();
         if(wm && wm.pc && wm.pc.netAnimator && !(delayBeforeFire > 0 && playFireAnimationOnDelay))

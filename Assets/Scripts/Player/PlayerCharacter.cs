@@ -14,13 +14,15 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using TMPro;
+using UnityEngine.VFX;
 
-public class PlayerCharacter : Damageable
+public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
 {
+    #region Definitions
     public static readonly HashSet<PlayerCharacter> players = new HashSet<PlayerCharacter>();
 
-
-
+    public NetworkVariable<bool> corrupted = new(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<bool> burning = new(writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<ulong> mySteamID;
 
     [SerializeField] internal Rigidbody rb;
@@ -46,9 +48,9 @@ public class PlayerCharacter : Damageable
 
     public float aimPitchOffset;
 
-    public NetworkVariable<float> currentHealth = new(writePerm: NetworkVariableWritePermission.Server), currentShields = new(writePerm: NetworkVariableWritePermission.Server);
+    public NetworkVariable<float> currentHealth = new(writePerm: NetworkVariableWritePermission.Server);
 
-    float healthRegenTime, shieldRegenTime;
+    float healthRegenTime;
 
     public List<Behaviour> remoteDisableComponents;
     public List<Behaviour> localDisableComponents;
@@ -68,7 +70,8 @@ public class PlayerCharacter : Damageable
     NetworkVariable<bool> canRespawn = new(writePerm: NetworkVariableWritePermission.Server);
     public NetworkVariable<float> timeLeftToRespawn = new(writePerm: NetworkVariableWritePermission.Server);
 
-    [SerializeField] Image healthBarImage, shieldBarImage;
+    [SerializeField] Image healthBarImage;
+    [SerializeField] TMP_Text healthText;
     [SerializeField] TMP_Text respawnTimer;
     [SerializeField] GameObject respawnPrompt;
     public NetworkVariable<bool> Dead = new(writePerm: NetworkVariableWritePermission.Server);
@@ -102,19 +105,25 @@ public class PlayerCharacter : Damageable
     float aimPitchRecoil;
     Vector3 weaponRecoilLinear, weaponRecoilAngular, cameraRecoilLinear, cameraRecoilAngular, 
         vel_weaponRecoilLinear, vel_weaponRecoilAngular, vel_cameraRecoilLinear, vel_cameraRecoilAngular;
+    #endregion
+    #region Callbacks
     private void OnEnable()
     {
         players.Add(this);
     }
-
     private void OnDisable()
     {
         if (IsServer || IsOwner)
         {
             currentHealth.OnValueChanged -= OnHealthChanged;
-            currentShields.OnValueChanged -= OnShieldChanged;
             SceneManager.sceneLoaded -= NewSceneLoaded;
         }
+
+        canRespawn.OnValueChanged -= OnRespawnChanged;
+        timeLeftToRespawn.OnValueChanged -= OnRespawnTimeChanged;
+
+        burning.OnValueChanged -= BurnChanged;
+
         players.Remove(this);
     }
     private void NewSceneLoaded(Scene arg0, LoadSceneMode arg1)
@@ -154,11 +163,11 @@ public class PlayerCharacter : Damageable
         canRespawn.OnValueChanged += OnRespawnChanged;
         timeLeftToRespawn.OnValueChanged += OnRespawnTimeChanged;
 
+        burning.OnValueChanged += BurnChanged;
 
         if (IsServer || IsOwner)
         {
             currentHealth.OnValueChanged += OnHealthChanged;
-            currentShields.OnValueChanged += OnShieldChanged;
             rb.isKinematic = true;
         }
         rb = GetComponent<Rigidbody>();
@@ -186,7 +195,8 @@ public class PlayerCharacter : Damageable
             }
         }
     }
-
+    #endregion
+    #region UpdateLoop
     /// <summary>
     /// Adds a force to counteract the player sliding down a slope. In theory.
     /// </summary>
@@ -294,9 +304,8 @@ public class PlayerCharacter : Damageable
             cameraRecoilTransform.SetLocalPositionAndRotation(Vector3.SmoothDamp(cameraRecoilTransform.localPosition, cameraRecoilLinear, ref vel_cameraRecoilLinear, wm.GetRecoilProfile.camRecoilSmoothness),
                 Quaternion.Lerp(cameraRecoilTransform.localRotation, Quaternion.Euler(new Vector3(0, cameraRecoilAngular.y, cameraRecoilAngular.z)), Time.fixedDeltaTime * wm.GetRecoilProfile.camAngularRecoilDecay) );
 
-            weaponSwayTransform.SetLocalPositionAndRotation(Vector3.SmoothDamp(weaponSwayTransform.localPosition, weaponRecoilLinear +
-                (wm.weaponBlocked ? wm.equipmentList[wm.equipmentIndex].blockedPosition : Vector3.zero), ref vel_weaponRecoilLinear, wm.GetRecoilProfile.weaponRecoilSmoothness),
-                Quaternion.Lerp(weaponSwayTransform.localRotation,  Quaternion.Euler(weaponRecoilAngular + (wm.weaponBlocked ? wm.equipmentList[wm.equipmentIndex].blockedRotation : Vector3.zero)), Time.fixedDeltaTime * wm.GetRecoilProfile.weaponAngularRecoilDecay));
+            weaponSwayTransform.SetLocalPositionAndRotation(Vector3.SmoothDamp(weaponSwayTransform.localPosition, weaponRecoilLinear, ref vel_weaponRecoilLinear, wm.GetRecoilProfile.weaponRecoilSmoothness),
+                Quaternion.Lerp(weaponSwayTransform.localRotation,  Quaternion.Euler(weaponRecoilAngular) * wm.recoilPointInitialRotation, Time.fixedDeltaTime * wm.GetRecoilProfile.weaponAngularRecoilDecay));
         }
     }
     void UpdateRecoil_Fixed()
@@ -329,7 +338,6 @@ public class PlayerCharacter : Damageable
     void ProcessHealth()
     {
         float health = currentHealth.Value;
-        float shield = currentShields.Value;
         if (GameplayManager.Instance.regenHealth.Value)
         {
             //Start regenerating health if we've waited long enough.
@@ -343,19 +351,6 @@ public class PlayerCharacter : Damageable
                 healthRegenTime += Time.fixedDeltaTime;
             }
         }
-        if (GameplayManager.Instance.regenShield.Value)
-        {
-
-            if (shieldRegenTime >= GameplayManager.Instance.shieldRegenDelay.Value &&
-                shield < GameplayManager.MaxShield)
-            {
-                shield += Time.fixedDeltaTime * GameplayManager.Instance.shieldRegenPerSec.Value;
-            }
-            else
-            {
-                shieldRegenTime += Time.fixedDeltaTime;
-            }
-        }
 
         //checks if current health and shields are equal to the potential new values.
         //values are clamped to the max health to prevent HP hacking
@@ -365,10 +360,8 @@ public class PlayerCharacter : Damageable
         {
             currentHealth.Value = Mathf.Min(health, GameplayManager.MaxHealth);
         }
-        if (currentShields.Value != Mathf.Min(shield, GameplayManager.MaxShield))
-        {
-            currentShields.Value = Mathf.Min(shield, GameplayManager.MaxShield);
-        }
+        if(accumulatedBurn > 0)
+        accumulatedBurn -= Time.fixedDeltaTime;
     }
     bool CheckGround(out RaycastHit hit)
     {
@@ -395,6 +388,10 @@ public class PlayerCharacter : Damageable
                     if(CheckGround(out RaycastHit hit))
                     {
                         moveState.Value = MoveState.grounded;
+                        if (hit.rigidbody)
+                        {
+                            rb.MovePosition(hit.rigidbody.linearVelocity * Time.fixedDeltaTime);
+                        }
                     }
                     else
                     {
@@ -424,7 +421,7 @@ public class PlayerCharacter : Damageable
                     break;
                 case MoveState.airborne:
                     moveInput *= GameplayManager.BaseAirControl * GameplayManager.Instance.airControlMultiplier.Value;
-                    CheckVault(out RaycastHit hit);
+                    CheckVault();
                     MovePlayer(moveInput);
                     break;
                 case MoveState.ladder:
@@ -486,7 +483,7 @@ public class PlayerCharacter : Damageable
         currentLadder = null;
         VaultToPoint(clientRotationRoot.TransformPoint(top ? ladderDismountTopPosition : ladderDismountBottomPosition));
     }
-    bool CheckVault(out RaycastHit hit)
+    bool CheckVault()
     {
         Ray r1 = new(clientRotationRoot.TransformPoint(vaultDownwardCheckPosition), Vector3.down);
         Vector3 pos1 = clientRotationRoot.TransformPoint(vaultForwardCheckOffsetTop), pos2 = clientRotationRoot.TransformPoint(vaultForwardCheckOffsetBottom);
@@ -494,13 +491,13 @@ public class PlayerCharacter : Damageable
         Debug.DrawRay(pos1, clientRotationRoot.forward * vaultForwardCheckDistance, Color.red, .2f);
         Debug.DrawRay(pos2, clientRotationRoot.forward * vaultForwardCheckDistance, Color.red, .2f);
         Debug.DrawRay(r1.origin, r1.direction, Color.yellow, .2f);
-        if (Physics.CapsuleCast(pos1, pos2, 0.4f, clientRotationRoot.forward, out hit, vaultForwardCheckDistance, groundMask) &&
+        if (Physics.CapsuleCast(pos1, pos2, 0.4f, clientRotationRoot.forward, out RaycastHit hit, vaultForwardCheckDistance, groundMask) &&
             Mathf.Abs(hit.normal.y) < 0.2f && Physics.Raycast(r1, out RaycastHit hit2, 2.5f, groundMask))
         {
             Ray r2 = new(hit2.point + Vector3.down * 0.05f, Vector3.up);
             Debug.DrawRay(r2.origin, r2.direction, Color.cyan, 2f);
             
-            if(!Physics.Raycast(r2, out RaycastHit hit3, 2.04f, groundMask))
+            if(!Physics.Raycast(r2, 2.04f, groundMask))
             {
                 print("Vaulting...");
                 VaultToPoint(hit2.point + vaultTargetOffset);
@@ -551,49 +548,69 @@ public class PlayerCharacter : Damageable
         }
         UpdateRecoil_Frame();
     }
+    #endregion
+    #region Health
     void OnHealthChanged(float previous, float current)
     {
         healthBarImage.fillAmount = Mathf.InverseLerp(0, GameplayManager.MaxHealth, current);
-        if(current <= 0)
+        healthText.text = $"{(int)current}/{(int)GameplayManager.MaxHealth}";
+        if (IsServer)
         {
-            //Kill the player
-            if (IsServer)
+            if(current <= 0)
             {
-                if (GameplayManager.Instance.allowRespawns.Value)
-                    timeLeftToRespawn.Value = GameplayManager.Instance.respawnTime.Value;
-                Dead.Value = true;
+                if(previous > 0)
+                {
+                    KillPlayer();
+                }
+
             }
+        }
+        if(current > previous)
+        {
+            //We're being healed
+            healthRegenTime = GameplayManager.Instance.healthRegenDelay.Value;
+        }
+        else
+        {
+            //We're taking damage
+            healthRegenTime = 0;
             if (IsOwner)
             {
-                respawnPrompt.SetActive(true);
-                if (GameplayManager.Instance.allowRespawns.Value)
-                {
-
-                }
-                else
-                {
-                    respawnTimer.text = "No Respawn!";
-                }
+                PlayerManager.Instance.sec.TakeDamage(previous - current);
             }
-
-            if(renderersToDisableOnDeath.Length > 0)
-            {
-                foreach (var item in renderersToDisableOnDeath)
-                {
-                    item.enabled = false;
-                }
-            }
-            deathEvent?.Invoke();
-            
         }
     }
-    void OnShieldChanged(float previous, float current)
+
+    private void KillPlayer()
     {
-        shieldBarImage.fillAmount = Mathf.InverseLerp(0, GameplayManager.MaxShield, current);
-        if(current <= 0)
+        //Kill the player
+        if (IsServer)
         {
-            //Disable the player's shield
+            if (GameplayManager.Instance.allowRespawns.Value)
+                timeLeftToRespawn.Value = GameplayManager.Instance.respawnTime.Value;
+            Dead.Value = true;
         }
+        if (IsOwner)
+        {
+            respawnPrompt.SetActive(true);
+            if (GameplayManager.Instance.allowRespawns.Value)
+            {
+
+            }
+            else
+            {
+                respawnTimer.text = "No Respawn!";
+            }
+        }
+
+        if (renderersToDisableOnDeath.Length > 0)
+        {
+            foreach (var item in renderersToDisableOnDeath)
+            {
+                item.enabled = false;
+            }
+        }
+        deathEvent?.Invoke();
     }
     void Respawn(bool firstSpawn)
     {
@@ -636,8 +653,10 @@ public class PlayerCharacter : Damageable
     void ResetHealth_ServerRPC()
     {
         currentHealth.Value = GameplayManager.BaseHealth * GameplayManager.Instance.healthMultiplier.Value;
-        currentShields.Value = GameplayManager.BaseShields * GameplayManager.Instance.shieldsMultiplier.Value;
+        healthRegenTime = 0;
     }
+    #endregion
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.matrix = transform.localToWorldMatrix;
@@ -654,6 +673,7 @@ public class PlayerCharacter : Damageable
         Gizmos.DrawWireCube(ladderDismountTopPosition, Vector3.one * 0.2f);
         
     }
+    #region Other Methods
     public void TryJump()
     {
         if (Dead.Value)
@@ -665,7 +685,7 @@ public class PlayerCharacter : Damageable
             return;
         }
 
-        if (CheckVault(out RaycastHit hit) && grounded)
+        if (CheckVault() && grounded)
         {
             return;
         }
@@ -729,7 +749,7 @@ public class PlayerCharacter : Damageable
         flashbangVolume.enabled = false;
     }
 
-    public override void TakeDamage(float damageAmount)
+    public void TakeDamage(float damageAmount)
     {
         currentHealth.Value -= damageAmount;
     }
@@ -753,5 +773,63 @@ public class PlayerCharacter : Damageable
             z = Mathf.Lerp(min.z, max.z, random.z)
         } * GameplayManager.Instance.recoilMultiplier.Value;
     }
+    #endregion
 
+    #region IFlammable
+    public VisualEffect burningEffect;
+    [SerializeField] float accumulatedBurn;
+
+    public void BurnChanged(bool previous, bool current)
+    {
+        if (current)
+            burningEffect.Play();
+        else
+            burningEffect.Stop();
+    }
+
+    public void TryIgnite(float duration, float igniteContribute)
+    {
+        accumulatedBurn += igniteContribute;
+        if(accumulatedBurn > 1 && !burning.Value)
+        {
+            burning.Value = true; 
+            Ignite(duration);
+        }
+    }
+
+    public void Extinguish()
+    {
+        if (burnCoroutine != null)
+            StopCoroutine(burnCoroutine);
+        EndBurn();
+    }
+    Coroutine burnCoroutine;
+
+    public NetworkObject NetObject => NetworkObject;
+
+    public Transform ThisTransform => transform;
+
+    public void Ignite(float duration)
+    {
+        if (burnCoroutine != null)
+            StopCoroutine(burnCoroutine);
+        burnCoroutine = StartCoroutine(Burn(duration));
+    }
+    public IEnumerator Burn(float duration)
+    {
+        float t = 0;
+        while (t < duration)
+        {
+            yield return new WaitForSeconds(GameplayManager.Instance.fireTickTime);
+            t += GameplayManager.Instance.fireTickTime;
+            currentHealth.Value -= GameplayManager.Instance.fireDamagePerTick;
+        }
+        EndBurn();
+        yield break;
+    }
+    public void EndBurn()
+    {
+        burning.Value = false;
+    }
+    #endregion
 }

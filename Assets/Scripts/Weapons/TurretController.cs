@@ -7,7 +7,7 @@ using opus.Gameplay;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-public class TurretController : Damageable
+public class TurretController : NetworkBehaviour, IDamageable
 {
     public NetworkVariable<ulong> ownerSteamID = new(writePerm: NetworkVariableWritePermission.Owner);
 
@@ -28,6 +28,11 @@ public class TurretController : Damageable
     [SerializeField] bool ignoreTeams;
 
     [SerializeField] PlayerCharacter currentTarget;
+
+    public NetworkObject NetObject => NetworkObject;
+
+    public Transform ThisTransform => transform;
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -40,7 +45,10 @@ public class TurretController : Damageable
             ownerSteamID.Value = PlayerManager.Instance.pc.mySteamID.Value;
         }
     }
-
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+    }
     private void FixedUpdate()
     {
         if (IsServer)
@@ -51,17 +59,25 @@ public class TurretController : Damageable
             TurretCheck();
             TurretFire();
         }
+
         Physics.Raycast(visLineRenderer.transform.position, turretWeapon.transform.forward, out RaycastHit hit, viewRange, detectionBlockMask);
         visLineRenderer.SetPosition(1, Vector3.forward * (hit.collider ? hit.distance : viewRange));
+    }
+    bool TargetValidate(PlayerCharacter item)
+    {
+        float dist = UtilityMethods.SquaredDistance(turretWeapon.transform.position, item.transform.position);
+        //Will proceed if the target is in range, visible, the closest target AND if we're either ignoring teams or the target is on the other team.
+        Debug.DrawLine(turretWeapon.transform.position, item.rb.worldCenterOfMass, Color.red, 0.1f);
+        return dist < viewRange * viewRange && Vector3.Angle(turretTransform.forward, item.transform.position - turretTransform.position) < viewFOV &&
+            !Physics.Linecast(turretWeapon.transform.position, item.rb.worldCenterOfMass, detectionBlockMask)
+            && (ignoreTeams || GameplayManager.Instance.IsOppositeTeam(ownerSteamID.Value, item.mySteamID.Value)) && !item.Dead.Value;
     }
     void TurretCheck()
     {
         if (currentTarget)
         {
-            print("Checking acquired target");
-            if(UtilityMethods.SquaredDistance(turretWeapon.transform.position, currentTarget.transform.position) > viewRange * viewRange)
+            if (!TargetValidate(currentTarget))
             {
-                //the target is too far, so we no longer follow this target.
                 currentTarget = null;
             }
         }
@@ -75,9 +91,7 @@ public class TurretController : Damageable
                 float dist = UtilityMethods.SquaredDistance(turretWeapon.transform.position, item.transform.position);
                 //Will proceed if the target is in range, visible, the closest target AND if we're either ignoring teams or the target is on the other team.
                 Debug.DrawLine(turretWeapon.transform.position, item.rb.worldCenterOfMass, Color.red, 0.1f);
-                if (dist < viewRange * viewRange && dist < closestDistance && Vector3.Angle(turretTransform.forward, item.transform.position - turretTransform.position) < viewFOV &&
-                    !Physics.Linecast(turretWeapon.transform.position, item.rb.worldCenterOfMass, detectionBlockMask)
-                    && (ignoreTeams || GameplayManager.Instance.IsOppositeTeam(ownerSteamID.Value, item.mySteamID.Value)))
+                if (TargetValidate(item) && dist < closestDistance)
                 {
                     closestDistance = dist;
                     closestPlayer = item;
@@ -89,15 +103,22 @@ public class TurretController : Damageable
     }
     void TurretFire()
     {
-        if(currentTarget)
+        if (currentTarget)
         {
+            print("getting turret direction");
             Vector3 direction = currentTarget.rb.worldCenterOfMass - turretWeapon.transform.position;
             pointer.forward = direction;
+            print("setting turret forward");
             turretTransform.forward = Vector3.RotateTowards(turretTransform.forward, direction, rotateSpeed * Time.fixedDeltaTime, 5);
-            turretWeapon.primaryInput.Value = Vector3.Dot(turretWeapon.transform.forward, direction) > 0.9f;
+            print("setting turret fire");
+            turretWeapon.primaryInput.Value = Vector3.Dot(turretWeapon.transform.forward, direction.normalized) > 0.9f;
+        }
+        else
+        {
+            turretWeapon.primaryInput.Value = false;
         }
     }
-    public override void TakeDamage(float damageAmount)
+    public void TakeDamage(float damageAmount)
     {
         currentHealth.Value -= damageAmount;
         if(currentHealth.Value < 0)

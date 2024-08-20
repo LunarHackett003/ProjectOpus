@@ -5,6 +5,7 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 namespace opus.Weapons
 {
@@ -23,8 +24,9 @@ namespace opus.Weapons
         [SerializeField] internal int equipmentIndex;
         public NetworkObject[] equipmentPrefabs;
 
-        public bool PrimaryInput => PlayerManager.Instance.fireInput && !PlayerManager.Instance.pc.Dead.Value && !fireBlocked && !weaponBlocked;
-        public bool SecondaryInput => PlayerManager.Instance.aimInput && !PlayerManager.Instance.pc.Dead.Value && !fireBlocked && !weaponBlocked;
+        public bool PrimaryInput => PlayerManager.Instance.fireInput && !PlayerManager.Instance.pc.Dead.Value;
+        public bool SecondaryInput => PlayerManager.Instance.aimInput && !PlayerManager.Instance.pc.Dead.Value;
+        public bool CanUseWeapon => !fireBlocked && !weaponBlocked && !carrying.Value && !interacting.Value;
         [SerializeField] internal bool fireBlocked;
 
         [SerializeField] Vector2 baseCrosshairSize;
@@ -54,11 +56,31 @@ namespace opus.Weapons
         [SerializeField] internal Transform aimTransform;
 
 
-
+        bool swappedAndFirePressed;
 
         [SerializeField] internal List<EquipmentImage> equipmentImages;
         [SerializeField] internal GameObject baseEquipmentImage;
         [SerializeField] internal Transform equipmentImageRoot;
+
+
+        public CanvasGroup hitmarker;
+        public Image hitmarkerImage;
+        public Color regularHitColor = Color.white, headshotColour = Color.yellow;
+
+
+        [SerializeField] internal Transform carryPoint;
+
+        [SerializeField] internal LayerMask interactMask, carryMask;
+        [SerializeField] internal NetworkVariable<bool> interacting = new(writePerm:NetworkVariableWritePermission.Server);
+        [SerializeField] internal NetworkVariable<bool> carrying = new(writePerm:NetworkVariableWritePermission.Server);
+        [SerializeField] internal NetworkVariable<bool> carryInput = new(writePerm: NetworkVariableWritePermission.Server);
+        [SerializeField] internal NetworkVariable<bool> interactInput = new(writePerm: NetworkVariableWritePermission.Owner);
+        #region Network Callbacks
+
+        [SerializeField] internal Quaternion recoilPointInitialRotation;
+
+        [SerializeField] internal float carriablePositionTime = 0.1f, carriableRotationSpeed;
+        [SerializeField] internal float carriableThrowForce = 25;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -68,31 +90,43 @@ namespace opus.Weapons
             if (IsOwner)
             {
                 animHelperNetRef.Value = animHelper;
+                currentCarriableRef.OnValueChanged += CarriableChanged;
             }
+        }
+        void CarriableChanged(NetworkBehaviourReference previous, NetworkBehaviourReference current)
+        {
+            current.TryGet(out currentCarriable);
         }
 
         private void Equipment_OnListChanged(NetworkListEvent<NetworkBehaviourReference> changeEvent)
         {
-            equipmentList.Clear();
-            for (int i = equipmentImages.Count -1; i > -1; i--)
+            
+            if(changeEvent.Type == NetworkListEvent<NetworkBehaviourReference>.EventType.Clear)
             {
-                Destroy(equipmentImages[i].gameObject);
+                equipmentList.Clear();
+                for (int i = equipmentImages.Count -1; i > -1; i--)
+                {
+                    Destroy(equipmentImages[i].gameObject);
+                }
+                equipmentImages.Clear();
             }
-            equipmentImages.Clear();
-            foreach (var item in equipment)
+            if(changeEvent.Type == NetworkListEvent<NetworkBehaviourReference>.EventType.Add)
             {
-                if (item.TryGet(out BaseEquipment e))
+                if (changeEvent.Value.TryGet(out BaseEquipment e))
                 {
                     if (equipmentList.Contains(e))
                         equipmentList[equipmentList.FindIndex(x => x == e)] = e;
                     else
                         equipmentList.Add(e);
                 }
-                var im = Instantiate(baseEquipmentImage, equipmentImageRoot).GetComponent<EquipmentImage>();
-                im.equipment = e;
-                im.useTextDisplay = e.isWeapon || e.storedUses > 0;
-                equipmentImages.Add(im);
-                
+                if (e != null)
+                {
+
+                    var im = Instantiate(baseEquipmentImage, equipmentImageRoot).GetComponent<EquipmentImage>();
+                    im.equipment = e;
+                    im.useTextDisplay = e.isWeapon || e.storedUses > 0;
+                    equipmentImages.Add(im);
+                }
             }
         }
 
@@ -102,7 +136,7 @@ namespace opus.Weapons
 
             equipment.OnListChanged -= Equipment_OnListChanged;
         }
-
+        #endregion
         internal void TryWeaponBlock()
         {
             if(equipmentList.Count > equipmentIndex && equipmentList[equipmentIndex] != null)
@@ -120,7 +154,7 @@ namespace opus.Weapons
                 }
             }
         }
-
+        #region Unity Messages
         private void Update()
         {
             if (!animHelper)
@@ -132,23 +166,33 @@ namespace opus.Weapons
             }
             if (IsOwner)
             {
+                carryInput.Value = PlayerManager.Instance.carryInput;
+                interactInput.Value = PlayerManager.Instance.interactInput;
+
+
                 for (int i = 0; i < equipmentList.Count; i++)
                 {
                     BaseEquipment e = equipmentList[i];
                     if (i == equipmentIndex)
                     {
-                        e.SetPrimaryInput(PrimaryInput);
-                        e.SetSecondaryInput(SecondaryInput);
+                        e.SetPrimaryInput(PrimaryInput && !swappedAndFirePressed && CanUseWeapon && reloadCoroutine == null);
+                        e.SetSecondaryInput(SecondaryInput && CanUseWeapon && reloadCoroutine == null);
 
                         if (e is BaseWeapon b)
                         {
                             aimAmount = Mathf.Clamp01(aimAmount + (e.secondaryInput.Value ? Time.deltaTime : -Time.deltaTime) * aimSpeed);
                             PlayerManager.Instance.viewFOV = Mathf.Lerp(PlayerManager.Instance.baseViewFOV, b.aimedViewFOV, aimAmount);
                             PlayerManager.Instance.worldFOV = Mathf.Lerp(PlayerManager.Instance.baseWorldFOV, b.aimedWorldFOV, aimAmount);
+                            aimTarget.localPosition = b.aimPosition;
+
+
+                            if(PlayerManager.Instance.reloadInput && b.useAmmo && b.CurrentAmmo < b.maxAmmo)
+                            {
+                                StartReload(b);
+                            }
                         }
                         else
                             aimAmount = 0;
-
                         aimTransform.position = Vector3.Lerp(aimTransform.parent.position, aimTarget.position, aimAmount);
                     }
                     else
@@ -157,12 +201,44 @@ namespace opus.Weapons
                         e.SetSecondaryInput(false);
                     }
                 }
+                if (!PrimaryInput)
+                    swappedAndFirePressed = false;
             }
 
             UpdateRecoil_Frame();
             crosshair.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Lerp(baseCrosshairSize.x, maxCrosshairSize.x, accumulatedSpread));
             crosshair.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Lerp(baseCrosshairSize.y, maxCrosshairSize.y, accumulatedSpread));
         }
+        public void CancelReload()
+        {
+            if (reloadCoroutine != null)
+                StopCoroutine(reloadCoroutine);
+        }
+        void StartReload(BaseWeapon b)
+        {
+            if (reloadCoroutine == null)
+            {
+                b.networkAnimator.SetTrigger("Reload");
+                pc.netAnimator.SetTrigger("Reload");
+                reloadCoroutine = StartCoroutine(ReloadTimer(b));
+            }
+        }
+        Coroutine reloadCoroutine;
+        IEnumerator ReloadTimer(BaseWeapon b)
+        {
+            yield return new WaitForSeconds(b.reloadTime);
+            ReloadWeapon_ServerRPC(b);
+            reloadCoroutine = null;
+        }
+        [ServerRpc]
+        void ReloadWeapon_ServerRPC(NetworkBehaviourReference weapon)
+        {
+            if(weapon.TryGet(out BaseWeapon b))
+            {
+                b.currentAmmo.Value = b.maxAmmo;
+            }
+        }
+
         private void LateUpdate()
         {
             if(IsOwner && weaponPoint != null)
@@ -186,7 +262,73 @@ namespace opus.Weapons
         {
             UpdateRecoil_Fixed();
             TryWeaponBlock();
+            TryInteract();
         }
+        #endregion
+        #region Interaction
+        public float interactionRadius;
+        public LayerMask interactLineOfSightMask;
+        internal NetworkVariable<NetworkBehaviourReference> currentCarriableRef = new(writePerm: NetworkVariableWritePermission.Server);
+        [SerializeField] internal Carriable currentCarriable;
+        internal NetworkVariable<NetworkBehaviourReference> currentInteractableRef = new(writePerm: NetworkVariableWritePermission.Server);
+        internal 
+        bool carryPressed;
+        bool interactPressed;
+        void TryInteract()
+        {
+            if (carryInput.Value)
+            {
+                if (!carrying.Value && !carryPressed)
+                {
+                    //If we're not carrying something,we want to find something to pick up
+                    Collider[] cols = new Collider[5];
+                    Carriable targeted = null;
+                    if (Physics.OverlapSphereNonAlloc(fireDirectionReference.position, interactionRadius, cols, carryMask, QueryTriggerInteraction.Ignore) > 0)
+                    {
+                        for (int i = 0; i < cols.Length; i++)
+                        {
+                            if (cols[i] == null)
+                                continue;
+                            Collider col = cols[i];
+                            if (Physics.Linecast(fireDirectionReference.position, col.transform.position, out RaycastHit hit, interactLineOfSightMask, QueryTriggerInteraction.Ignore) && hit.collider == col)
+                            {
+                                targeted = hit.collider.GetComponentInParent<Carriable>();
+                            }
+                        }
+                    }
+                    if (targeted)
+                    {
+                        currentCarriableRef.Value = targeted;
+                        currentCarriable = targeted;
+                        carrying.Value = true;
+                        targeted.OnPickup(this);
+                        carryPressed = true;
+
+                    }
+                }
+            }
+            else
+            {
+                carryPressed = false;
+            }
+
+            if (currentCarriable != null && ((!carryPressed && carryInput.Value) || PrimaryInput))
+            {
+                currentCarriable.OnThrow(PrimaryInput);
+                currentCarriable = null;
+                currentCarriableRef.Value = null;
+                carrying.Value = false;
+                swappedAndFirePressed = true;
+                carryPressed = true;
+            }
+
+            if (interactInput.Value && !carrying.Value)
+            {
+
+            }
+            interactPressed = interactInput.Value;
+        }
+        #endregion
         [ServerRpc()]
         internal void Respawn_ServerRPC(ServerRpcParams param = default)
         {
@@ -200,6 +342,7 @@ namespace opus.Weapons
                     }
                 }
             }
+            equipment.Clear();
             List<NetworkBehaviourReference> e = new List<NetworkBehaviourReference>();
             for (int i = 0; i < equipmentPrefabs.Length; i++)
             {
@@ -235,6 +378,7 @@ namespace opus.Weapons
                 }
                 equipmentIndex = nextEquipmentIndex;
                 FinishWeaponSwitch();
+                swappedAndFirePressed = PrimaryInput;
             }
         }
         [Rpc(SendTo.Owner)]
@@ -251,7 +395,7 @@ namespace opus.Weapons
             equipmentIndex = nextEquipmentIndex;
             if (equipmentList[equipmentIndex] is BaseWeapon weapon)
             {
-                aimTarget.localPosition = weapon.aimTransform.localPosition;
+                aimTarget.localPosition = weapon.aimPosition;
             }
         }
         internal void ScrollWeapon(bool up)
@@ -283,5 +427,30 @@ namespace opus.Weapons
             accumulatedSpread += GetRecoilProfile.spreadAdditivePerShot;
             pc.ReceiveRecoil();
         }
+
+        #region Hit Feedback
+        Coroutine hitfeedbackCoroutine;
+        [SerializeField] float hitmarkerDisplayTime;
+        [Rpc(SendTo.Owner)]
+        public void HitFeedback_RPC(bool headshot)
+        {
+            if (hitfeedbackCoroutine != null)
+                StopCoroutine(hitfeedbackCoroutine);
+            hitfeedbackCoroutine = StartCoroutine(HitmarkerDisplay());
+            hitmarkerImage.color = headshot ? headshotColour : regularHitColor;
+        }
+        IEnumerator HitmarkerDisplay()
+        {
+            float t = 0;
+            while (t < hitmarkerDisplayTime)
+            {
+                t += Time.deltaTime;
+                hitmarker.alpha = Mathf.InverseLerp(hitmarkerDisplayTime, 0, t);
+                yield return new WaitForEndOfFrame();
+            }
+            hitmarker.alpha = 0;
+
+        }
+        #endregion
     }
 }

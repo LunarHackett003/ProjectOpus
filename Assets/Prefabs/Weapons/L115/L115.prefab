@@ -203,7 +203,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5952605032318852927}
   - component: {fileID: 3294354415671865586}
-  - component: {fileID: 828610147961671293}
   - component: {fileID: 288346593155764768}
   m_Layer: 0
   m_Name: Camera
@@ -279,14 +278,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &828610147961671293
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6430141957305268327}
-  m_Enabled: 1
 --- !u!114 &288346593155764768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -381,7 +372,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1487918801
+  GlobalObjectIdHash: 2018328166
   InScenePlacedSourceGlobalObjectIdHash: 2018328166
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -412,6 +403,7 @@ MonoBehaviour:
   syncedCooldown:
     m_InternalValue: 0
   localCooldown: 0
+  canCooldown: 0
   primaryInput:
     m_InternalValue: 0
   secondaryInput:
@@ -423,6 +415,8 @@ MonoBehaviour:
   networkAnimator: {fileID: 0}
   renderers: []
   overrideController: {fileID: 0}
+  currentGear:
+    m_InternalValue: 0
   blockedPosition: {x: 0, y: 0, z: 0}
   blockedRotation: {x: 0, y: 0, z: 0}
   blockingCheckSize: {x: 0, y: 0, z: 0}
@@ -478,6 +472,7 @@ MonoBehaviour:
   aimTransform: {fileID: 7589015280016787796}
   aimedWorldFOV: 25
   aimedViewFOV: 30
+  playerWeapon: 1
   maxDamage: 150
   minDamage: 20
   headshotDamageMultiplier: 4

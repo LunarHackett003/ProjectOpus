@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class SpawnOnStart : NetworkBehaviour
 {
+    public bool withOwnership;
     private void Start()
     {
         if (IsSpawned)
@@ -12,6 +13,13 @@ public class SpawnOnStart : NetworkBehaviour
     [ServerRpc]
     void Spawn_ServerRPC(ServerRpcParams param = default)
     {
-        NetworkObject.SpawnWithOwnership(param.Receive.SenderClientId);
+        if (withOwnership)
+        {
+            NetworkObject.SpawnWithOwnership(param.Receive.SenderClientId);
+        }
+        else
+        {
+            NetworkObject.Spawn();
+        }
     }
 }

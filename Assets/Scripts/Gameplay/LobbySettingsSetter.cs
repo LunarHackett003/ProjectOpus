@@ -7,12 +7,11 @@ public class LobbySettingsSetter : MonoBehaviour
 {
 
     public Slider moveSpeedSlider, gravitySlider, reloadSpeedSlider, fireRateSlider, airControlSlider,
-        recoilSlider, inaccuracySlider, damageSlider, fireDamageSlider, shieldSlider, healthSlider,
-        shieldRegenDelay, shieldRegenSpeed, healthRegenDelay, healthRegenSpeed;
+        recoilSlider, inaccuracySlider, damageSlider, fireDamageSlider, healthSlider, healthRegenDelay, healthRegenSpeed;
     public Toggle infiniteTimeToggle, headshotToggle, friendlyFireToggle, shieldRegenToggle, healthRegenToggle;
     public TMP_Text moveSpeedText, gravityText, reloadSpeedText, fireRateText, airControlText, recoilText,
-        inaccuracyText, damageText, fireDamageText, shieldText, healthText, 
-        healthRegenDelayText, healthRegenSpeedText, shieldRegenDelayText, shieldRegenSpeedText;
+        inaccuracyText, damageText, fireDamageText, healthText,
+        healthRegenDelayText, healthRegenSpeedText;
 
     private void OnEnable()
     {
@@ -27,17 +26,13 @@ public class LobbySettingsSetter : MonoBehaviour
             inaccuracySlider.value = GameplayManager.Instance.inaccuracyMultiplier.Value;
             damageSlider.value = GameplayManager.Instance.damageMultiplier.Value;
             fireDamageSlider.value = GameplayManager.Instance.fireDamageMultiplier.Value;
-            shieldSlider.value = GameplayManager.Instance.shieldsMultiplier.Value;
             healthSlider.value = GameplayManager.Instance.healthMultiplier.Value;
             healthRegenDelay.value = GameplayManager.Instance.healthRegenDelay.Value;
             healthRegenSpeed.value = GameplayManager.Instance.healthRegenPerSec.Value;
-            shieldRegenDelay.value = GameplayManager.Instance.shieldRegenDelay.Value;
-            shieldRegenSpeed.value = GameplayManager.Instance.shieldRegenPerSec.Value;
 
             infiniteTimeToggle.isOn = GameplayManager.Instance.infiniteTime.Value;
             headshotToggle.isOn = GameplayManager.Instance.headshotsOnly.Value;
             friendlyFireToggle.isOn = GameplayManager.Instance.friendlyFire.Value;
-            shieldRegenToggle.isOn = GameplayManager.Instance.regenShield.Value;
             healthRegenToggle.isOn = GameplayManager.Instance.regenHealth.Value;
         }    
     }
@@ -110,13 +105,6 @@ public class LobbySettingsSetter : MonoBehaviour
         GameplayManager.Instance.fireDamageMultiplier.Value = ClampAmount(amount);
         fireDamageText.text = $"Fire Damage: x{amount:0.00}";
     }
-    public void SetShieldsMultiplier(float amount)
-    {
-        if (!SteamLobbyManager.Instance.IsHost)
-            return;
-        GameplayManager.Instance.shieldsMultiplier.Value = ClampAmount(amount);
-        shieldText.text = $"Max Shield: x {amount:0.00}";
-    }
     public void SetHealthMultiplier(float amount)
     {
         if (!SteamLobbyManager.Instance.IsHost)
@@ -138,20 +126,6 @@ public class LobbySettingsSetter : MonoBehaviour
             return;
         GameplayManager.Instance.healthRegenDelay.Value = ClampAmount(amount);
         healthRegenDelayText.text = $"Health Regen Delay: {amount}s";
-    }
-    public void SetShieldRegenDelay(float amount)
-    {
-        if (!SteamLobbyManager.Instance.IsHost)
-            return;
-        GameplayManager.Instance.shieldRegenDelay.Value = ClampAmount(amount);
-        shieldRegenDelayText.text = $"Shield Regen Delay: {amount}s";
-    }
-    public void SetShieldRegenSpeed(float amount)
-    {
-        if (!SteamLobbyManager.Instance.IsHost)
-            return;
-        GameplayManager.Instance.shieldRegenPerSec.Value = ClampAmount(amount);
-        shieldRegenSpeedText.text = $"Shield Regen: {amount:0.00}Shields/sec";
     }
     public void SetHealthRegenSpeed(float amount)
     {
@@ -178,12 +152,6 @@ public class LobbySettingsSetter : MonoBehaviour
         if (!SteamLobbyManager.Instance.IsHost)
             return;
         GameplayManager.Instance.friendlyFire.Value = value;
-    }
-    public void SetShieldRegen(bool value)
-    {
-        if (!SteamLobbyManager.Instance.IsHost)
-            return;
-        GameplayManager.Instance.regenShield.Value = value;
     }
     public void SetHealthRegen(bool value)
     {

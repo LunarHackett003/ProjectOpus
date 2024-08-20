@@ -14,22 +14,24 @@ public class Explosive : Grenade
         {
             print("Exploded Server Side");
             Explode_ClientRPC();
-            NetworkObject.Despawn();
 
 
 
             Collider[] overlap = Physics.OverlapSphere(transform.position, damageMaxRange, damageableLayerMask);
             bool[] hitThisFrame = new bool[overlap.Length];
+            print($"checking {overlap.Length} entries on grenade");
             if(overlap != null && overlap.Length > 0)
             {
                 for (int i = 0; i < overlap.Length; i++)
                 {
                     Collider c = overlap[i];
                     Vector3 closest = c.ClosestPoint(transform.position);
-                    if (Physics.Linecast(transform.position, closest ,out RaycastHit hit, losLayerMask))
+                    Ray r = new(transform.position, closest - transform.position);
+                    Debug.DrawRay(r.origin, r.direction, Color.cyan, 5f);
+                    if (Physics.Raycast(r,out RaycastHit hit, damageMaxRange, losLayerMask))
                     {
                         //If we hit this collider with the raycast
-                        if(c.TryGetComponent(out Damageable d) && hit.collider == c && !hitThisFrame[i])
+                        if(c.TryGetComponent(out IDamageable d) && hit.collider == c && !hitThisFrame[i])
                         {
                             //Lerps from the maximum to the minimum damage
                             float damage = Mathf.Lerp(minExplosionDamage, maxExplosionDamage, 
@@ -42,6 +44,7 @@ public class Explosive : Grenade
 
                 }
             }
+            NetworkObject.Despawn();
 
         }
     }
@@ -51,8 +54,8 @@ public class Explosive : Grenade
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(Vector3.zero, damageMaxRange);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(Vector3.zero, damageDropOffCurve.Evaluate(0.5f) * damageMaxRange);
+        Gizmos.DrawWireSphere(Vector3.zero, Mathf.Lerp(damageDropOffStart, damageMaxRange, damageDropOffCurve.Evaluate(0.5f)));
         Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(Vector3.zero, damageDropOffCurve.Evaluate(1) * damageMaxRange);
+        Gizmos.DrawWireSphere(Vector3.zero, damageDropOffStart);
     }
 }

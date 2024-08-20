@@ -52,7 +52,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1036002264
+  GlobalObjectIdHash: 4075985952
   InScenePlacedSourceGlobalObjectIdHash: 2821673158
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -83,11 +83,12 @@ MonoBehaviour:
   syncedCooldown:
     m_InternalValue: 0
   localCooldown: 0
+  canCooldown: 0
   primaryInput:
     m_InternalValue: 0
   secondaryInput:
     m_InternalValue: 0
-  isWeapon: 0
+  isWeapon: 1
   playerAnimations: {fileID: 11400000, guid: cd295ed129d6ecc4fa9ad2749b9ee07f, type: 2}
   weaponAnimations: {fileID: 11400000, guid: d2b67f9afe6f1b141bb5e770ab73a725, type: 2}
   animator: {fileID: 5704680303091172958}
@@ -95,6 +96,8 @@ MonoBehaviour:
   renderers:
   - {fileID: 7029070090907295047}
   overrideController: {fileID: 0}
+  currentGear:
+    m_InternalValue: 0
   blockedPosition: {x: -0.18, y: -0.08, z: -0.08}
   blockedRotation: {x: 35.69, y: -58.3, z: 0}
   blockingCheckSize: {x: 0.14, y: 0.3, z: 0.74}
@@ -148,7 +151,10 @@ MonoBehaviour:
   minBaseSpread: {x: 0, y: 0}
   maxBaseSpread: {x: 0, y: 0}
   aimTransform: {fileID: 5147752212863261851}
-  maxDamage: 15
+  aimedWorldFOV: 70
+  aimedViewFOV: 30
+  playerWeapon: 1
+  maxDamage: 20
   minDamage: 1
   headshotDamageMultiplier: 2
   damageDropoffStart: 10

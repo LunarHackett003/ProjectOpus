@@ -15,30 +15,30 @@ MonoBehaviour:
   active: 1
   mode:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 1
   neutralHDRRangeReductionMode:
     m_OverrideState: 0
-    m_Value: 2
+    m_Value: 1
   acesPreset:
-    m_OverrideState: 0
-    m_Value: 3
+    m_OverrideState: 1
+    m_Value: 5
   hueShiftAmount:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 1
   detectPaperWhite:
     m_OverrideState: 0
     m_Value: 0
   paperWhite:
     m_OverrideState: 0
-    m_Value: 300
+    m_Value: 100
   detectBrightnessLimits:
     m_OverrideState: 0
     m_Value: 1
   minNits:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0.005
   maxNits:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1000
 --- !u!114 &-1174467485591032532
 MonoBehaviour:
