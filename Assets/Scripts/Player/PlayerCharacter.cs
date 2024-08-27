@@ -15,6 +15,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using TMPro;
 using UnityEngine.VFX;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
 {
@@ -26,7 +27,7 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
     public NetworkVariable<ulong> mySteamID;
 
     [SerializeField] internal Rigidbody rb;
-    [SerializeField] Transform lookTransform;
+    [SerializeField] internal Transform lookTransform;
     [SerializeField] internal Transform clientRotationRoot;
     [SerializeField] Transform weaponSwayTransform;
     [SerializeField] Transform cameraRecoilTransform;
@@ -44,8 +45,8 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
     [SerializeField] internal ClientNetworkAnimator netAnimator;
     [SerializeField] internal Animator animator;
 
-    [SerializeField] float aimPitch = 0;
-
+    [SerializeField] internal float aimPitch = 0;
+    internal float previousAimPitch;
     public float aimPitchOffset;
 
     public NetworkVariable<float> currentHealth = new(writePerm: NetworkVariableWritePermission.Server);
@@ -105,6 +106,8 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
     float aimPitchRecoil;
     Vector3 weaponRecoilLinear, weaponRecoilAngular, cameraRecoilLinear, cameraRecoilAngular, 
         vel_weaponRecoilLinear, vel_weaponRecoilAngular, vel_cameraRecoilLinear, vel_cameraRecoilAngular;
+
+    [SerializeField] internal Camera viewmodelCamera;
     #endregion
     #region Callbacks
     private void OnEnable()
@@ -132,11 +135,14 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
 
         if (IsOwner)
         {
+            //Respawn the player
             Respawn(true);
-            rb.isKinematic = false;
+            
+            var data = Camera.main.GetUniversalAdditionalCameraData();
+            data.cameraStack.Add(viewmodelCamera);
+            
+            ResetHealth_ServerRPC();
         }
-        ResetHealth_ServerRPC();
-        
     }
     public override void OnNetworkSpawn()
     {
@@ -158,6 +164,7 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
             });
             PlayerManager.Instance.pc = this;
             mySteamID.Value = SteamClient.SteamId;
+
         }
 
         canRespawn.OnValueChanged += OnRespawnChanged;
@@ -168,7 +175,6 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
         if (IsServer || IsOwner)
         {
             currentHealth.OnValueChanged += OnHealthChanged;
-            rb.isKinematic = true;
         }
         rb = GetComponent<Rigidbody>();
     }
@@ -296,16 +302,15 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
         }
         UpdateRecoil_Fixed();
     }
-    
+
+    Vector3 linearWeaponRecoilFinal, linearCameraRecoilFinal; Quaternion angularWeaponRecoilFinal, angularCameraRecoilFinal;
     void UpdateRecoil_Frame()
     {
         if (weaponSwayTransform && wm.GetRecoilProfile != null)
         {
-            cameraRecoilTransform.SetLocalPositionAndRotation(Vector3.SmoothDamp(cameraRecoilTransform.localPosition, cameraRecoilLinear, ref vel_cameraRecoilLinear, wm.GetRecoilProfile.camRecoilSmoothness),
-                Quaternion.Lerp(cameraRecoilTransform.localRotation, Quaternion.Euler(new Vector3(0, cameraRecoilAngular.y, cameraRecoilAngular.z)), Time.fixedDeltaTime * wm.GetRecoilProfile.camAngularRecoilDecay) );
+            cameraRecoilTransform.SetLocalPositionAndRotation(linearCameraRecoilFinal, angularCameraRecoilFinal);
 
-            weaponSwayTransform.SetLocalPositionAndRotation(Vector3.SmoothDamp(weaponSwayTransform.localPosition, weaponRecoilLinear, ref vel_weaponRecoilLinear, wm.GetRecoilProfile.weaponRecoilSmoothness),
-                Quaternion.Lerp(weaponSwayTransform.localRotation,  Quaternion.Euler(weaponRecoilAngular) * wm.recoilPointInitialRotation, Time.fixedDeltaTime * wm.GetRecoilProfile.weaponAngularRecoilDecay));
+            weaponSwayTransform.SetLocalPositionAndRotation(linearWeaponRecoilFinal + wm.swayPosition + (Vector3)wm.bobPosition, angularWeaponRecoilFinal * Quaternion.Euler(wm.swayEuler));
         }
     }
     void UpdateRecoil_Fixed()
@@ -324,6 +329,12 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
             cameraRecoilAngular = Vector3.Lerp(cameraRecoilAngular, Vector3.zero, cameraDecay);
             weaponRecoilLinear = Vector3.Lerp(weaponRecoilLinear, Vector3.zero, weaponDecay);
             weaponRecoilAngular = Vector3.Lerp(weaponRecoilAngular , Vector3.zero, weaponDecay);
+
+            linearWeaponRecoilFinal = Vector3.SmoothDamp(linearWeaponRecoilFinal, weaponRecoilLinear, ref vel_weaponRecoilLinear, wm.GetRecoilProfile.weaponRecoilSmoothness);
+            linearCameraRecoilFinal = Vector3.SmoothDamp(linearCameraRecoilFinal, cameraRecoilLinear, ref vel_cameraRecoilLinear, wm.GetRecoilProfile.camRecoilSmoothness);
+
+            angularWeaponRecoilFinal = Quaternion.Lerp(angularWeaponRecoilFinal, Quaternion.Euler(weaponRecoilAngular) * wm.recoilPointInitialRotation, Time.fixedDeltaTime * wm.GetRecoilProfile.weaponAngularRecoilDecay);
+            angularCameraRecoilFinal = Quaternion.Lerp(angularCameraRecoilFinal, Quaternion.Euler(new Vector3(0, cameraRecoilAngular.y, cameraRecoilAngular.z)), Time.fixedDeltaTime * wm.GetRecoilProfile.camAngularRecoilDecay);
         }
     }
     Vector3 spectatorPosition;
@@ -370,6 +381,18 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
     void TryMove(Vector2 moveInput)
     {
         moveInput = Vector2.ClampMagnitude(moveInput, 1);
+
+        rb.isKinematic = moveState.Value switch
+        {
+            MoveState.vaulting => true,
+            MoveState.grounded => false,
+            MoveState.airborne => false,
+            MoveState.ladder => true,
+            MoveState.mounted => true,
+            MoveState.sliding => false,
+            _ => false,
+        };
+
         if (moveState.Value != MoveState.vaulting)
         {
 
@@ -399,18 +422,6 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
                     }
                 }
             }
-
-
-            rb.isKinematic = moveState.Value switch
-            {
-                MoveState.vaulting => true,
-                MoveState.grounded => false,
-                MoveState.airborne => false,
-                MoveState.ladder => true,
-                MoveState.mounted => true,
-                MoveState.sliding => false,
-                _ => false,
-            };
 
 
             switch (moveState.Value)
@@ -527,7 +538,6 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
             yield return new WaitForFixedUpdate();
         }
         moveState.Value = MoveState.airborne;
-        rb.isKinematic = false;
     }
     private void Update()
     {
@@ -539,6 +549,7 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
         }
         if (PlayerManager.Instance.InGame)
         {
+            previousAimPitch = aimPitch;
             aimPitch = Mathf.Clamp(aimPitch - (PlayerManager.Instance.lookSpeed.y * PlayerManager.Instance.lookInput.y * (PlayerManager.Instance.invertLookY ? -1 : 1) * Time.deltaTime), -89, 89);
             lookTransform.localRotation = Quaternion.Euler(aimPitch + aimPitchOffset, 0, 0);
             clientRotationRoot.localRotation *= Quaternion.Euler(0, PlayerManager.Instance.lookInput.x * Time.deltaTime * PlayerManager.Instance.lookSpeed.x, 0);
@@ -610,6 +621,7 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
                 item.enabled = false;
             }
         }
+        wm.KillPlayer();
         deathEvent?.Invoke();
     }
     void Respawn(bool firstSpawn)
@@ -647,6 +659,14 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
             spectatorRotation = Quaternion.identity;
             spectatorTransform.SetLocalPositionAndRotation(spectatorPosition, spectatorRotation);
         }
+        if (renderersToDisableOnDeath.Length > 0)
+        {
+            foreach (var item in renderersToDisableOnDeath)
+            {
+                item.enabled = true;
+            }
+        }
+        
     }
 
     [ServerRpc]
@@ -697,7 +717,6 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
         
         currentLadder = null;
         moveState.Value = MoveState.airborne;
-        rb.isKinematic = false;
         if (nt.IsServerAuthoritative())
         {
             Jump_ServerRPC();
@@ -719,34 +738,6 @@ public class PlayerCharacter : NetworkBehaviour, IDamageable, IFlammable
         {
             ApplyJumpForce(MoveInput.Value);
         }
-    }
-    float flashtime = 0;
-    public void ReceiveFlashbangEffect(float time, float maxTime)
-    {
-        if(time < flashtime || flashtime == 0 || flashtime == maxTime)
-            flashtime = time;
-        else
-        {
-            flashtime -= time / 2;
-        }
-        flashbangTime = maxTime;
-        flashtime = Mathf.Max(flashtime, 0);
-        print("received flashbang effect");
-        if (!flashbangVolume.enabled)
-        {
-            StartCoroutine(FlashbangEffect());
-        }       
-    }
-    IEnumerator FlashbangEffect()
-    {
-        flashbangVolume.enabled = true;
-        while (flashtime < flashbangTime)
-        {
-            flashtime += Time.deltaTime;
-            flashbangVolume.weight = flashbangWeightCurve.Evaluate(Mathf.InverseLerp(flashbangTime, 0, flashtime));
-            yield return new WaitForEndOfFrame();
-        }
-        flashbangVolume.enabled = false;
     }
 
     public void TakeDamage(float damageAmount)

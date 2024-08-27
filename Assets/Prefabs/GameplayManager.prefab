@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4252469150
+  GlobalObjectIdHash: 327420051
   InScenePlacedSourceGlobalObjectIdHash: 327420051
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -113,7 +113,7 @@ MonoBehaviour:
     m_InternalValue: 1
   bulletLayermask:
     serializedVersion: 2
-    m_Bits: 200705
+    m_Bits: 724993
   TeamMembers:
     m_InternalValue: []
   teamMembers: []
@@ -147,23 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c0a998a7c20be044a82713799eb45bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  barrelSpawnpoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  barrelSpawnpoints: []
   barrels:
   - {fileID: 5548346576246866392, guid: 1f4c1523f9eba1a478cb268848e01577, type: 3}
   - {fileID: 7972995105500606960, guid: 9dc4c007c3afe214b8b4592463dbb8ab, type: 3}

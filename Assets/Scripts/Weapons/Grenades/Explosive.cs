@@ -44,7 +44,10 @@ public class Explosive : Grenade
 
                 }
             }
-            NetworkObject.Despawn();
+            if (NetworkObject.IsSpawned)
+            {
+                NetworkObject.Despawn();
+            }
 
         }
     }

@@ -14,18 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   aimPitchDecaySpeed: 15
   minCamRecoilEuler: {x: -5, y: -2, z: -10}
-  maxCamRecoilEuler: {x: -5, y: 2, z: 10}
-  minCamRecoilLinear: {x: 0, y: 0.02, z: 0.05}
-  maxCamRecoilLinear: {x: 0, y: 0.05, z: 0.07}
-  minWeaponRecoilEuler: {x: -20, y: -2, z: -5}
-  maxWeaponRecoilEuler: {x: -15, y: 2, z: 5}
+  maxCamRecoilEuler: {x: -5, y: -2, z: 10}
+  minCamRecoilLinear: {x: 0, y: 0.02, z: 0.08}
+  maxCamRecoilLinear: {x: 0, y: 0.05, z: 0.25}
+  minWeaponRecoilEuler: {x: -20, y: -8, z: -20}
+  maxWeaponRecoilEuler: {x: -15, y: 8, z: 20}
   minWeaponRecoilLinear: {x: -0.01, y: -0.02, z: -0.05}
-  maxWeaponRecoilLinear: {x: 0.01, y: -0.04, z: -0.07}
+  maxWeaponRecoilLinear: {x: 0.01, y: -0.04, z: -0.1}
   camRecoilSmoothness: 0.03
-  camAngularRecoilDecay: 2
+  camAngularRecoilDecay: 5
   weaponRecoilSmoothness: 0.05
   weaponAngularRecoilDecay: 2
   cameraRecoilDecay: 15
-  weaponRecoilDecay: 5
+  weaponRecoilDecay: 25
   spreadAdditivePerShot: 1
-  spreadDecay: 1
+  spreadDecay: 0.75

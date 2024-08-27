@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 729050b954d25954aa545fed735f4612, type: 3}
+  m_Name: MPXAnimations
+  m_EditorClassIdentifier: 
+  overrides:
+  - name: Equip
+    clip: {fileID: 7400000, guid: 79766d755c9230d4c9d96825456818eb, type: 2}
+  - name: Fire
+    clip: {fileID: 7400000, guid: 03c7819d23653364396f78a0debdd3f1, type: 2}
+  - name: Reload
+    clip: {fileID: 7400000, guid: 87349909bb282e045857cb06fed6641f, type: 2}
+  - name: Inspect
+    clip: {fileID: 7400000, guid: 37409da3f39ccb144bea3e4c5eff4753, type: 2}

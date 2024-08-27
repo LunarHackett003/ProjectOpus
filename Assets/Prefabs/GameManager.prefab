@@ -5436,7 +5436,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2357009173794047402}
   m_HandleRect: {fileID: 1588595565622763448}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -7220,7 +7220,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.0004545965}
+  m_AnchoredPosition: {x: 0, y: 0.00000016391277}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2364716330329384790
@@ -7770,7 +7770,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.0004545965}
+  m_AnchoredPosition: {x: 0, y: 0.00000016391277}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &7656678364084979704
@@ -9543,6 +9543,7 @@ GameObject:
   - component: {fileID: 5631587053869344758}
   - component: {fileID: 8715093118485690842}
   - component: {fileID: 3141603734660576463}
+  - component: {fileID: 8379763755289512022}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -9620,9 +9621,6 @@ MonoBehaviour:
   viewFOV: 50
   baseWorldFOV: 70
   baseViewFOV: 50
-  affectedRenderObjects:
-  - {fileID: -4633656645432227005, guid: 7f4fbfbb957be634f9723a88a27f5605, type: 2}
-  - {fileID: 6081251165910853111, guid: 7f4fbfbb957be634f9723a88a27f5605, type: 2}
   moveInput: {x: 0, y: 0}
   lookInput: {x: 0, y: 0}
   sprintInput: 0
@@ -9632,11 +9630,11 @@ MonoBehaviour:
   jumpInput: 0
   reloadInput: 0
   holdCrouch: 0
-  holdSprint: 0
+  holdSprint: 1
   holdAim: 0
   cameraMask:
     serializedVersion: 2
-    m_Bits: 269303
+    m_Bits: 269239
 --- !u!114 &5631587053869344758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9882,6 +9880,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 9d8ab580-0a55-467f-878d-4ca0d9791fdf
     m_ActionName: 'Player/Reload[/Keyboard/r]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 5546705151008446972}
+        m_TargetAssemblyTypeName: opus.Gameplay.PlayerManager, Assembly-CSharp
+        m_MethodName: GetMeleeInput
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: a725aeb4-e5a2-4a62-aa17-d91c34068553
+    m_ActionName: 'Player/Melee[/Keyboard/v]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -9949,6 +9963,19 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &8379763755289512022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4785674527867527620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83a6c2d86a4ebde43bdc2527fe65c95a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SequencesRunning: 0
 --- !u!1 &4863832684527918913
 GameObject:
   m_ObjectHideFlags: 0
@@ -15641,7 +15668,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4083797615350612257}
   m_HandleRect: {fileID: 5704062059315687607}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -17039,7 +17066,6 @@ MonoBehaviour:
   infiniteTimeToggle: {fileID: 4786889386132218902}
   headshotToggle: {fileID: 5122005071372055364}
   friendlyFireToggle: {fileID: 1134041742732164737}
-  shieldRegenToggle: {fileID: 7437320910636733520}
   healthRegenToggle: {fileID: 3616569167647123814}
   moveSpeedText: {fileID: 1869855605171346226}
   gravityText: {fileID: 4798598343931982073}

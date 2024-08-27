@@ -53,7 +53,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 4075985952
-  InScenePlacedSourceGlobalObjectIdHash: 2821673158
+  InScenePlacedSourceGlobalObjectIdHash: 4075985952
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -89,7 +89,7 @@ MonoBehaviour:
   secondaryInput:
     m_InternalValue: 0
   isWeapon: 1
-  playerAnimations: {fileID: 11400000, guid: cd295ed129d6ecc4fa9ad2749b9ee07f, type: 2}
+  playerAnimations: {fileID: 11400000, guid: d2b67f9afe6f1b141bb5e770ab73a725, type: 2}
   weaponAnimations: {fileID: 11400000, guid: d2b67f9afe6f1b141bb5e770ab73a725, type: 2}
   animator: {fileID: 5704680303091172958}
   networkAnimator: {fileID: 3192812003269527757}
@@ -107,7 +107,7 @@ MonoBehaviour:
   maxAmmo: 30
   currentAmmo:
     m_InternalValue: 0
-  useAmmo: 0
+  useAmmo: 1
   fireEvents:
     m_PersistentCalls:
       m_Calls:
@@ -136,6 +136,18 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   recoilProfile: {fileID: 11400000, guid: 0a53ec4bee0d2984e956dbf077a762de, type: 2}
+  reloadSequence:
+    events:
+    - time: 2.5
+      eventData: {fileID: 11400000, guid: 3e53b96be59308c478133d258455ed13, type: 2}
+    currentTime: 0
+  gunshotReference:
+    Guid:
+      Data1: -1125471935
+      Data2: 1277452750
+      Data3: 501421219
+      Data4: -1956093027
+    Path: event:/Weapons/SMG
   roundsPerMinute: 800
   roundsPerSecond: 13.333333
   timeBetweenRounds: 0.075
@@ -146,14 +158,16 @@ MonoBehaviour:
   delayAfterBurst: 0.1
   delayBeforeFire: 0
   playFireAnimationOnDelay: 0
+  playSoundOnDelay: 0
   minHipSpread: {x: -25, y: -25}
   maxHipSpread: {x: 25, y: 25}
   minBaseSpread: {x: 0, y: 0}
   maxBaseSpread: {x: 0, y: 0}
-  aimTransform: {fileID: 5147752212863261851}
-  aimedWorldFOV: 70
+  aimedWorldFOV: 60
   aimedViewFOV: 30
+  aimPosition: {x: 0.1252, y: 0, z: 0}
   playerWeapon: 1
+  reloadTime: 2
   maxDamage: 20
   minDamage: 1
   headshotDamageMultiplier: 2
@@ -207,6 +221,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 386a640015197354d989be7ec700d731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  withOwnership: 0
 --- !u!114 &3817723144800104226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5779,6 +5794,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 6180833488598099292}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: d90addcd73bdc7f488df3d4a41fcd4f6, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d90addcd73bdc7f488df3d4a41fcd4f6, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d90addcd73bdc7f488df3d4a41fcd4f6, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: d90addcd73bdc7f488df3d4a41fcd4f6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -5863,7 +5890,7 @@ Animator:
   m_GameObject: {fileID: 9015416387119390862}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 9d9ee40ce54e6c64a98e33cfefbef401, type: 2}
+  m_Controller: {fileID: 9100000, guid: 50848221087a04641822e02c34e24d3e, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

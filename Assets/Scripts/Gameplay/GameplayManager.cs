@@ -197,7 +197,7 @@ public class GameplayManager : NetworkBehaviour
         base.OnNetworkDespawn();
     }
 
-    void UpdateGameMode()
+    protected virtual void UpdateGameMode()
     {
 
     }

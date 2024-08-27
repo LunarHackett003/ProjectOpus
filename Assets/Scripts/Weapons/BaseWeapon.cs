@@ -1,3 +1,4 @@
+using FMODUnity;
 using opus.Weapons;
 using System.Collections;
 using Unity.Netcode;
@@ -15,6 +16,10 @@ public class BaseWeapon : BaseEquipment
     [SerializeField] protected UnityEvent fireEvents;
 
     [SerializeField] internal RecoilProfile recoilProfile;
+
+    [SerializeField] internal EventSequence reloadSequence;
+
+    [SerializeField] EventReference gunshotReference;
 
     public enum FireMode
     {
@@ -35,7 +40,7 @@ public class BaseWeapon : BaseEquipment
         /// </summary>
         auto = 3
     }
-
+    public string FireAnimatorParamName = "Fire";
     [SerializeField, Tooltip("How many rounds are fired every minute")] protected float roundsPerMinute;
     [SerializeField, Tooltip("How many rounds are fired every second")] protected float roundsPerSecond;
     [SerializeField, Tooltip("The delay between each shot")] protected float timeBetweenRounds;
@@ -47,6 +52,7 @@ public class BaseWeapon : BaseEquipment
 
     [SerializeField] protected float delayBeforeFire;
     [SerializeField] protected bool playFireAnimationOnDelay;
+    [SerializeField] protected bool playSoundOnDelay;
     [SerializeField] protected Vector2 minHipSpread, maxHipSpread;
     [SerializeField] protected Vector2 minBaseSpread, maxBaseSpread;
 
@@ -62,7 +68,7 @@ public class BaseWeapon : BaseEquipment
 
     [SerializeField] internal float reloadTime = 2;
     //Sends the fire stuff to everyone
-    [Rpc(SendTo.ClientsAndHost, DeferLocal = true)]
+    [Rpc(SendTo.ClientsAndHost)]
     protected virtual void FireWeapon_RPC(Vector3 end)
     {
         print("received remote fire from a client");
@@ -98,7 +104,7 @@ public class BaseWeapon : BaseEquipment
     {
         delayDone = true;
     }
-    bool CheckWeaponManager()
+    protected bool CheckWeaponManager()
     {
         if (!wm && playerWeapon)
         {
@@ -186,19 +192,16 @@ public class BaseWeapon : BaseEquipment
             {
                 if(delayDone)
                     StartCoroutine(DelayFire());
-                if (playFireAnimationOnDelay)
-                    networkAnimator.SetTrigger("Fire");
             }
             else
             {
                 rofLimited = true;
                 Invoke(nameof(ResetROFLimit), timeBetweenRounds / GameplayManager.Instance.fireRateMultiplier.Value);
                 if (!playFireAnimationOnDelay)
-                    networkAnimator.SetTrigger("Fire");
+                    networkAnimator.SetTrigger(FireAnimatorParamName);
             }
         }
     }
-
     public IEnumerator BurstFire()
     {
         int b = 0;
@@ -214,37 +217,80 @@ public class BaseWeapon : BaseEquipment
         semiFired = false;
     }
     bool delayDone;
+
+        [SerializeField, Tooltip("How much damage this weapon does at the dropoff start")] protected float maxDamage = 20;
+
+        [SerializeField, Tooltip("How much damage this weapon does at the dropoff end")] protected float minDamage = 1;
+
+        [SerializeField, Tooltip("How much the damage is multiplied by on a headshot")] protected float headshotDamageMultiplier;
+
+        [SerializeField, Tooltip("The distance in metres before which the weapon deals max damage")] protected float damageDropoffStart = 10;
+
+        [SerializeField, Tooltip("The distance in metres after which the weapon deals min damage")] protected float damageDropoffEnd = 100;
     public IEnumerator DelayFire()
     {
         delayDone = false;
-        if (playFireAnimationOnDelay)
+        if (playFireAnimationOnDelay && IsOwner)
         {
-            wm.pc.netAnimator.SetTrigger("Fire");
+            wm.pc.netAnimator.SetTrigger(FireAnimatorParamName);
+            networkAnimator.SetTrigger(FireAnimatorParamName);
+        }
+        if (playSoundOnDelay)
+        {
+            PlayGunshot(true);
         }
         yield return new WaitForSeconds(delayBeforeFire / GameplayManager.Instance.fireRateMultiplier.Value);
         if (IsServer)
         {
             FireWeaponOnServer(wm ? wm.NetworkObject : NetworkObject);
-        }
-        if (IsOwner || IsServer)
-        {
             rofLimited = true;
+        }
+        if (IsOwner)
+        {
+            if (!playFireAnimationOnDelay)
+            {
+                wm.pc.netAnimator.SetTrigger(FireAnimatorParamName);
+                networkAnimator.SetTrigger(FireAnimatorParamName);
+                rofLimited = true;
+            }
         }
         Invoke(nameof(ResetROFLimit), timeBetweenRounds / GameplayManager.Instance.fireRateMultiplier.Value);
         delayDone = true;
+    }
+    void PlayGunshot(bool sendRPC)
+    {
+        if (gunshotReference.IsNull)
+            return;
+
+        RuntimeManager.PlayOneShot(gunshotReference, transform.position);
+        if (sendRPC)
+        {
+            PlayGunshot_RPC();
+        }
+    }
+    [Rpc(SendTo.NotMe)]
+    void PlayGunshot_RPC()
+    {
+        PlayGunshot(false);
     }
     public virtual void FireWeapon(Vector3 end)
     {
         print("fired weapon locally");
         fireEvents?.Invoke();
-        if(wm && wm.pc && wm.pc.netAnimator && !(delayBeforeFire > 0 && playFireAnimationOnDelay))
+        if (!playSoundOnDelay)
+            PlayGunshot(false);
+        if(IsOwner && wm && wm.pc)
         {
-            wm.pc.netAnimator.SetTrigger("Fire");
-        }
-
-        if(wm && wm.pc)
-        {
+            if(wm.pc.netAnimator && !playFireAnimationOnDelay)
+            {
+                wm.pc.netAnimator.SetTrigger(FireAnimatorParamName);
+            }
             wm.ReceiveRecoil();
+            if(storedUses > 0)
+            {
+                currentStoredUses.Value--;
+                CheckStillUsable();
+            }
         }
     }
     protected Vector3 SpreadVector(Vector2 min, Vector2 max, float z)

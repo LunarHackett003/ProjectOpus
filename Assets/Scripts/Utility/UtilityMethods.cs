@@ -25,6 +25,15 @@ namespace opus.utility
                 return null;
             }
         }
+        public static Vector3 ScaleThis(this Vector3 a, Vector3 b)
+        {
+            return new()
+            {
+                x = a.x * b.x,
+                y = a.y * b.y,
+                z = a.z * b.z
+            };
+        }
         public static Texture2D Convert(this Steamworks.Data.Image image)
         {
             // Create a new Texture2D
@@ -45,6 +54,24 @@ namespace opus.utility
 
             avatar.Apply();
             return avatar;
+        }
+    }
+    public static class ScriptableObjectExtension
+    {
+        /// <summary>
+        /// Creates and returns a clone of any given scriptable object.
+        /// </summary>
+        public static T Clone<T>(this T scriptableObject) where T : ScriptableObject
+        {
+            if (scriptableObject == null)
+            {
+                Debug.LogError($"ScriptableObject was null. Returning default {typeof(T)} object.");
+                return (T)ScriptableObject.CreateInstance(typeof(T));
+            }
+
+            T instance = UnityEngine.Object.Instantiate(scriptableObject);
+            instance.name = scriptableObject.name; // remove (Clone) from name
+            return instance;
         }
     }
 }

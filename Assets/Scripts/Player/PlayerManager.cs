@@ -1,9 +1,7 @@
 using opus.SteamIntegration;
 using opus.Weapons;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering.Universal;
 namespace opus.Gameplay {
     public class PlayerManager : MonoBehaviour
     {
@@ -42,8 +40,7 @@ namespace opus.Gameplay {
         public bool invertLookY;
 
         public float worldFOV, viewFOV, baseWorldFOV, baseViewFOV;
-        float _worldFOV, _viewFOV;
-        public RenderObjects[] affectedRenderObjects;
+        float _worldFOV = -1, _viewFOV = -1;
 
         public Vector2 moveInput, lookInput;
         public bool sprintInput, crouchInput, fireInput, aimInput, jumpInput, reloadInput;
@@ -52,20 +49,20 @@ namespace opus.Gameplay {
         bool PlayerAlive => InGame && pc && !pc.Dead.Value;
         private void FixedUpdate()
         {
-            if(_worldFOV != worldFOV)
+            if (pc)
             {
-                _worldFOV = worldFOV;
-                if (pc && pc.cineCam)
+                if(_worldFOV != worldFOV)
                 {
-                    pc.cineCam.Lens.FieldOfView = worldFOV; 
+                    _worldFOV = worldFOV;
+                    if (pc.cineCam)
+                    {
+                        pc.cineCam.Lens.FieldOfView = worldFOV; 
+                    }
                 }
-            }
-            if(_viewFOV != viewFOV)
-            {
-                _viewFOV = viewFOV;
-                foreach (var item in affectedRenderObjects)
+                if(_viewFOV != viewFOV)
                 {
-                    item.settings.cameraSettings.cameraFieldOfView = viewFOV;
+                    _viewFOV = viewFOV;
+                        pc.viewmodelCamera.fieldOfView = viewFOV;
                 }
             }
         }
@@ -261,6 +258,13 @@ namespace opus.Gameplay {
         public void GetInteractInput(InputAction.CallbackContext context)
         {
             interactInput = context.ReadValueAsButton();
+        }
+        public void GetMeleeInput(InputAction.CallbackContext context)
+        {
+            if (InGame && context.performed)
+            {
+                pc.wm.TryMeleeAttack();
+            }
         }
         #endregion
     }

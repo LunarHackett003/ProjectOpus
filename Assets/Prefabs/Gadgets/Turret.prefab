@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isHead: 0
-  ownerFound: 0
+  ownerName: 
 --- !u!65 &9027932710041159658
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -443,6 +443,16 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   recoilProfile: {fileID: 0}
+  reloadSequence:
+    events: []
+    currentTime: 0
+  gunshotReference:
+    Guid:
+      Data1: 63462863
+      Data2: 1083491563
+      Data3: 964216707
+      Data4: -396832587
+    Path: event:/Weapons/Pistol
   roundsPerMinute: 300
   roundsPerSecond: 5
   timeBetweenRounds: 0.2
@@ -453,20 +463,22 @@ MonoBehaviour:
   delayAfterBurst: 0
   delayBeforeFire: 0
   playFireAnimationOnDelay: 0
+  playSoundOnDelay: 0
   minHipSpread: {x: 0, y: 0}
   maxHipSpread: {x: 0, y: 0}
   minBaseSpread: {x: -2, y: -2}
   maxBaseSpread: {x: 2, y: 2}
-  aimTransform: {fileID: 0}
   aimedWorldFOV: 70
   aimedViewFOV: 30
+  aimPosition: {x: 0, y: 0, z: 0}
   playerWeapon: 0
+  reloadTime: 2
   maxDamage: 5
   minDamage: 0
   headshotDamageMultiplier: 1
-  damageDropoffStart: 20
-  damageDropoffEnd: 40
-  maxRange: 40
+  damageDropoffStart: 10
+  damageDropoffEnd: 25
+  maxRange: 25
   tracerPrefab: {fileID: 5821701802367213182, guid: dc383cbbe6d13d74db7438af3ba00afb, type: 3}
   tracerSpeed: 100
   tracerOrigin: {fileID: 7588995642684619659}
@@ -517,7 +529,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isHead: 0
-  ownerFound: 0
+  ownerName: 
 --- !u!65 &4544027059755891863
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1440,7 +1452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3304633857
+  GlobalObjectIdHash: 983027658
   InScenePlacedSourceGlobalObjectIdHash: 3304633857
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1

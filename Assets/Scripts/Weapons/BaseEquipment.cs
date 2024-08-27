@@ -24,10 +24,7 @@ public class BaseEquipment : BaseGear
     protected override void Start()
     {
         base.Start();
-        if (animator)
-        {
-            UpdateAnimations();
-        }
+
     }
     public override void OnNetworkSpawn()
     {
@@ -35,6 +32,10 @@ public class BaseEquipment : BaseGear
         if (IsServer)
         {
             currentStoredUses.Value = storedUses;
+        }
+        if (animator)
+        {
+            UpdateAnimations();
         }
     }
     protected virtual void UpdateAnimations()
@@ -53,7 +54,7 @@ public class BaseEquipment : BaseGear
             clipOverrides[pair.name] = pair.clip;
         }
         overrideController.ApplyOverrides(clipOverrides);
-
+        animator.Rebind();
         
     }
     protected virtual void CheckStillUsable()

@@ -8,7 +8,7 @@ public class LobbySettingsSetter : MonoBehaviour
 
     public Slider moveSpeedSlider, gravitySlider, reloadSpeedSlider, fireRateSlider, airControlSlider,
         recoilSlider, inaccuracySlider, damageSlider, fireDamageSlider, healthSlider, healthRegenDelay, healthRegenSpeed;
-    public Toggle infiniteTimeToggle, headshotToggle, friendlyFireToggle, shieldRegenToggle, healthRegenToggle;
+    public Toggle infiniteTimeToggle, headshotToggle, friendlyFireToggle, healthRegenToggle;
     public TMP_Text moveSpeedText, gravityText, reloadSpeedText, fireRateText, airControlText, recoilText,
         inaccuracyText, damageText, fireDamageText, healthText,
         healthRegenDelayText, healthRegenSpeedText;

@@ -25,9 +25,10 @@ public class Grenade : NetworkBehaviour
 
         if (IsOwner)
         {
-            rb = GetComponent<Rigidbody>();
-            if (launchOnStart)
+            if(TryGetComponent(out rb) && launchOnStart)
+            {
                 rb.AddForce(transform.forward * launchForce);
+            }
             if (fuseOnStart)
                 SetFuse();
         }
@@ -51,7 +52,6 @@ public class Grenade : NetworkBehaviour
     {
         ExplodeServerSide();
         NetworkManager.SpawnManager.InstantiateAndSpawn(explosionPrefab.GetComponent<NetworkObject>(), position: transform.position, rotation: Quaternion.identity);
-
     }
     [ServerRpc(DeferLocal = true)]
     protected void SetFuse_ServerRPC()

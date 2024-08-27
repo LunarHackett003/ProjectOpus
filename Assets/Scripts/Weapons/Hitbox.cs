@@ -9,14 +9,15 @@ public class Hitbox : NetworkBehaviour, IDamageable
     public NetworkObject NetObject => NetworkObject;
 
     public Transform ThisTransform => transform;
-
+    public string ownerName;
     public void TakeDamage(float damageAmount)
     {
         owner.TakeDamage(damageAmount);
     }
     private void Awake()
     {
-        owner ??= transform.parent.GetComponentInParent<IDamageable>();
+        owner ??= transform.root.GetComponent<IDamageable>();
+        ownerName = owner.NetObject.name;
     }
 
 }

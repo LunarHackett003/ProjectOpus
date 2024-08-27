@@ -45,11 +45,6 @@ namespace opus.Weapons
             return tr;
         }
 
-        [SerializeField, Tooltip("How much damage this weapon does at the dropoff start")] protected float maxDamage = 20;
-        [SerializeField, Tooltip("How much damage this weapon does at the dropoff end")] protected float minDamage = 1;
-        [SerializeField, Tooltip("How much the damage is multiplied by on a headshot")] protected float headshotDamageMultiplier;
-        [SerializeField, Tooltip("The distance in metres before which the weapon deals max damage")] protected float damageDropoffStart = 10;
-        [SerializeField, Tooltip("The distance in metres after which the weapon deals min damage")] protected float damageDropoffEnd = 100;
         [SerializeField, Tooltip("The maximum distance this weapon will fire across")] protected float maxRange = 300;
         [SerializeField] protected GameObject tracerPrefab;
         [SerializeField] protected float tracerSpeed;
@@ -65,7 +60,14 @@ namespace opus.Weapons
             public Vector3 start, end;
             public float increment;
         }
-
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            if (TracerPool != null)
+            {
+                TracerPool.Clear();
+            }
+        }
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -163,7 +165,7 @@ namespace opus.Weapons
                     }
                     else
                     {
-                        PlayerCharacter.players.First(x => x.OwnerClientId == OwnerClientId)?.wm.HitFeedback_RPC(didHeadshotDamage);
+                        PlayerCharacter.players.First(x => x.OwnerClientId == OwnerClientId).wm.HitFeedback_RPC(didHeadshotDamage);
                     }
                     print($"dealing {damage}/{maxDamage}(headshot:{didHeadshotDamage}) to entity.");
                 }

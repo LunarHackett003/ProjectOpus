@@ -1,6 +1,7 @@
 using Netcode.Extensions;
 using opus.Weapons;
 using System.Collections.Generic;
+using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -46,6 +47,28 @@ namespace opus.utility
                 clipOverrides[pair.name] = pair.clip;
             }
             overrideController.ApplyOverrides(clipOverrides);
+        }
+        public void MeleeAttack()
+        {
+            weaponManager.meleeAttack.MeleeAttack();
+        }
+        Coroutine layerLerpRoutine;
+        [Rpc(SendTo.Everyone)]
+        public void LerpLayerWeight_RPC(float speed, float target)
+        {
+            if (layerLerpRoutine != null)
+                StopCoroutine(layerLerpRoutine);
+            layerLerpRoutine = StartCoroutine(LayerLerpCoroutine(speed, target));
+        }
+        IEnumerator LayerLerpCoroutine(float speed, float target)
+        {
+            float t = 0;
+            while (t < 1)
+            {
+                t += Time.fixedDeltaTime * speed;
+                animator.SetLayerWeight(1, Mathf.Lerp(0, target, t));
+                yield return new WaitForFixedUpdate();
+            }
         }
     }
 

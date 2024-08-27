@@ -162,6 +162,9 @@ Weapon sounds courtesy of Frank Bry at The Recordist.</value>
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{ea9c197f-e18e-4658-b971-3fbfc0b272f9}">
+		<property name="volume">
+			<value>-18.5</value>
+		</property>
 		<property name="name">
 			<value>Full Auto</value>
 		</property>
@@ -197,6 +200,9 @@ Weapon sounds courtesy of Frank Bry at The Recordist.</value>
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{d30a8be5-04c4-42f5-b5f9-c60b7f924b51}">
+		<property name="volume">
+			<value>-15.5</value>
+		</property>
 		<property name="name">
 			<value>Casings</value>
 		</property>
@@ -288,6 +294,7 @@ Weapon sounds courtesy of Frank Bry at The Recordist.</value>
 	<object class="MixerBusEffectChain" id="{39db7427-a2f3-4014-bfa4-4250245b3654}">
 		<relationship name="effects">
 			<destination>{8d9bed40-adf7-4bad-92fe-a3643f9a3d42}</destination>
+			<destination>{e7f29238-0c6b-4271-bb3b-40e4f4a2f5ff}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{eda7e555-d35d-48a8-8f10-91f44299067a}" />
@@ -362,5 +369,13 @@ Weapon sounds courtesy of Frank Bry at The Recordist.</value>
 		</relationship>
 	</object>
 	<object class="MixerBusFader" id="{8d9bed40-adf7-4bad-92fe-a3643f9a3d42}" />
+	<object class="LimiterEffect" id="{e7f29238-0c6b-4271-bb3b-40e4f4a2f5ff}">
+		<property name="boost">
+			<value>2</value>
+		</property>
+		<property name="release">
+			<value>90</value>
+		</property>
+	</object>
 	<object class="MixerBusFader" id="{f9410e74-bb39-4698-8ed5-a4168081ce7d}" />
 </objects>

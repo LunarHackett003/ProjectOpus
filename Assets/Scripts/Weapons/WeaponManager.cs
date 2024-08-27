@@ -6,6 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.VisualScripting;
+using System.Linq;
 
 namespace opus.Weapons
 {
@@ -33,6 +34,7 @@ namespace opus.Weapons
         [SerializeField] Vector2 maxCrosshairSize;
 
         [SerializeField] RectTransform crosshair;
+        [SerializeField] CanvasGroup crosshairCanvasGroup; 
         public RecoilProfile GetRecoilProfile
         {
             get
@@ -56,7 +58,7 @@ namespace opus.Weapons
         [SerializeField] internal Transform aimTransform;
 
 
-        bool swappedAndFirePressed;
+        bool fireBlockedByAction;
 
         [SerializeField] internal List<EquipmentImage> equipmentImages;
         [SerializeField] internal GameObject baseEquipmentImage;
@@ -79,8 +81,17 @@ namespace opus.Weapons
 
         [SerializeField] internal Quaternion recoilPointInitialRotation;
 
-        [SerializeField] internal float carriablePositionTime = 0.1f, carriableRotationSpeed;
-        [SerializeField] internal float carriableThrowForce = 25;
+        [SerializeField] internal float carriablePositionTime = 0.05f, carriableRotationSpeed = 20;
+        [SerializeField] internal float carriableThrowForce = 15;
+
+
+        [SerializeField] float swayClamp = .1f, linearSwaySpeed = 2f, angularSwaySpeed = 2f;
+        [SerializeField] Vector3 linearSwayMultiplier, angularSwayMultiplier;
+        Vector2 swayDelta;
+        internal Vector3 swayPosition, swayEuler;
+
+        [SerializeField] internal MeleeWeapon meleeAttack;
+        [SerializeField] internal EventSequence meleeSequence;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -91,6 +102,7 @@ namespace opus.Weapons
             {
                 animHelperNetRef.Value = animHelper;
                 currentCarriableRef.OnValueChanged += CarriableChanged;
+                meleeAttack.ownerWeaponManager.Value = this;
             }
         }
         void CarriableChanged(NetworkBehaviourReference previous, NetworkBehaviourReference current)
@@ -155,6 +167,7 @@ namespace opus.Weapons
             }
         }
         #region Unity Messages
+        bool reloading;
         private void Update()
         {
             if (!animHelper)
@@ -175,8 +188,8 @@ namespace opus.Weapons
                     BaseEquipment e = equipmentList[i];
                     if (i == equipmentIndex)
                     {
-                        e.SetPrimaryInput(PrimaryInput && !swappedAndFirePressed && CanUseWeapon && reloadCoroutine == null);
-                        e.SetSecondaryInput(SecondaryInput && CanUseWeapon && reloadCoroutine == null);
+                        e.SetPrimaryInput(PrimaryInput && !fireBlockedByAction && CanUseWeapon && !reloading );
+                        e.SetSecondaryInput(SecondaryInput && CanUseWeapon && !reloading);
 
                         if (e is BaseWeapon b)
                         {
@@ -184,7 +197,7 @@ namespace opus.Weapons
                             PlayerManager.Instance.viewFOV = Mathf.Lerp(PlayerManager.Instance.baseViewFOV, b.aimedViewFOV, aimAmount);
                             PlayerManager.Instance.worldFOV = Mathf.Lerp(PlayerManager.Instance.baseWorldFOV, b.aimedWorldFOV, aimAmount);
                             aimTarget.localPosition = b.aimPosition;
-
+                            crosshairCanvasGroup.alpha = 1 - aimAmount;
 
                             if(PlayerManager.Instance.reloadInput && b.useAmmo && b.CurrentAmmo < b.maxAmmo)
                             {
@@ -202,41 +215,85 @@ namespace opus.Weapons
                     }
                 }
                 if (!PrimaryInput)
-                    swappedAndFirePressed = false;
-            }
+                    fireBlockedByAction = false;
 
-            UpdateRecoil_Frame();
-            crosshair.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Lerp(baseCrosshairSize.x, maxCrosshairSize.x, accumulatedSpread));
-            crosshair.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Lerp(baseCrosshairSize.y, maxCrosshairSize.y, accumulatedSpread));
+                UpdateRecoil_Frame();
+                UpdateSway();
+                crosshair.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Lerp(baseCrosshairSize.x, maxCrosshairSize.x, accumulatedSpread));
+                crosshair.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Mathf.Lerp(baseCrosshairSize.y, maxCrosshairSize.y, accumulatedSpread));
+            }
+        }
+        internal Vector2 bobTime, bobPosition;
+        public Vector2 bobIdleSpeed, bobMoveSpeed;
+        public Vector2 idleLinearBobScale, movingLinearBobScale;
+        public float moveLerpSpeed = 15, aimBobReduction = 2, aimSwayReduction = 2;
+        float moveLerp;
+        void UpdateSway()
+        {
+            //Sway maths
+            float pitchdelta = pc.aimPitch - pc.previousAimPitch;
+            float aimLerpSway = Mathf.Lerp(1, aimSwayReduction, aimAmount);
+            float aimLerpBob = Mathf.Lerp(1, aimBobReduction, aimAmount);
+            swayDelta = new Vector2(PlayerManager.Instance.lookInput.x * Time.deltaTime, pitchdelta) / aimLerpSway;
+            swayPosition = Vector3.Lerp(swayPosition, ((Vector3)swayDelta).ScaleThis(linearSwayMultiplier), Time.deltaTime * linearSwaySpeed);
+            swayEuler = Vector3.Lerp(swayEuler,  new Vector3(swayDelta.y, swayDelta.x, swayDelta.x).ScaleThis(angularSwayMultiplier), Time.deltaTime * angularSwaySpeed);
+            //bobbing maths
+            moveLerp = Mathf.Lerp(moveLerp, PlayerManager.Instance.moveInput.sqrMagnitude, moveLerpSpeed * Time.deltaTime);
+            Vector2 bobSpeed = Vector2.Lerp(bobIdleSpeed, bobMoveSpeed, moveLerp) * Time.deltaTime;
+            bobTime = new((bobTime.x + bobSpeed.x) % 360, (bobTime.y + bobSpeed.y) % 360);
+            bobPosition = new Vector2()
+            {
+                x = Mathf.Sin(bobTime.x),
+                y = Mathf.Cos(bobTime.y)
+            } * Vector2.Lerp(idleLinearBobScale, movingLinearBobScale, moveLerp) / aimLerpBob;
+        }
+        [Rpc(SendTo.NotOwner, DeferLocal = true)]
+        void TriggerReloadSequence_RPC(bool empty)
+        {
+            if (equipmentList[equipmentIndex] is BaseWeapon b)
+            {
+                b.reloadSequence.Initialise(b.gameObject);
+                b.reloadSequence.onLastEventTriggered += EndReload;
+            }
         }
         public void CancelReload()
         {
-            if (reloadCoroutine != null)
-                StopCoroutine(reloadCoroutine);
+            if (reloading)
+            {
+                if(equipmentList[equipmentIndex] is BaseWeapon b)
+                {
+                    print("reload canceled");
+                    b.reloadSequence.Cancel();
+                    EndReload();
+                    reloading = false;
+                }
+            }
         }
         void StartReload(BaseWeapon b)
         {
-            if (reloadCoroutine == null)
+            if (b.reloadSequence.IsCompleted)
             {
+                fireBlockedByAction = true;
                 b.networkAnimator.SetTrigger("Reload");
                 pc.netAnimator.SetTrigger("Reload");
-                reloadCoroutine = StartCoroutine(ReloadTimer(b));
+                b.reloadSequence.Initialise(b.gameObject);
+                SetReloading(true);
+                TriggerReloadSequence_RPC(false);
+                b.reloadSequence.onLastEventTriggered += EndReload;
             }
         }
-        Coroutine reloadCoroutine;
-        IEnumerator ReloadTimer(BaseWeapon b)
+        void EndReload()
         {
-            yield return new WaitForSeconds(b.reloadTime);
-            ReloadWeapon_ServerRPC(b);
-            reloadCoroutine = null;
-        }
-        [ServerRpc]
-        void ReloadWeapon_ServerRPC(NetworkBehaviourReference weapon)
-        {
-            if(weapon.TryGet(out BaseWeapon b))
+            print("reload ended");
+            SetReloading(false);
+            if (equipmentList[equipmentIndex] is BaseWeapon b)
             {
-                b.currentAmmo.Value = b.maxAmmo;
+                b.reloadSequence.onLastEventTriggered -= EndReload;
             }
+        }
+        void SetReloading(bool reloading)
+        {
+            this.reloading = reloading;
         }
 
         private void LateUpdate()
@@ -280,30 +337,16 @@ namespace opus.Weapons
             {
                 if (!carrying.Value && !carryPressed)
                 {
-                    //If we're not carrying something,we want to find something to pick up
-                    Collider[] cols = new Collider[5];
-                    Carriable targeted = null;
-                    if (Physics.OverlapSphereNonAlloc(fireDirectionReference.position, interactionRadius, cols, carryMask, QueryTriggerInteraction.Ignore) > 0)
+                    if(Physics.Raycast(fireDirectionReference.position, fireDirectionReference.forward, out RaycastHit hit, interactionRadius, interactLineOfSightMask, QueryTriggerInteraction.Ignore))
                     {
-                        for (int i = 0; i < cols.Length; i++)
+                        if(hit.rigidbody.TryGetComponent(out Carriable targeted))
                         {
-                            if (cols[i] == null)
-                                continue;
-                            Collider col = cols[i];
-                            if (Physics.Linecast(fireDirectionReference.position, col.transform.position, out RaycastHit hit, interactLineOfSightMask, QueryTriggerInteraction.Ignore) && hit.collider == col)
-                            {
-                                targeted = hit.collider.GetComponentInParent<Carriable>();
-                            }
+                            currentCarriableRef.Value = targeted;
+                            currentCarriable = targeted;
+                            carrying.Value = true;
+                            targeted.OnPickup(this);
+                            carryPressed = true;
                         }
-                    }
-                    if (targeted)
-                    {
-                        currentCarriableRef.Value = targeted;
-                        currentCarriable = targeted;
-                        carrying.Value = true;
-                        targeted.OnPickup(this);
-                        carryPressed = true;
-
                     }
                 }
             }
@@ -318,7 +361,7 @@ namespace opus.Weapons
                 currentCarriable = null;
                 currentCarriableRef.Value = null;
                 carrying.Value = false;
-                swappedAndFirePressed = true;
+                fireBlockedByAction = true;
                 carryPressed = true;
             }
 
@@ -327,6 +370,17 @@ namespace opus.Weapons
 
             }
             interactPressed = interactInput.Value;
+        }
+        [Rpc(SendTo.Everyone)]
+        internal void RevivePlayer_RPC()
+        {
+            for (int i = 0; i < equipmentList.Count; i++)
+            {
+                if (equipmentList[i] != null)
+                {
+                    equipmentList[i].DisplayWeapon_RPC(false);
+                }
+            }
         }
         #endregion
         [ServerRpc()]
@@ -371,14 +425,14 @@ namespace opus.Weapons
                 nextEquipmentIndex = switchWeapon;
                 if (animHelper)
                 {
-                    if (nextEquipmentIndex == equipmentIndex)
-                        animHelper.networkAnimator.SetTrigger("CancelSwitch");
-                    else
-                        animHelper.networkAnimator.SetTrigger("Switch");
+                    //if (nextEquipmentIndex == equipmentIndex)
+                    //    animHelper.networkAnimator.SetTrigger("CancelSwitch");
+                    //else
+                    //    animHelper.networkAnimator.SetTrigger("Switch");
                 }
                 equipmentIndex = nextEquipmentIndex;
                 FinishWeaponSwitch();
-                swappedAndFirePressed = PrimaryInput;
+                fireBlockedByAction = PrimaryInput;
             }
         }
         [Rpc(SendTo.Owner)]
@@ -391,11 +445,14 @@ namespace opus.Weapons
             if (animHelper)
             {
                 animHelper.UpdateAnimationsFromEquipment_RPC(equipmentList[nextEquipmentIndex]);
+                pc.netAnimator.SetTrigger("Equip");
+
             }
             equipmentIndex = nextEquipmentIndex;
             if (equipmentList[equipmentIndex] is BaseWeapon weapon)
             {
                 aimTarget.localPosition = weapon.aimPosition;
+                weapon.networkAnimator.SetTrigger("Equip");
             }
         }
         internal void ScrollWeapon(bool up)
@@ -450,6 +507,59 @@ namespace opus.Weapons
             }
             hitmarker.alpha = 0;
 
+        }
+        public void KillPlayer()
+        {
+            for (int i = 0; i < equipmentList.Count; i++)
+            {
+                if (equipmentList[i] != null)
+                {
+                    equipmentList[i].DisplayWeapon_RPC(false);
+                }
+            }
+        }
+        bool meleeInProgress;
+        
+        public void TryMeleeAttack()
+        {
+            if (meleeInProgress)
+                return;
+            
+            switch (pc.moveState.Value)
+            {
+                case PlayerCharacter.MoveState.ladder:
+                    return;
+                case PlayerCharacter.MoveState.mounted:
+                    return;
+                default:
+                    break;
+            }
+            if (reloading)
+            {
+                CancelReload();
+            }
+            meleeInProgress = true;
+            animHelper.networkAnimator.SetTrigger("Melee");
+            if(!IsServer)
+                meleeSequence.onLastEventTriggered += ClearMeleeAttack;
+            animHelper.LerpLayerWeight_RPC(5, 1);
+            MeleeSequence_RPC();
+        }
+        
+        [Rpc(SendTo.Server)]
+        public void MeleeSequence_RPC()
+        {
+            meleeSequence.onLastEventTriggered += ClearMeleeAttack;
+            meleeSequence.Initialise(gameObject);
+        }
+        void ClearMeleeAttack()
+        {
+            meleeInProgress = false;
+            meleeSequence.onLastEventTriggered -= ClearMeleeAttack;
+            if (IsOwner)
+            {
+                animHelper.LerpLayerWeight_RPC(5, 0);
+            }
         }
         #endregion
     }

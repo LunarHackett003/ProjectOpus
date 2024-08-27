@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   overrides:
   - name: Equip
-    clip: {fileID: 0}
+    clip: {fileID: 7400000, guid: efcfa276d2aa7e94fa9f16485e26c138, type: 2}
   - name: Fire
-    clip: {fileID: 0}
+    clip: {fileID: 7400000, guid: c99d1977a4eb6624b90836483900d840, type: 2}
   - name: Reload
-    clip: {fileID: 0}
+    clip: {fileID: 7400000, guid: d63d26cc878302e4b9528f0b46d77e4b, type: 2}
   - name: Inspect
-    clip: {fileID: 0}
+    clip: {fileID: 7400000, guid: ac084d5757bf08742809d6c692ab8e51, type: 2}

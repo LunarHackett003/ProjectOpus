@@ -44,7 +44,7 @@ public class Flashbang : Grenade
                 if (hit.rigidbody && hit.rigidbody.CompareTag("Player"))
                 {
                     float flashTime = Mathf.Lerp(0, maxFlashbangTime, Mathf.InverseLerp(0, flashbangMaxRange, hit.distance) + (((viewDot * 0.5f) + 0.5f)) * viewDirectionModifier);
-                    PlayerManager.Instance.pc.ReceiveFlashbangEffect(flashTime, maxFlashbangTime);
+                    //PlayerManager.Instance.pc.ReceiveFlashbangEffect(flashTime, maxFlashbangTime);
                 }
             }
         }
