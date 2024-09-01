@@ -19,7 +19,11 @@ MonoBehaviour:
     rid: 6321952653799850047
   m_Scenes:
   - m_enabled: 1
-    m_path: Assets/Scenes/TestScene.unity
+    m_path: Assets/Scenes/InitialiseScene.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/StartScene.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/DefaultScene.unity
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
     m_Settings: []
@@ -29,7 +33,7 @@ MonoBehaviour:
     - rid: 6321952653799850047
       type: {class: WindowsPlatformSettings, ns: UnityEditor.WindowsStandalone, asm: UnityEditor.WindowsStandalone.Extensions}
       data:
-        m_Development: 1
+        m_Development: 0
         m_ConnectProfiler: 0
         m_BuildWithDeepProfilingSupport: 0
         m_AllowDebugging: 0

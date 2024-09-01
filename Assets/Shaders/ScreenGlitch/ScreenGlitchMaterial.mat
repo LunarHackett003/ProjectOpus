@@ -42,22 +42,22 @@ Material:
     - _BlockGlitchPixelSize: 32
     - _BlockGlitchTimeMultiplier: 0.02
     - _ColourSeparationDistance: -0.04
-    - _ColourSeparationPower: 0
-    - _ColourSeparationReduction: 0
+    - _ColourSeparationPower: 0.797
+    - _ColourSeparationReduction: 1
     - _EdgePixelationPower: 0.5
     - _EdgePixelationStrength: 0
     - _FlickerStrength: 0.264
-    - _GlitchStrength: 2
-    - _HorizontalNoiseStrength: 0
+    - _GlitchStrength: 1
+    - _HorizontalNoiseStrength: 0.2
     - _NoiseAmount: 25
     - _PixelCount: 1
     - _PixelSize: 6
     - _PixelationSize: 256
     - _PixelationStrength: 0
     - _ScreenGlitchPower: 0
-    - _TotalEffectPower: 1
+    - _TotalEffectPower: 0
     m_Colors:
     - _BlockGlitchNoiseStrength: {r: 0, g: 1, b: 0, a: 0}
-    - _TestColour: {r: 0, g: 0, b: 0, a: 1}
+    - _TestColour: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
