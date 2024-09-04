@@ -63,11 +63,11 @@ namespace Opus
         public void Detach()
         {
             zipping = false;
-            Vector3 velocity = inForwardDirection ? currentZipline.start.forward : currentZipline.end.forward;
+            Vector3 velocity = (inForwardDirection ? currentZipline.forwardDirection : -currentZipline.forwardDirection);
             currentZipline = null;
             pm.moveState = PlayerMotor.MovementState.none;
             pm.rb.isKinematic = false;
-            pm.rb.AddForce(velocity * detachForce, ForceMode.Impulse);
+            pm.rb.AddForce(Vector3.up + velocity * detachForce, ForceMode.Impulse);
         }
     }
 }

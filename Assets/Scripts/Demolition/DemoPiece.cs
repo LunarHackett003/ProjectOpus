@@ -1,30 +1,27 @@
-using FishNet.Connection;
-using FishNet.Object;
-using FishNet.Object.Synchronizing;
+
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Opus
 {
     public class DemoPiece : NetworkBehaviour
     {
-        [SerializeField] protected readonly SyncVar<float> integrity = new(new(WritePermission.ServerOnly));
+        [SerializeField] protected readonly NetworkVariable<float> integrity = new();
         [SerializeField] protected float _integrity;
         [SerializeField] protected float maxIntegrity = 100;
         public float Integrity { get { return integrity.Value; } }
         public delegate void OnDamageReceived();
         public OnDamageReceived onDamageReceived;
 
-        public readonly SyncVar<bool> active = new SyncVar<bool>(new()
+        public readonly NetworkVariable<bool> active = new NetworkVariable<bool>();
+
+        public override void OnNetworkSpawn()
         {
-            WritePermission = WritePermission.ServerOnly
-        });
-        public override void OnSpawnServer(NetworkConnection connection)
-        {
-            base.OnSpawnServer(connection);
-            if (connection.IsHost)
+            base.OnNetworkSpawn();
+            if (IsHost)
             {
                 integrity.Value = maxIntegrity;
-                integrity.OnChange += IntegrityChanged;
+                integrity.OnValueChanged += IntegrityChanged;
             }
         }
         protected virtual void Start()
@@ -32,7 +29,7 @@ namespace Opus
 
         }
 
-        protected virtual void IntegrityChanged(float prev, float next, bool asServer)
+        protected virtual void IntegrityChanged(float prev, float next)
         {
             _integrity = next;
         }

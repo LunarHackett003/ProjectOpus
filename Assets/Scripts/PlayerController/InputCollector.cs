@@ -1,6 +1,5 @@
-using FishNet;
-using FishNet.Connection;
-using FishNet.Object;
+
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,18 +17,17 @@ namespace Opus
         public float lookClamp = 89;
         bool jumpInput;
         public bool interactInput;
-        public override void OnSpawnServer(NetworkConnection connection)
+        public override void OnNetworkSpawn()
         {
-            base.OnSpawnServer(connection);
+            base.OnNetworkSpawn();
             if (IsOwner)
             {
                 AssignInputEvents();
             }
-
         }
         private void Start()
         {
-            AssignInputEvents();
+
         }
 
         void AssignInputEvents()
@@ -74,8 +72,7 @@ namespace Opus
         }
         public bool TryConsumeJump()
         {
-            bool jumped = false;
-            jumped = jumpInput;
+            bool jumped = jumpInput;
             jumpInput = false;
             return jumped;
         }

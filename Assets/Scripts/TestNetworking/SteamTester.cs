@@ -1,8 +1,8 @@
 using Eflatun.SceneReference;
-using FishNet;
-using FishNet.Managing;
+using Netcode.Transports.Facepunch;
 using Steamworks;
 using Steamworks.Data;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Opus
@@ -11,12 +11,12 @@ namespace Opus
     {
         public static SteamTester Instance { get; private set; }
 
-        public FishyFacepunch.FishyFacepunch ffp;
+        public FacepunchTransport transport;
         public Lobby? currentLobby;
         public ulong hostID;
 
         public GameObject hostButton, quitButton;
-
+        public NetworkObject matchControllerPrefab;
         private void Awake()
         {
             if(Instance != null)
@@ -36,6 +36,11 @@ namespace Opus
             SteamMatchmaking.OnLobbyInvite += SteamMatchmaking_OnLobbyInvite;
             SteamMatchmaking.OnLobbyGameCreated += SteamMatchmaking_OnLobbyGameCreated;
             SteamFriends.OnGameLobbyJoinRequested += SteamFriends_OnGameLobbyJoinRequested;
+
+            NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
+            NetworkManager.Singleton.OnClientStarted += ClientStarted;
+
+
         }
         private void OnDestroy()
         {
@@ -46,6 +51,9 @@ namespace Opus
             SteamMatchmaking.OnLobbyInvite -= SteamMatchmaking_OnLobbyInvite;
             SteamMatchmaking.OnLobbyGameCreated -= SteamMatchmaking_OnLobbyGameCreated;
             SteamFriends.OnGameLobbyJoinRequested -= SteamFriends_OnGameLobbyJoinRequested;
+
+            NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
+            NetworkManager.Singleton.OnClientStarted -= ClientStarted;
         }
 
         private async void SteamFriends_OnGameLobbyJoinRequested(Lobby _lobby, SteamId _steamID)
@@ -84,7 +92,7 @@ namespace Opus
 
         private void SteamMatchmaking_OnLobbyEntered(Lobby _lobby)
         {
-            if (InstanceFinder.IsHostStarted)
+            if (NetworkManager.Singleton.IsHost)
             {
                 return;
             }
@@ -93,18 +101,8 @@ namespace Opus
         public void DisconnectFromServer()
         {
             currentLobby?.Leave();
-            if (InstanceFinder.IsHostStarted)
-            {
-                InstanceFinder.ServerManager.OnServerConnectionState -= ServerManager_OnServerConnectionState;
-                InstanceFinder.ServerManager.StopConnection(false);
-                InstanceFinder.ClientManager.StopConnection();
-
-            }
-            else
-            {
-                InstanceFinder.ClientManager.OnClientConnectionState -= ClientManager_OnClientConnectionState;
-                InstanceFinder.ClientManager.StopConnection();
-            }
+            currentLobby = null;
+            NetworkManager.Singleton.Shutdown();
             SceneLoader.Instance.LoadMenuScene();
         }
         private void SteamMatchmaking_OnLobbyCreated(Result _result, Lobby _lobby)
@@ -120,45 +118,30 @@ namespace Opus
         }
         public async void StartHost(int maxMembers = 8)
         {
-            InstanceFinder.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
-            InstanceFinder.ServerManager.StartConnection();
-            InstanceFinder.ClientManager.StartConnection();
             currentLobby = await SteamMatchmaking.CreateLobbyAsync(maxMembers);
-            InstanceFinder.SceneManager.LoadGlobalScenes(new(SceneLoader.Instance.gameScene.Name) { ReplaceScenes = FishNet.Managing.Scened.ReplaceOption.All});
+            NetworkManager.Singleton.StartHost();
+            NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(matchControllerPrefab);
+            NetworkManager.Singleton.SceneManager.LoadScene(SceneLoader.Instance.gameScene.Name, UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
+
+        private void Singleton_OnServerStarted()
+        {
+            print("server started");
+        }
+
         public void StartClient(SteamId _steamID)
         {
-            InstanceFinder.ClientManager.OnClientConnectionState += ClientManager_OnClientConnectionState;
-            ffp.SetClientAddress(_steamID.ToString());
-            if (InstanceFinder.ClientManager.StartConnection())
+            transport.targetSteamId = _steamID;
+            if (NetworkManager.Singleton.StartClient())
             {
                 print("Client started successfully!");
 
             }
         }
 
-        private void ClientManager_OnClientConnectionState(FishNet.Transporting.ClientConnectionStateArgs obj)
+        private void ClientStarted()
         {
-            if(obj.ConnectionState == FishNet.Transporting.LocalConnectionState.Started)
-            {
-                print("Started connection!");
-                hostButton.SetActive(false);
-                quitButton.SetActive(true);
-            }
-            else if (obj.ConnectionState == FishNet.Transporting.LocalConnectionState.Stopped)
-            {
-                print("Stopped connection!");
-                hostButton.SetActive(true);
-                quitButton.SetActive(false);
-            }
-        }
-
-        private void ServerManager_OnServerConnectionState(FishNet.Transporting.ServerConnectionStateArgs obj)
-        {
-            if(obj.ConnectionState == FishNet.Transporting.LocalConnectionState.Started)
-            {
-                print("Server started!");
-            }
+            print("Client started");
         }
     }
 }

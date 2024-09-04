@@ -10,6 +10,9 @@ namespace Opus
         public float width = 0.1f;
         public Vector3 forwardDirection;
         public float distance;
+
+        public override bool RequireLineOfSight => false;
+
         [ContextMenu("Set Up Zipline")]
         public void SetUpZipline()
         {

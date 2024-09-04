@@ -1,7 +1,7 @@
 using Eflatun.SceneReference;
-using FishNet;
 using System.Collections;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Opus
@@ -29,28 +29,32 @@ namespace Opus
                 Destroy(this);
                 return;
             }
-            InstanceFinder.SceneManager.OnLoadStart += SceneManager_OnLoadStart;
-            InstanceFinder.SceneManager.OnLoadEnd += SceneManager_OnLoadEnd;
-        }
 
-        private void SceneManager_OnLoadEnd(FishNet.Managing.Scened.SceneLoadEndEventArgs obj)
+        }
+        //fix compilation
+        private void Start()
+        {
+            //NetworkManager.Singleton.SceneManager.OnLoad += SceneManager_OnLoad;
+            //NetworkManager.Singleton.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
+        }
+        private void SceneManager_OnLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
         {
             loadScreenCanvas.alpha = 0;
             loadScreenCanvas.gameObject.SetActive(false);
+        }
 
+        private void SceneManager_OnLoad(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, AsyncOperation asyncOperation)
+        {
+            loadScreenCanvas.alpha = 1;
+            loadScreenCanvas.gameObject.SetActive(true);
         }
 
         private void OnDestroy()
         {
-            InstanceFinder.SceneManager.OnLoadStart -= SceneManager_OnLoadStart;
-            InstanceFinder.SceneManager.OnLoadEnd -= SceneManager_OnLoadEnd;
+            //NetworkManager.Singleton.SceneManager.OnLoad -= SceneManager_OnLoad;
+            //NetworkManager.Singleton.SceneManager.OnLoadComplete -= SceneManager_OnLoadComplete;
         }
-        private void SceneManager_OnLoadStart(FishNet.Managing.Scened.SceneLoadStartEventArgs obj)
-        {
-            loadScreenCanvas.alpha = 1;
-            loadScreenCanvas.gameObject.SetActive(true);
 
-        }
 
         public void LoadGameScene()
         {

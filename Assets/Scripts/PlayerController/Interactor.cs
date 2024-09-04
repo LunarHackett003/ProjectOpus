@@ -5,7 +5,7 @@ namespace Opus
     public class Interactor : MonoBehaviour
     {
         public Transform interactOrigin;
-        public float interactDistance, interactRadius;
+        public float interactDistance, interactRadiusLineOfSight;
         public LayerMask interactMask;
 
         public InputCollector collector;
@@ -16,7 +16,7 @@ namespace Opus
         bool lastInteract = false;
         private void FixedUpdate()
         {
-            if (Physics.SphereCast(interactOrigin.position, interactRadius, interactOrigin.forward, out RaycastHit hit, interactDistance, interactMask, QueryTriggerInteraction.Collide))
+            if (Physics.SphereCast(interactOrigin.position, interactRadiusLineOfSight, interactOrigin.forward, out RaycastHit hit, interactDistance, interactMask, QueryTriggerInteraction.Collide))
             {
                 Interactable i = hit.collider.GetComponentInParent<Interactable>();
                 if (i != null && i.canInteract)

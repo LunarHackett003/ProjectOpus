@@ -1,5 +1,5 @@
-using FishNet.Connection;
-using FishNet.Object;
+
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Opus
@@ -33,14 +33,17 @@ namespace Opus
         }
         public MovementState moveState;
         public ZiplineMotor zipMotor;
-        public override void OnSpawnServer(NetworkConnection connection)
+        public override void OnNetworkSpawn()
         {
-            base.OnSpawnServer(connection);
+            base.OnNetworkSpawn();
             if (!IsOwner)
             {
+                rb.isKinematic = true;
                 enabled = false;
                 return;
             }
+
+            SpawnPlayer();
             ic = GetComponent<InputCollector>();
         }
         private void Start()
@@ -115,5 +118,13 @@ namespace Opus
             Gizmos.DrawWireSphere(transform.position + groundCheckOrigin, 0.3f);
             Gizmos.DrawWireSphere(transform.position + groundCheckOrigin + (Vector3.down * groundCheckDistance), 0.3f);
         }
+
+        public void SpawnPlayer()
+        {
+            SceneData sd = FindAnyObjectByType<SceneData>();
+            Transform t = sd.GetSpawnPoint(MatchController.Instance.teamMembers.Value.FindIndex(x => x.playerID == OwnerClientId));
+            transform.SetPositionAndRotation(t.position, t.rotation);
+        }
+        
     }
 }

@@ -9,9 +9,9 @@ namespace Opus.Demolition
         {
             base.DealDamage(damage);
         }
-        protected override void IntegrityChanged(float prev, float next, bool asServer)
+        protected override void IntegrityChanged(float prev, float next)
         {
-            base.IntegrityChanged(prev, next, asServer);
+            base.IntegrityChanged(prev, next);
             if(next <= 0)
                 render.SetActive(false);
         }
