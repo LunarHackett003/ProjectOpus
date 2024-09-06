@@ -15,7 +15,6 @@ namespace Opus
             public ulong playerID;
             public int team, kills, deaths, assists, revives, amountHealed;
         }
-
         public NetworkVariable<List<TeamMember>> teamMembers = new();
         /// <summary>
         /// A dictionary containing the number of teams, and the number of players on those teams.<br></br>
@@ -23,6 +22,7 @@ namespace Opus
         /// Value = Number of players on that team
         /// </summary>
         public NetworkVariable<Dictionary<int, int>> teamNumbers = new(new());
+        public int numberOfTeams = 4;
         public void AssignPlayerToTeam(ulong ID)
         {
             int teamToAssign = 0;
@@ -42,6 +42,7 @@ namespace Opus
 
             };
             teamMembers.Value.Add(t);
+            teamNumbers.Value.Add(teamToAssign, teamNumbers.Value[teamToAssign] + 1);
         }
         
         public static MatchController Instance { get; private set; }
@@ -50,18 +51,36 @@ namespace Opus
         {
             base.OnNetworkSpawn();
             Instance = this;
+            if (IsOwner)
+            {
+                for (int i = 0; i < numberOfTeams; i++)
+                {
+                    teamNumbers.Value.Add(i, 0);
+                }
+                NetworkManager.OnConnectionEvent += PlayerConnectionEvent;
+            }
+        }
+
+        private void PlayerConnectionEvent(NetworkManager arg1, ConnectionEventData arg2)
+        {
+            if(arg2.EventType == ConnectionEvent.ClientConnected)
+            {
+                AssignPlayerToTeam(arg2.ClientId);
+            }
+            else if(arg2.EventType == ConnectionEvent.ClientDisconnected)
+            {
+                RemovePlayerFromTeam(arg2.ClientId);
+            }
         }
         private void Start()
         {
-            if (IsOwner)
-            {
-                SetMyTeam_RPC(OwnerClientId);
-            }
+
         }
-        [Rpc(SendTo.Server)]
-        void SetMyTeam_RPC(ulong ID)
+        void RemovePlayerFromTeam(ulong ID)
         {
-            AssignPlayerToTeam(ID);
+            TeamMember t = teamMembers.Value.Find(x => x.playerID == ID);
+            teamMembers.Value.RemoveAt(t.team);
+            teamNumbers.Value.Add(t.team, teamNumbers.Value[t.team] - 1);
         }
     }
 }

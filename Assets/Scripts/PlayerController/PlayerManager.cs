@@ -10,7 +10,7 @@ namespace Opus
     {
         public static HashSet<PlayerManager> playerManagers = new HashSet<PlayerManager>();
         public NetworkObject playerPrefab;
-
+        public NetworkVariable<string> playerName = new(writePerm: NetworkVariableWritePermission.Owner);
         private void Start()
         {
             playerManagers.Add(this);
@@ -21,6 +21,7 @@ namespace Opus
             if (IsOwner)
             {
                 NetworkManager.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
+                playerName.Value = SteamClient.Name;
             }
         }
 
