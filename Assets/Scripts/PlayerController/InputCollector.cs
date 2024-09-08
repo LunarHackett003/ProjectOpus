@@ -17,7 +17,7 @@ namespace Opus
         public float lookClamp = 89;
         bool jumpInput;
         public bool interactInput;
-        public bool scoreboardInput;
+        public bool scoreboardInput, sprintInput;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -45,6 +45,13 @@ namespace Opus
             cs.Player.Interact.canceled += OnInteract;
             cs.Player.Scoreboard.performed += OnScoreboard;
             cs.Player.Scoreboard.canceled += OnScoreboard;
+            cs.Player.Sprint.performed += OnSprint;
+            cs.Player.Sprint.canceled += OnSprint;
+        }
+
+        private void OnSprint(InputAction.CallbackContext obj)
+        {
+            sprintInput = obj.ReadValueAsButton();
         }
 
         private void OnScoreboard(InputAction.CallbackContext obj)

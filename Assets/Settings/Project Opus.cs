@@ -137,6 +137,15 @@ namespace Opus
                     ""processors"": """",
                     ""interactions"": ""Tap"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Sprint"",
+                    ""type"": ""Button"",
+                    ""id"": ""2368feb7-2afd-472e-b1d8-d6e2eb7592f9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -588,6 +597,28 @@ namespace Opus
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Reload"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c19339f3-ffbc-423c-84fd-ad5fd46d1a64"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Sprint"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e3bc68c0-730c-4829-8b42-fe2260a11a5e"",
+                    ""path"": ""<Gamepad>/leftStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Sprint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1187,6 +1218,7 @@ namespace Opus
             m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
             m_Player_PickUp = m_Player.FindAction("PickUp", throwIfNotFound: true);
             m_Player_Reload = m_Player.FindAction("Reload", throwIfNotFound: true);
+            m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1278,6 +1310,7 @@ namespace Opus
         private readonly InputAction m_Player_Interact;
         private readonly InputAction m_Player_PickUp;
         private readonly InputAction m_Player_Reload;
+        private readonly InputAction m_Player_Sprint;
         public struct PlayerActions
         {
             private @ControlScheme m_Wrapper;
@@ -1294,6 +1327,7 @@ namespace Opus
             public InputAction @Interact => m_Wrapper.m_Player_Interact;
             public InputAction @PickUp => m_Wrapper.m_Player_PickUp;
             public InputAction @Reload => m_Wrapper.m_Player_Reload;
+            public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1339,6 +1373,9 @@ namespace Opus
                 @Reload.started += instance.OnReload;
                 @Reload.performed += instance.OnReload;
                 @Reload.canceled += instance.OnReload;
+                @Sprint.started += instance.OnSprint;
+                @Sprint.performed += instance.OnSprint;
+                @Sprint.canceled += instance.OnSprint;
             }
 
             private void UnregisterCallbacks(IPlayerActions instance)
@@ -1379,6 +1416,9 @@ namespace Opus
                 @Reload.started -= instance.OnReload;
                 @Reload.performed -= instance.OnReload;
                 @Reload.canceled -= instance.OnReload;
+                @Sprint.started -= instance.OnSprint;
+                @Sprint.performed -= instance.OnSprint;
+                @Sprint.canceled -= instance.OnSprint;
             }
 
             public void RemoveCallbacks(IPlayerActions instance)
@@ -1573,6 +1613,7 @@ namespace Opus
             void OnInteract(InputAction.CallbackContext context);
             void OnPickUp(InputAction.CallbackContext context);
             void OnReload(InputAction.CallbackContext context);
+            void OnSprint(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {

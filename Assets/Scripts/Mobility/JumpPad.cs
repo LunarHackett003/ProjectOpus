@@ -13,6 +13,10 @@ namespace Opus
             if (other.attachedRigidbody)
             {
                 other.attachedRigidbody.AddForce(jumpDirection.up * jumpForce, ForceMode.VelocityChange);
+                if (other.attachedRigidbody.TryGetComponent(out PlayerMotor pm))
+                {
+                    pm.SendJump();
+                }
             }
         }
         [ContextMenu("Calculate Points")]

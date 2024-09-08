@@ -36,10 +36,12 @@ namespace Opus
             SteamMatchmaking.OnLobbyInvite += SteamMatchmaking_OnLobbyInvite;
             SteamMatchmaking.OnLobbyGameCreated += SteamMatchmaking_OnLobbyGameCreated;
             SteamFriends.OnGameLobbyJoinRequested += SteamFriends_OnGameLobbyJoinRequested;
-
-            NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
-            NetworkManager.Singleton.OnClientStarted += ClientStarted;
-
+            
+            if (NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.OnServerStarted += Singleton_OnServerStarted;
+                NetworkManager.Singleton.OnClientStarted += ClientStarted;
+            }
 
         }
         private void OnDestroy()
@@ -52,8 +54,11 @@ namespace Opus
             SteamMatchmaking.OnLobbyGameCreated -= SteamMatchmaking_OnLobbyGameCreated;
             SteamFriends.OnGameLobbyJoinRequested -= SteamFriends_OnGameLobbyJoinRequested;
 
-            NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
-            NetworkManager.Singleton.OnClientStarted -= ClientStarted;
+            if (NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.OnServerStarted -= Singleton_OnServerStarted;
+                NetworkManager.Singleton.OnClientStarted -= ClientStarted;
+            }
         }
 
         private async void SteamFriends_OnGameLobbyJoinRequested(Lobby _lobby, SteamId _steamID)
@@ -104,6 +109,8 @@ namespace Opus
             currentLobby = null;
             NetworkManager.Singleton.Shutdown();
             SceneLoader.Instance.LoadMenuScene();
+            hostButton.SetActive(true);
+            quitButton.SetActive(false);
         }
         private void SteamMatchmaking_OnLobbyCreated(Result _result, Lobby _lobby)
         {
@@ -142,6 +149,8 @@ namespace Opus
         private void ClientStarted()
         {
             print("Client started");
+            hostButton.SetActive(false);
+            quitButton.SetActive(true);
         }
     }
 }

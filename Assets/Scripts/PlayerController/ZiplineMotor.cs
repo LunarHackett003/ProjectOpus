@@ -1,5 +1,4 @@
 using System.Collections;
-using TMPro.EditorUtilities;
 using UnityEngine;
 
 namespace Opus
@@ -50,20 +49,21 @@ namespace Opus
             currentZiplineLerp = Mathf.Clamp01(currentZiplineLerp + zipPerStep * (inForwardDirection ? 1 : -1));
             currentZiplinePosition = Vector3.Lerp(currentZipline.start.position, currentZipline.end.position, currentZiplineLerp);
             pm.transform.position = currentZiplinePosition + ziplineOffset;
-            if(Physics.CapsuleCast(pm.transform.position + Vector3.up * .8f, pm.transform.position - Vector3.up * .8f, 0.4f, currentZipline.forwardDirection, ziplineSpeed * Time.fixedDeltaTime))
+            if(Physics.CapsuleCast(pm.transform.position + Vector3.up * .8f, pm.transform.position - Vector3.up * .8f, 0.4f, inForwardDirection ? currentZipline.forwardDirection : currentZipline.forwardDirection, 
+                ziplineSpeed * Time.fixedDeltaTime))
             {
-                Detach();
+                Detach(false);
             }
             if (ziptime != 0 && (currentZiplineLerp == 0 || currentZiplineLerp == 1))
             {
-                Detach();
+                Detach(true);
             }
             ziptime += Time.fixedDeltaTime;
         }
-        public void Detach()
+        public void Detach(bool end)
         {
             zipping = false;
-            Vector3 velocity = (inForwardDirection ? currentZipline.forwardDirection : -currentZipline.forwardDirection);
+            Vector3 velocity = end ? (currentZiplineLerp == 1 ? currentZipline.end.forward : currentZipline.start.forward) : (inForwardDirection ? currentZipline.forwardDirection : -currentZipline.forwardDirection);
             currentZipline = null;
             pm.moveState = PlayerMotor.MovementState.none;
             pm.rb.isKinematic = false;

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEditor.Overlays;
 using UnityEngine;
 
 namespace Opus
@@ -22,6 +21,7 @@ namespace Opus
         /// Value = Number of players on that team
         /// </summary>
         public NetworkVariable<Dictionary<int, int>> teamNumbers = new(new());
+        public List<TeamMember> localTeamMembers = new();
         public int numberOfTeams = 4;
         public void AssignPlayerToTeam(ulong ID)
         {
@@ -42,7 +42,7 @@ namespace Opus
 
             };
             teamMembers.Value.Add(t);
-            teamNumbers.Value.Add(teamToAssign, teamNumbers.Value[teamToAssign] + 1);
+            teamNumbers.Value[teamToAssign] += 1;
         }
         
         public static MatchController Instance { get; private set; }
@@ -57,14 +57,30 @@ namespace Opus
                 {
                     teamNumbers.Value.Add(i, 0);
                 }
+                AssignPlayerToTeam(0);
                 NetworkManager.OnConnectionEvent += PlayerConnectionEvent;
             }
+            teamMembers.OnValueChanged += TeamMembersUpdated;
+        }
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            if (IsOwner)
+            {
+                NetworkManager.OnConnectionEvent -= PlayerConnectionEvent;
+            }
+            teamMembers.OnValueChanged -= TeamMembersUpdated;
+        }
+        void TeamMembersUpdated(List<TeamMember> previous,  List<TeamMember> current)
+        {
+            localTeamMembers = current;
         }
 
         private void PlayerConnectionEvent(NetworkManager arg1, ConnectionEventData arg2)
         {
             if(arg2.EventType == ConnectionEvent.ClientConnected)
             {
+                print("adding player to team");
                 AssignPlayerToTeam(arg2.ClientId);
             }
             else if(arg2.EventType == ConnectionEvent.ClientDisconnected)

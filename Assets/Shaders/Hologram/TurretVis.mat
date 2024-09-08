@@ -39,11 +39,10 @@ Material:
     MotionVector: User
   disabledShaderPasses:
   - MOTIONVECTORS
-  - SHADOWCASTER
+  - RayTracingPrepass
   - TransparentDepthPrepass
   - TransparentDepthPostpass
   - TransparentBackface
-  - RayTracingPrepass
   m_LockedProperties: _CastShadows
   m_SavedProperties:
     serializedVersion: 3

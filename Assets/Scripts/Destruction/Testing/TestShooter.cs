@@ -5,19 +5,12 @@ namespace Opus
 {
     public class TestShooter : MonoBehaviour
     {
-        public TestCameraFly tcf;
         public LineRenderer lastShotLine;
         public GameObject lastExplosionSphere;
         public float explosionRadius;
         public LayerMask shootmask;
         private void Start()
         {
-            if (!TryGetComponent(out tcf))
-            {
-                enabled = false;
-                Debug.LogWarning("No Test Camera Fly!", this);
-                return;
-            }
             lastShotLine.enabled = false;
             lastExplosionSphere.SetActive(false);
         }
@@ -27,7 +20,7 @@ namespace Opus
             {
                 Fire();
             }
-            else if (Input.GetKey(KeyCode.Mouse1))
+            else if (Input.GetKeyDown(KeyCode.Mouse1))
             {
                 Explode();
             }

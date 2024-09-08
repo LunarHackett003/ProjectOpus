@@ -1,5 +1,6 @@
 using System.Linq;
 using TMPro;
+using Unity.Collections;
 using UnityEngine;
 
 namespace Opus
@@ -16,7 +17,7 @@ namespace Opus
             if(newID != 999)
                 ID = newID;
             
-            playerName.text = PlayerManager.playerManagers.First(x => x.OwnerClientId == ID).playerName.Value;
+            playerName.text = PlayerManager.playerManagers.First(x => x.OwnerClientId == ID).playerName.Value.ToString();
             MatchController.TeamMember t = MatchController.Instance.teamMembers.Value.Find(x => x.playerID == ID);
             //We'll do more stuff with this later.
 

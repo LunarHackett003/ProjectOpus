@@ -12,6 +12,8 @@ namespace Opus
         Vector3 movementVelocity;
         Vector3 movementVelocityDamping;
         public Vector2 groundMoveSpeed, airMoveSpeed;
+        [Tooltip("X axis is sprinting sideways and backwards, y is sprinting forwards")]
+        public Vector2 sprintMultiplier = Vector2.one;
         public float jumpSpeed, jumpLateralForce;
         public float groundDrag, airDrag;
         public LayerMask groundMask;
@@ -25,6 +27,8 @@ namespace Opus
         public float gravityAcceleration = -9.81f;
         bool grounded;
 
+        public Vector2 movementVector;
+        public PlayerAnimator animator;
         public enum MovementState
         {
             none = 0,
@@ -84,8 +88,15 @@ namespace Opus
         }
         void RegularMovement()
         {
-            movementVelocity = transform.TransformDirection(ic.moveInput.x * (grounded ? groundMoveSpeed.x : airMoveSpeed.x),
-                0, ic.moveInput.y * (grounded ? groundMoveSpeed.y : airMoveSpeed.y));
+            Vector2 moveMultiplier = ic.sprintInput ? new()
+            {
+                x = sprintMultiplier.x,
+                y = ic.moveInput.y < 0 ? sprintMultiplier.x : sprintMultiplier.y,
+            } : Vector2.one;
+
+            movementVector = ic.moveInput * moveMultiplier;
+            movementVelocity = transform.TransformDirection(ic.moveInput.x * (grounded ? groundMoveSpeed.x * moveMultiplier.x : airMoveSpeed.x),
+                0, ic.moveInput.y * (grounded ? groundMoveSpeed.y * moveMultiplier.y : airMoveSpeed.y));
             //Move using our movement vector
             rb.AddForce(Vector3.ProjectOnPlane(movementVelocity, groundNormal));
         }
@@ -93,12 +104,13 @@ namespace Opus
         {
             if (zipMotor.currentZipline)
             {
-                zipMotor.Detach();
+                zipMotor.Detach(false);
             }
             else if(grounded)
             {
                 rb.AddForce((Vector3.up * jumpSpeed) + (transform.TransformDirection(ic.moveInput.x, 0, ic.moveInput.y) * jumpLateralForce), ForceMode.Impulse);
             }
+            SendJump();
         }
         bool CheckGround()
         {
@@ -107,6 +119,10 @@ namespace Opus
                 float angle = Vector3.Angle(transform.up, hit.normal);
                 if(angle < 70)
                 {
+                    if (!grounded)
+                    {
+                        animator.LandTrigger();
+                    }
                     groundNormal = hit.normal;
                     return true;
                 }
@@ -125,6 +141,10 @@ namespace Opus
             Transform t = sd.GetSpawnPoint(MatchController.Instance.teamMembers.Value.FindIndex(x => x.playerID == OwnerClientId));
             transform.SetPositionAndRotation(t.position, t.rotation);
         }
-        
+        public void SendJump()
+        {
+            if (grounded)
+                animator.JumpTrigger();
+        }
     }
 }

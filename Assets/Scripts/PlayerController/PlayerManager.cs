@@ -1,6 +1,7 @@
 
 using Steamworks;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace Opus
     {
         public static HashSet<PlayerManager> playerManagers = new HashSet<PlayerManager>();
         public NetworkObject playerPrefab;
-        public NetworkVariable<string> playerName = new(writePerm: NetworkVariableWritePermission.Owner);
+        public NetworkVariable<FixedString32Bytes> playerName = new(writePerm: NetworkVariableWritePermission.Owner);
         private void Start()
         {
             playerManagers.Add(this);
@@ -27,7 +28,7 @@ namespace Opus
 
         private void SceneManager_OnLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
         {
-            AskForPlayer_RPC();
+            Invoke(nameof(AskForPlayer_RPC), .5f);
         }
 
         [Rpc(SendTo.Server)]

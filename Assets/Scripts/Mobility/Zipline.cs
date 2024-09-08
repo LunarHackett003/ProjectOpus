@@ -5,7 +5,7 @@ namespace Opus
     public class Zipline : Interactable
     {
         public Transform start, end;
-        public LineRenderer ziplineRenderer;
+        public Transform ziplineRenderer;
         public BoxCollider interactBox;
         public float width = 0.1f;
         public Vector3 forwardDirection;
@@ -16,10 +16,6 @@ namespace Opus
         [ContextMenu("Set Up Zipline")]
         public void SetUpZipline()
         {
-            if(ziplineRenderer == null)
-            {
-                ziplineRenderer = gameObject.AddComponent<LineRenderer>();
-            }
             if(interactBox == null)
             {
                 var g = new GameObject("InteractBox_Zipline");
@@ -27,15 +23,21 @@ namespace Opus
                 interactBox = g.AddComponent<BoxCollider>();
             }
 
-            interactBox.transform.forward = forwardDirection;
-            interactBox.transform.position = Vector3.Lerp(start.position, end.position, 0.5f);
             forwardDirection = end.position - start.position;
             distance = forwardDirection.magnitude;
+            forwardDirection.Normalize();
             interactBox.size = new(width, width, distance);
-            ziplineRenderer.useWorldSpace = true;
-            ziplineRenderer.widthMultiplier = width;
-            ziplineRenderer.SetPosition(0, start.position);
-            ziplineRenderer.SetPosition(1, end.position);
+
+            interactBox.transform.forward = forwardDirection;
+            interactBox.transform.position = Vector3.Lerp(start.position, end.position, 0.5f);
+
+            ziplineRenderer.up = forwardDirection;
+            ziplineRenderer.position = interactBox.transform.position;
+            ziplineRenderer.localScale = new(width, distance / 2, width);
+        }
+        private void Start()
+        {
+            forwardDirection.Normalize();
         }
         public override void Interact(PlayerMotor pm)
         {

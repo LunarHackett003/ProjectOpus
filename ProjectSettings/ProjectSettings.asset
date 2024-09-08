@@ -143,6 +143,8 @@ PlayerSettings:
   bundleVersion: 0.0.0-steamtest
   preloadedAssets:
   - {fileID: 0}
+  - {fileID: 11400000, guid: f91c87190d6d6ed4280fc7fbc9d86c8b, type: 2}
+  - {fileID: -944628639613478452, guid: 04199bfd206ef7243969f4b661696eaa, type: 3}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
