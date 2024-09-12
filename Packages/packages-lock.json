@@ -33,7 +33,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "b75790bf0a8cf4194fffff2055d9b5fcc6e0d0a9"
+      "hash": "edeb0620a11d4f250b59f9e37d6aff04b521e336"
     },
     "com.unity.2d.animation": {
       "version": "10.1.1",
@@ -325,28 +325,6 @@
         "com.unity.modules.terrain": "1.0.0",
         "com.unity.modules.jsonserialize": "1.0.0",
         "com.unity.rendering.light-transport": "1.0.0"
-      }
-    },
-    "com.unity.render-pipelines.high-definition": {
-      "version": "17.0.3",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.video": "1.0.0",
-        "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.imageconversion": "1.0.0",
-        "com.unity.render-pipelines.core": "17.0.3",
-        "com.unity.shadergraph": "17.0.3",
-        "com.unity.visualeffectgraph": "17.0.3",
-        "com.unity.render-pipelines.high-definition-config": "17.0.3"
-      }
-    },
-    "com.unity.render-pipelines.high-definition-config": {
-      "version": "17.0.3",
-      "depth": 1,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.render-pipelines.core": "17.0.3"
       }
     },
     "com.unity.render-pipelines.universal": {

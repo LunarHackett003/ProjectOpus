@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89ba2b0f27ebdc14e91a78279b3b0a71, type: 3}
+  m_Name: TeamNames
+  m_EditorClassIdentifier: 
+  teams:
+  - name: Team 1
+    color: {r: 1, g: 0.18396229, b: 0.18396229, a: 0.39215687}
+  - name: Team 2
+    color: {r: 1, g: 0.48584908, b: 0.9676143, a: 0.39215687}
+  - name: Team 3
+    color: {r: 0.41237193, g: 0.18431371, b: 1, a: 0.39215687}
+  - name: Team 4
+    color: {r: 0.18431371, g: 0.8383769, b: 1, a: 0.39215687}
+  - name: Team 5
+    color: {r: 0.18431371, g: 1, b: 0.49423376, a: 0.39215687}
+  - name: Team 6
+    color: {r: 1, g: 0.9947224, b: 0.18431371, a: 0.39215687}
+  - name: Team 7
+    color: {r: 1, g: 0.5206087, b: 0.18431371, a: 0.39215687}
+  - name: De Caca
+    color: {r: 0.2735849, g: 0.15928926, b: 0.078720175, a: 0.39215687}

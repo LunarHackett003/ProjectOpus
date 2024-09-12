@@ -1,4 +1,3 @@
-using System.Linq;
 using TMPro;
 using Unity.Netcode;
 using System.Collections.Generic;
@@ -9,36 +8,48 @@ namespace Opus
     public class Scoreboard : MonoBehaviour
     {
         public static Scoreboard Instance { get; private set; }
-        public InputCollector ic;
-        bool sbActive;
-        public GameObject scoreboard;
-        List<ScoreboardEntry> allEntries = new();
-        [System.Serializable]
-        public struct TeamEntry
-        {
-            public ScoreboardEntry[] scoreboardEntries;
-        }
-        public TeamEntry[] teamEntries;
-        private void Start()
+        public List<ScoreboardEntry> scoreboardEntries;
+        public GameObject scoreboardRoot;
+        bool firstUpdateDone;
+        private void Awake()
         {
             Instance = this;
-            scoreboard.SetActive(false);
+            ShowScoreboard(false);
+        }
+        public TeamEntry[] teamEntries;
+        public void UpdateScoreboard()
+        {
+            firstUpdateDone = true;
+            int[] playersOnTeams = new int[MatchController.Instance.numberOfTeams];
+            for (int i = 0; i < playersOnTeams.Length; i++)
+            {
+                TeamNameSO.TeamData t = MatchController.Instance.teamNames.teams[MatchController.Instance.teamDataNumbers.Value[i]];
+                //Initialise the teams first
+                teamEntries[i].teamNameDisplay.text = t.name;
+                teamEntries[i].teamBackground.color = t.color;
+            }
             for (int i = 0; i < teamEntries.Length; i++)
             {
-                allEntries.AddRange(teamEntries[i].scoreboardEntries);
+                TeamEntry t = teamEntries[i];
+                List<MatchController.TeamMember> members = MatchController.Instance.teamMembers.Value.FindAll(x => x.team == i);
+                print($"found {members.Count} players on team {i}");
+                for (int j = 0; j < t.scoreboardEntries.Length; j++)
+                {
+                    ScoreboardEntry s = t.scoreboardEntries[j];
+                    if(members.Count > 0 && j < members.Count)
+                        s.UpdateEntry(members[j]);
+                    else
+                        s.UpdateEntry(999);
+                }  
             }
         }
-        private void Update()
+        public void ShowScoreboard(bool show)
         {
-            if(sbActive != ic.scoreboardInput)
+            if (show && !firstUpdateDone)
             {
-                ActivateScoreboard();
+                UpdateScoreboard();
             }
-        }
-        void ActivateScoreboard()
-        {
-            sbActive = ic.scoreboardInput;
-            scoreboard.SetActive(sbActive);
+            scoreboardRoot.SetActive(show);
         }
     }
 }

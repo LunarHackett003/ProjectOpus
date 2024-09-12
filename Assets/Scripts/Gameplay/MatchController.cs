@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Opus
@@ -14,6 +15,8 @@ namespace Opus
             public ulong playerID;
             public int team, kills, deaths, assists, revives, amountHealed;
         }
+        public TeamNameSO teamNames;
+        public NetworkVariable<Dictionary<int, int>> teamDataNumbers = new(new());
         public NetworkVariable<List<TeamMember>> teamMembers = new();
         /// <summary>
         /// A dictionary containing the number of teams, and the number of players on those teams.<br></br>
@@ -23,6 +26,9 @@ namespace Opus
         public NetworkVariable<Dictionary<int, int>> teamNumbers = new(new());
         public List<TeamMember> localTeamMembers = new();
         public int numberOfTeams = 4;
+
+        public LayerMask damageLayermask;
+
         public void AssignPlayerToTeam(ulong ID)
         {
             int teamToAssign = 0;
@@ -32,6 +38,8 @@ namespace Opus
             {
                 if (teamNumbers.Value[i] < smallestTeam)
                 {
+                    print(teamNumbers.Value[i] + " players on team " + i);
+                    smallestTeam = i;
                     teamToAssign = i;
                 }
             }
@@ -41,8 +49,10 @@ namespace Opus
                 team = teamToAssign,
 
             };
+            print($"added Player {t.playerID} to team {teamToAssign}");
             teamMembers.Value.Add(t);
             teamNumbers.Value[teamToAssign] += 1;
+            NetworkManager.ConnectedClients[t.playerID].PlayerObject.GetComponent<PlayerManager>().BestowPlayer();
         }
         
         public static MatchController Instance { get; private set; }
@@ -51,16 +61,33 @@ namespace Opus
         {
             base.OnNetworkSpawn();
             Instance = this;
+            teamMembers.OnValueChanged += TeamMembersUpdated;
             if (IsOwner)
             {
                 for (int i = 0; i < numberOfTeams; i++)
                 {
                     teamNumbers.Value.Add(i, 0);
                 }
+                InitialiseTeamNumbers();
                 AssignPlayerToTeam(0);
                 NetworkManager.OnConnectionEvent += PlayerConnectionEvent;
             }
-            teamMembers.OnValueChanged += TeamMembersUpdated;
+        }
+        void InitialiseTeamNumbers()
+        {
+            for (int i = 0; i < numberOfTeams; i++)
+            {
+                int random = UnityEngine.Random.Range(0, teamNames.teams.Count);
+                if(i != 0 )
+                {
+                    while (teamDataNumbers.Value.ContainsValue(random))
+                    {
+                        random = UnityEngine.Random.Range(0, teamNames.teams.Count);
+                    }
+                }
+                print($"using team data index {random} for team {i}");
+                teamDataNumbers.Value.Add(i, random);
+            }
         }
         public override void OnNetworkDespawn()
         {
@@ -74,6 +101,10 @@ namespace Opus
         void TeamMembersUpdated(List<TeamMember> previous,  List<TeamMember> current)
         {
             localTeamMembers = current;
+            if(Scoreboard.Instance != null)
+            {
+                Scoreboard.Instance.UpdateScoreboard();
+            }
         }
 
         private void PlayerConnectionEvent(NetworkManager arg1, ConnectionEventData arg2)
@@ -88,15 +119,25 @@ namespace Opus
                 RemovePlayerFromTeam(arg2.ClientId);
             }
         }
-        private void Start()
-        {
-
-        }
         void RemovePlayerFromTeam(ulong ID)
         {
             TeamMember t = teamMembers.Value.Find(x => x.playerID == ID);
             teamMembers.Value.RemoveAt(t.team);
             teamNumbers.Value.Add(t.team, teamNumbers.Value[t.team] - 1);
+        }
+        public void UpdateScoreForPlayer(ulong ID, int killDelta = 0, int deathDelta = 0, int assistDelta = 0, int reviveDelta = 0, int healDelta = 0)
+        {
+            int index = teamMembers.Value.FindIndex(x => x.playerID == ID);
+            TeamMember t = teamMembers.Value[index];
+            teamMembers.Value[index] = new()
+            {
+                playerID = t.playerID,
+                kills = t.kills + killDelta,
+                deaths = t.deaths + deathDelta,
+                assists = t.assists + assistDelta,
+                revives = t.revives + reviveDelta,
+                amountHealed = t.amountHealed + healDelta,
+            };
         }
     }
 }

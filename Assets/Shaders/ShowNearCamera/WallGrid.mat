@@ -108,7 +108,7 @@ Material:
     - _Surface: 1
     - _SurfaceType: 1
     - _Tiling: 1
-    - _TransparencyDistance: 7
+    - _TransparencyDistance: 500
     - _TransparentBackfaceEnable: 0
     - _TransparentCullMode: 2
     - _TransparentDepthPostpassEnable: 0

@@ -8,7 +8,7 @@ namespace Opus
     public class InputCollector : NetworkBehaviour
     {
         public ControlScheme cs;
-
+        public PlayerManager playerManager;
 
         public Vector2 moveInput, lookInput;
         Vector2 lookDelta, oldLook;
@@ -18,17 +18,15 @@ namespace Opus
         bool jumpInput;
         public bool interactInput;
         public bool scoreboardInput, sprintInput;
+        public bool primaryInput, secondaryInput;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
             if (IsOwner)
             {
                 AssignInputEvents();
+                playerManager = GetComponent<PlayerManager>();
             }
-        }
-        private void Start()
-        {
-
         }
 
         void AssignInputEvents()
@@ -44,9 +42,32 @@ namespace Opus
             cs.Player.Interact.performed += OnInteract;
             cs.Player.Interact.canceled += OnInteract;
             cs.Player.Scoreboard.performed += OnScoreboard;
-            cs.Player.Scoreboard.canceled += OnScoreboard;
             cs.Player.Sprint.performed += OnSprint;
             cs.Player.Sprint.canceled += OnSprint;
+            cs.Player.Fire.performed += OnFire;
+            cs.Player.Fire.canceled += OnFire;
+            cs.Player.SecondaryInput.performed += OnSecondaryInput;
+            cs.Player.SecondaryInput.canceled += OnSecondaryInput;
+        }
+        public void OnPause(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+            {
+                playerManager.pauseMenu.PauseGame(!PauseMenu.GamePaused);
+                if (PauseMenu.GamePaused)
+                    cs.Disable();
+                else
+                    cs.Enable();
+            }
+        }
+        private void OnSecondaryInput(InputAction.CallbackContext obj)
+        {
+            secondaryInput = obj.ReadValueAsButton();
+        }
+
+        private void OnFire(InputAction.CallbackContext obj)
+        {
+            primaryInput = obj.ReadValueAsButton();
         }
 
         private void OnSprint(InputAction.CallbackContext obj)
@@ -56,7 +77,11 @@ namespace Opus
 
         private void OnScoreboard(InputAction.CallbackContext obj)
         {
-            scoreboardInput = obj.ReadValueAsButton();
+            scoreboardInput = !scoreboardInput;
+            if(Scoreboard.Instance != null)
+            {
+                Scoreboard.Instance.ShowScoreboard(scoreboardInput);
+            }
         }
 
         private void Update()

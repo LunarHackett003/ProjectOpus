@@ -1,4 +1,5 @@
 
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ namespace Opus
     {
         public Rigidbody rb;
         public InputCollector ic;
+        public PlayerManager pm;
         public Vector3 velocity;
         Vector3 movementVelocity;
         Vector3 movementVelocityDamping;
@@ -40,19 +42,16 @@ namespace Opus
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            pm = PlayerManager.playerManagers.First(m => m.OwnerClientId == OwnerClientId);
+            ic = pm.InputCollector;
+            pm.playerMotor = this;
             if (!IsOwner)
             {
                 rb.isKinematic = true;
                 enabled = false;
                 return;
             }
-
             SpawnPlayer();
-            ic = GetComponent<InputCollector>();
-        }
-        private void Start()
-        {
-            ic = GetComponent<InputCollector>();
         }
 
         private void Update()

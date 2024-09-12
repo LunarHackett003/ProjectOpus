@@ -15,7 +15,6 @@ namespace Opus
         public Lobby? currentLobby;
         public ulong hostID;
 
-        public GameObject hostButton, quitButton;
         public NetworkObject matchControllerPrefab;
         private void Awake()
         {
@@ -109,8 +108,6 @@ namespace Opus
             currentLobby = null;
             NetworkManager.Singleton.Shutdown();
             SceneLoader.Instance.LoadMenuScene();
-            hostButton.SetActive(true);
-            quitButton.SetActive(false);
         }
         private void SteamMatchmaking_OnLobbyCreated(Result _result, Lobby _lobby)
         {
@@ -149,8 +146,6 @@ namespace Opus
         private void ClientStarted()
         {
             print("Client started");
-            hostButton.SetActive(false);
-            quitButton.SetActive(true);
         }
     }
 }

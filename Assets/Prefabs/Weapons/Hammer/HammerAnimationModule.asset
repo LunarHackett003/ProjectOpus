@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6fde86df04a3fa46b9b7c164f905e49, type: 3}
+  m_Name: HammerAnimationModule
+  m_EditorClassIdentifier: 
+  attackTiming: 0
+  animationOverrides:
+  - name: Equip
+    clip: {fileID: 7400000, guid: ec22a2acc64f4aa4d8b329615a460c60, type: 2}
+  - name: PrimaryMelee
+    clip: {fileID: 7400000, guid: 20f08a367e29203418e929ec31c04b7c, type: 2}
+  - name: PrimaryMelee 1
+    clip: {fileID: 7400000, guid: d1e0ff3b2c9f91a4ba84e829f3681210, type: 2}
+  - name: SecondaryMelee
+    clip: {fileID: 7400000, guid: 8a89a9dabb238ec43828d07084fcd560, type: 2}
+  attackAnimationCount: 2
