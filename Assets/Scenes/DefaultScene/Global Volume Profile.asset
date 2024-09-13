@@ -40,7 +40,7 @@ MonoBehaviour:
   maxNits:
     m_OverrideState: 0
     m_Value: 1000
---- !u!114 &-6436175056030391730
+--- !u!114 &-7611214860323500686
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -58,15 +58,15 @@ MonoBehaviour:
     m_Value: 1
   localClouds:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 1
   m_CloudPreset:
-    m_OverrideState: 1
-    m_Value: 4
+    m_OverrideState: 0
+    m_Value: 1
   densityMultiplier:
-    m_OverrideState: 1
-    m_Value: 0.482
+    m_OverrideState: 0
+    m_Value: 0.4
   densityCurve:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value:
       serializedVersion: 2
       m_Curve:
@@ -80,7 +80,7 @@ MonoBehaviour:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 0.17293397
+        time: 0.15
         value: 1
         inSlope: 0
         outSlope: 0
@@ -88,33 +88,6 @@ MonoBehaviour:
         weightedMode: 0
         inWeight: 0
         outWeight: 0
-      - serializedVersion: 3
-        time: 0.3600117
-        value: 0.6133645
-        inSlope: -1.4422302
-        outSlope: -1.4422302
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.56674194
-        value: 0.8525907
-        inSlope: -1.3097876
-        outSlope: -1.3097876
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      - serializedVersion: 3
-        time: 0.82402873
-        value: 0.5681381
-        inSlope: 1.5704991
-        outSlope: 1.5704991
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.23988757
       - serializedVersion: 3
         time: 1
         value: 0.1
@@ -128,17 +101,17 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   shapeFactor:
-    m_OverrideState: 1
-    m_Value: 0.989
+    m_OverrideState: 0
+    m_Value: 0.9
   shapeScale:
-    m_OverrideState: 1
-    m_Value: 11.84
+    m_OverrideState: 0
+    m_Value: 5
   erosionFactor:
-    m_OverrideState: 1
-    m_Value: 1
+    m_OverrideState: 0
+    m_Value: 0.8
   erosionScale:
     m_OverrideState: 0
-    m_Value: 99.54
+    m_Value: 107
   erosionCurve:
     m_OverrideState: 0
     m_Value:
@@ -231,11 +204,11 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0
   globalOrientation:
-    m_OverrideState: 1
-    m_Value: 47
+    m_OverrideState: 0
+    m_Value: 0
   globalSpeed:
-    m_OverrideState: 1
-    m_Value: 100
+    m_OverrideState: 0
+    m_Value: 0
   shapeSpeedMultiplier:
     m_OverrideState: 0
     m_Value: 1
@@ -244,25 +217,25 @@ MonoBehaviour:
     m_Value: 0.25
   altitudeDistortion:
     m_OverrideState: 0
-    m_Value: -0.11
+    m_Value: 0.25
   verticalShapeWindSpeed:
-    m_OverrideState: 1
-    m_Value: 5
+    m_OverrideState: 0
+    m_Value: 0
   verticalErosionWindSpeed:
     m_OverrideState: 0
     m_Value: 0
   ambientLightProbeDimmer:
-    m_OverrideState: 1
-    m_Value: 2
+    m_OverrideState: 0
+    m_Value: 1
   sunLightDimmer:
     m_OverrideState: 0
-    m_Value: 1.49
+    m_Value: 1
   erosionOcclusion:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 0.1
   scatteringTint:
-    m_OverrideState: 1
-    m_Value: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 1}
+    m_OverrideState: 0
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
   powderEffectIntensity:
     m_OverrideState: 0
     m_Value: 0.25
@@ -271,7 +244,7 @@ MonoBehaviour:
     m_Value: 0.5
   shadows:
     m_OverrideState: 0
-    m_Value: 1
+    m_Value: 0
   shadowResolution:
     m_OverrideState: 0
     m_Value: 256
@@ -283,7 +256,7 @@ MonoBehaviour:
     m_Value: 1
   shadowOpacityFallback:
     m_OverrideState: 0
-    m_Value: 0.042
+    m_Value: 0
   temporalAccumulationFactor:
     m_OverrideState: 0
     m_Value: 0.95
@@ -434,13 +407,9 @@ MonoBehaviour:
   m_Name: Global Volume Profile
   m_EditorClassIdentifier: 
   components:
-  - {fileID: 1452042327438506159}
-  - {fileID: -2580452382193166204}
-  - {fileID: 1543188442441739826}
-  - {fileID: -3195301994228680120}
-  - {fileID: -6436175056030391730}
   - {fileID: 864227869701776050}
   - {fileID: -8843919983167961943}
+  - {fileID: -7611214860323500686}
 --- !u!114 &864227869701776050
 MonoBehaviour:
   m_ObjectHideFlags: 3

@@ -51,7 +51,7 @@ namespace Opus
             }
             if (IsOwner)
             {
-                currentAttackIndex = primaryInput.Value ? (currentAttackIndex + increment) % animationModule.attackAnimationCount : 0;
+                currentAttackIndex = PrimaryInput ? (currentAttackIndex + increment) % animationModule.attackAnimationCount : 0;
             }
             AttackClient();
             if (manager is PlayerWeaponManager p)
@@ -67,7 +67,7 @@ namespace Opus
             }
             if (IsOwner)
             {
-                currentAttackIndex = primaryInput.Value ? (currentAttackIndex + increment) % animationModule.attackAnimationCount : 0;
+                currentAttackIndex = PrimaryInput ? (currentAttackIndex + increment) % animationModule.attackAnimationCount : 0;
             }
             AttackClient();
         }
@@ -77,8 +77,8 @@ namespace Opus
             {
                 if(manager is PlayerWeaponManager p)
                 {
-                    p.PlayerAnimator.PrimaryMeleeSet(primaryInput.Value);
-                    p.PlayerAnimator.SecondaryMeleeSet(secondaryInput.Value);
+                    p.PlayerAnimator.PrimaryMeleeSet(PrimaryInput);
+                    p.PlayerAnimator.SecondaryMeleeSet(SecondaryInput);
                 }
             }
         }

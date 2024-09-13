@@ -56,12 +56,15 @@ namespace Opus
 
         private void Update()
         {
-            head.localRotation = Quaternion.Euler(-ic.lookInput.y, 0, 0);
-            transform.rotation = Quaternion.Euler(0, ic.lookInput.x, 0);
-
-            if(ic.TryConsumeJump())
+            if(ic != null)
             {
-                TryJump();
+                head.localRotation = Quaternion.Euler(-ic.lookInput.y, 0, 0);
+                transform.rotation = Quaternion.Euler(0, ic.lookInput.x, 0);
+
+                if(ic.TryConsumeJump())
+                {
+                    TryJump();
+                }
             }
         }
         private void FixedUpdate()
@@ -70,7 +73,7 @@ namespace Opus
             rb.linearDamping = grounded ? groundDrag : airDrag;
             if (zipMotor.currentZipline != null)
                 moveState = MovementState.zipline;
-            if (moveState == MovementState.none)
+            if (ic != null && moveState == MovementState.none)
             {
                 rb.isKinematic = false; 
                 if (grounded)

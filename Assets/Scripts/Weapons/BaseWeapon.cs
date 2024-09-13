@@ -18,13 +18,24 @@ namespace Opus
 
         public OpusNetworkAnimator animator;
         public WeaponManager manager;
-        public NetworkVariable<bool> primaryInput = new(writePerm: NetworkVariableWritePermission.Owner);
-        public NetworkVariable<bool> secondaryInput = new(writePerm: NetworkVariableWritePermission.Owner);
+        public bool PrimaryInput { get; internal set; }
+        public bool SecondaryInput { get; internal set; }
 
         public delegate void OnKilledEntity(Entity entityKilled);
         public OnKilledEntity onKilledEntity;
 
         public WeaponAnimationModule animationModule;
+        [Rpc(SendTo.Server)]
+        public void SetPrimaryInput_RPC(bool input)
+        {
+            PrimaryInput = input;
+        }
+        [Rpc(SendTo.Server)]
+        public void SetSecondaryInput_RPC(bool input)
+        {
+            SecondaryInput = input;
+        }
+
 
         public bool isPlayerWeapon;
         public override void OnNetworkSpawn()

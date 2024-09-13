@@ -15,4 +15,4 @@ MonoBehaviour:
   slot: 1
   displayName: Sledgehammer
   icon: {fileID: 21300000, guid: 8c042dae3cf18f447ba200790163e610, type: 3}
-  prefab: {fileID: 0}
+  prefab: {fileID: 1211152858846308390, guid: 36b9add26b053fc4db528c54a1fa8192, type: 3}

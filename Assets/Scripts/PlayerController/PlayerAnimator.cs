@@ -63,10 +63,36 @@ namespace Opus
             {
                 clipOverrides[item.name] = item.clip;
             }
+
+
             aoc.ApplyOverrides(clipOverrides);
             animator.Rebind();
+            
+            switch (b)
+            {
+                case MeleeWeapon t1:
+                    SetLayerWeights(1, 0, 0);
+                    break;
+                case RangedWeapon t2:
+                    SetLayerWeights(0, 1, 0);
+                    break;
+                case DualWieldWeapon t3:
+                    SetLayerWeights(0, 0, 1);
+                    break;
+                default:
+                    break;
+            }
         }
+        void SetLayerWeights(float meleeWeight, float twoHandWeight, float dualWeight)
+        {
+            print($"Set weapon layer weights: {meleeWeight}, {twoHandWeight}, {dualWeight}");
 
+
+            animator.SetLayerWeight(1, meleeWeight);
+            animator.SetLayerWeight(2, twoHandWeight);
+            animator.SetLayerWeight(3, dualWeight);
+            animator.SetLayerWeight(4, dualWeight);
+        }
         private void FixedUpdate()
         {
             //Rigidbody or Input Collector is not assigned, and we therefore probably shouldn't be doing stuff with this character.

@@ -23,13 +23,10 @@ namespace Opus
         public NetworkVariable<int> primaryIndex = new(writePerm: NetworkVariableWritePermission.Owner), secondaryIndex = new(writePerm:NetworkVariableWritePermission.Owner),
             gadgetOneIndex = new(writePerm:NetworkVariableWritePermission.Owner), gadgetTwoIndex = new(writePerm:NetworkVariableWritePermission.Owner), specialIndex = new(writePerm:NetworkVariableWritePermission.Owner);
 
-        private void Start()
-        {
-            playerManagers.Add(this);
-        }
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            playerManagers.Add(this);
             InputCollector = GetComponent<InputCollector>();
             loadoutManager = FindAnyObjectByType<LoadoutManager>();
             if (IsOwner)
@@ -38,6 +35,7 @@ namespace Opus
                 if (loadoutManager)
                 {
                     loadoutManager.onLoadoutUpdated += UpdateLoadout;
+                    UpdateLoadout();
                 }
             }
         }
@@ -52,6 +50,19 @@ namespace Opus
         public void BestowPlayer()
         {
             NetworkManager.SceneManager.OnLoadComplete += SceneLoadComplete;
+        }
+        public void BestowWeapons()
+        {
+            if(primaryIndex.Value > -1)
+            {
+                NetworkObject nob = NetworkManager.SpawnManager.InstantiateAndSpawn(loadoutManager.ValidLoadoutItemContainer.primary[primaryIndex.Value].prefab, OwnerClientId);
+                weaponManager.primaryWeaponRef.Value = nob.GetComponent<BaseWeapon>();
+            }
+            if(secondaryIndex.Value > -1)
+            {
+                NetworkObject nob = NetworkManager.SpawnManager.InstantiateAndSpawn(loadoutManager.ValidLoadoutItemContainer.secondary[secondaryIndex.Value].prefab, OwnerClientId);
+                weaponManager.secondaryWeaponRef.Value = nob.GetComponent<BaseWeapon>();
+            }
         }
 
         private void SceneLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)

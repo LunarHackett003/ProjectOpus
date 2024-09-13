@@ -14,13 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   primary:
   - {fileID: 11400000, guid: 657cd0d670368004085734e0ee25a086, type: 2}
-  - {fileID: 11400000, guid: a2f4fc71491f82d4a98ac0b6333c5f76, type: 2}
-  - {fileID: 11400000, guid: 0cc46accd03014a49879599e688610c1, type: 2}
-  - {fileID: 11400000, guid: 7a2dc0ff4e581ab489b50b23221447b6, type: 2}
-  - {fileID: 11400000, guid: e1158f06e14e2464ca010ad976a8efa4, type: 2}
   - {fileID: 11400000, guid: 270be9ce5d7c0f744a5b2b4c8eb0b346, type: 2}
-  secondary:
-  - {fileID: 11400000, guid: 30c96357702970443af7035ba49e0936, type: 2}
-  - {fileID: 11400000, guid: 98f579931866b5440955f6a062db2547, type: 2}
+  secondary: []
   gadget: []
   special: []

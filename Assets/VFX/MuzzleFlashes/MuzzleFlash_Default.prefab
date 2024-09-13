@@ -42,21 +42,60 @@ VisualEffect:
   m_GameObject: {fileID: 3777926426336733899}
   m_Enabled: 1
   m_Asset: {fileID: 8926484042661614526, guid: d94d2b452c13a4a489925adb5456f745, type: 3}
-  m_InitialEventName: OnPlay
-  m_InitialEventNameOverriden: 0
+  m_InitialEventName: Fire
+  m_InitialEventNameOverriden: 1
   m_StartSeed: 0
   m_ResetSeedOnPlay: 1
   m_AllowInstancing: 1
   m_ResourceVersion: 1
   m_PropertySheet:
     m_Float:
-      m_Array: []
+      m_Array:
+      - m_Value: 0.01
+        m_Name: FlashConeCircle_circle_radius
+        m_Overridden: 1
     m_Vector2f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 0.01, y: 0.1}
+        m_Name: FlashConeLifetime
+        m_Overridden: 1
+      - m_Value: {x: 0.02, y: 0.1}
+        m_Name: FlashForwardLifetime
+        m_Overridden: 1
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 0, y: 0, z: 5}
+        m_Name: FlashForwardMaxVelocity
+        m_Overridden: 1
+      - m_Value: {x: 0, y: 0, z: 15}
+        m_Name: FlashForwardMinVelocity
+        m_Overridden: 1
+      - m_Value: {x: -2, y: -2, z: 0.5}
+        m_Name: FlashConeMinVelocity
+        m_Overridden: 1
+      - m_Value: {x: 2, y: 2, z: 1}
+        m_Name: FlashConeMaxVelocity
+        m_Overridden: 1
+      - m_Value: {x: 0, y: 0, z: 0}
+        m_Name: FlashConeCircle_circle_transform_angles
+        m_Overridden: 1
+      - m_Value: {x: 0.03, y: 0.01, z: 0.03}
+        m_Name: FlashConeMinScale
+        m_Overridden: 1
+      - m_Value: {x: 0.08, y: 0.3, z: 0.08}
+        m_Name: FlashConeMaxScale
+        m_Overridden: 1
+      - m_Value: {x: 0.03, y: 0.4, z: 0.03}
+        m_Name: FlashForwardMinScale
+        m_Overridden: 1
+      - m_Value: {x: 0, y: 0, z: 0.2}
+        m_Name: FlashForwardOffset
+        m_Overridden: 1
     m_Vector4f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: 31.999996, y: 0, z: 0, w: 0}
+        m_Name: FlashColourB
+        m_Overridden: 1
     m_Uint:
       m_Array: []
     m_Int:
