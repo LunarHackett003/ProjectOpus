@@ -31,7 +31,7 @@ namespace Opus
             {
                 if (hit.collider.TryGetComponent(out Fragment fc))
                 {
-                    fc.HitFragment(30);
+                    fc.TakeDamage(30);
                 }
                 lastShotLine.enabled = true;
                 lastShotLine.useWorldSpace = true;
@@ -49,7 +49,7 @@ namespace Opus
                     if(item.TryGetComponent(out Fragment fc))
                     {
                         float distance = Vector3.Distance(hit.point, item.ClosestPoint(hit.point));
-                        fc.HitFragment(30 / Mathf.Min(1, distance));
+                        fc.TakeDamage(30 / Mathf.Min(1, distance));
                     }
                     lastExplosionSphere.transform.position = hit.point;
                 }

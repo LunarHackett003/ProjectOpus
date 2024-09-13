@@ -33,6 +33,7 @@ namespace Opus
         {
             cs = new();
             cs.Enable();
+            print("registering input callbacks");
             cs.Player.Move.performed += OnMove;
             cs.Player.Move.canceled += OnMove;
             cs.Player.Look.performed += OnLook;
@@ -48,18 +49,42 @@ namespace Opus
             cs.Player.Fire.canceled += OnFire;
             cs.Player.SecondaryInput.performed += OnSecondaryInput;
             cs.Player.SecondaryInput.canceled += OnSecondaryInput;
+            cs.Player.Pause.performed += OnPause;
+            cs.Player.Pause.canceled += OnPause;
         }
-        public void OnPause(InputAction.CallbackContext context)
+        public override void OnNetworkDespawn()
         {
-            if (context.performed)
+            base.OnNetworkDespawn();
+            cs.Player.Move.performed -= OnMove;
+            cs.Player.Move.canceled -= OnMove;
+            cs.Player.Look.performed -= OnLook;
+            cs.Player.Look.canceled -= OnLook;
+            cs.Player.Jump.performed -= OnJump;
+            cs.Player.Jump.canceled -= OnJump;
+            cs.Player.Interact.performed -= OnInteract;
+            cs.Player.Interact.canceled -= OnInteract;
+            cs.Player.Scoreboard.performed -= OnScoreboard;
+            cs.Player.Sprint.performed -= OnSprint;
+            cs.Player.Sprint.canceled -= OnSprint;
+            cs.Player.Fire.performed -= OnFire;
+            cs.Player.Fire.canceled -= OnFire;
+            cs.Player.SecondaryInput.performed -= OnSecondaryInput;
+            cs.Player.SecondaryInput.canceled -= OnSecondaryInput;
+            cs.Player.Pause.performed -= OnPause;
+            cs.Player.Pause.canceled -= OnPause;
+            cs.Disable();
+            cs.Dispose();
+        }
+
+        private void OnPause(InputAction.CallbackContext obj)
+        {
+            if (obj.performed)
             {
-                playerManager.pauseMenu.PauseGame(!PauseMenu.GamePaused);
-                if (PauseMenu.GamePaused)
-                    cs.Disable();
-                else
-                    cs.Enable();
+                print("Pausing or unpausing game");
+                PauseMenu.Instance.PauseGame(!PauseMenu.Instance.GamePaused);
             }
         }
+
         private void OnSecondaryInput(InputAction.CallbackContext obj)
         {
             secondaryInput = obj.ReadValueAsButton();

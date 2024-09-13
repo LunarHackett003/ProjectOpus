@@ -1136,6 +1136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: caca6a88e28b801458d983250f4e4a6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectPoolPrefab: {fileID: 5534826361335020093, guid: c825d5b12b725da4b911efa3735459a1, type: 3}
   teamNames: {fileID: 11400000, guid: 31ffdec1c3be06242a5ecd57c2d6a5f6, type: 2}
   teamMembers:
     m_InternalValue: []
@@ -1819,6 +1820,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1016967456302459837, guid: 956f08cd85c07c54e97433ad283b8939, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1016967456302459837, guid: 956f08cd85c07c54e97433ad283b8939, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -1919,6 +1924,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8325353717063757686, guid: 956f08cd85c07c54e97433ad283b8939, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8325353717063757686, guid: 956f08cd85c07c54e97433ad283b8939, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -1936,6 +1945,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8572528085197725990, guid: 956f08cd85c07c54e97433ad283b8939, type: 3}
       propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8572528085197725990, guid: 956f08cd85c07c54e97433ad283b8939, type: 3}
+      propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8572528085197725990, guid: 956f08cd85c07c54e97433ad283b8939, type: 3}

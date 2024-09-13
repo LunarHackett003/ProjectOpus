@@ -1,10 +1,12 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Opus
 {
-    public class FragmentController : MonoBehaviour
+    public class FragmentController : NetworkBehaviour
     {
+        public NetworkVariable<bool> hasBeenHit = new();
         public Fragment[] fragments;
         public GameObject undamagedSurface;
         [ContextMenu("Initialise Fragmentation")]
@@ -16,6 +18,14 @@ namespace Opus
                 fragments[i].controller = this;
             }
         }
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (hasBeenHit.Value)
+            {
+                undamagedSurface.SetActive(false);
+            }
+        }
         public void FragmentDamaged()
         {
             if (undamagedSurface.activeInHierarchy)
@@ -24,7 +34,7 @@ namespace Opus
             }
             for (int i = 0; i < fragments.Length; i++)
             {
-                if (fragments[i].health > 0)
+                if (fragments[i].health.Value > 0)
                     fragments[i].renderer.enabled = true;
             }
         }

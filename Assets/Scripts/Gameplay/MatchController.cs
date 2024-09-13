@@ -15,6 +15,8 @@ namespace Opus
             public ulong playerID;
             public int team, kills, deaths, assists, revives, amountHealed;
         }
+        public NetworkObject objectPoolPrefab;
+
         public TeamNameSO teamNames;
         public NetworkVariable<Dictionary<int, int>> teamDataNumbers = new(new());
         public NetworkVariable<List<TeamMember>> teamMembers = new();
@@ -64,6 +66,7 @@ namespace Opus
             teamMembers.OnValueChanged += TeamMembersUpdated;
             if (IsOwner)
             {
+                NetworkManager.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
                 for (int i = 0; i < numberOfTeams; i++)
                 {
                     teamNumbers.Value.Add(i, 0);
@@ -73,6 +76,12 @@ namespace Opus
                 NetworkManager.OnConnectionEvent += PlayerConnectionEvent;
             }
         }
+
+        private void SceneManager_OnLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
+        {
+            NetworkManager.SpawnManager.InstantiateAndSpawn(objectPoolPrefab);
+        }
+
         void InitialiseTeamNumbers()
         {
             for (int i = 0; i < numberOfTeams; i++)

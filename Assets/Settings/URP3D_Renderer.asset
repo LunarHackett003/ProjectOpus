@@ -17,7 +17,7 @@ MonoBehaviour:
   renderingDebugger: 0
   reflectionProbe: 0
   resolutionScale: 0.5
-  upscaleMode: 0
+  upscaleMode: 1
   preferredRenderMode: 1
   ambientProbe: 1
   sunAttenuation: 1

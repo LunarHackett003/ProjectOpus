@@ -285,7 +285,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7492810022823991443}
   - component: {fileID: 7705383919531691823}
-  - component: {fileID: 5283553225955702069}
   - component: {fileID: 5084491368473432253}
   - component: {fileID: 1430274595006817669}
   - component: {fileID: 3854731301262515291}
@@ -339,28 +338,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &5283553225955702069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 658764362685067556}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 65fb97e29ed18dc4b85c6b5ebc1018e7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerManager: {fileID: 0}
-  moveInput: {x: 0, y: 0}
-  lookInput: {x: 0, y: 0}
-  lookSpeed: 15
-  lookClamp: 89
-  interactInput: 0
-  scoreboardInput: 0
-  sprintInput: 0
-  primaryInput: 0
-  secondaryInput: 0
 --- !u!114 &5084491368473432253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -374,7 +351,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 1430274595006817669}
-  ic: {fileID: 5283553225955702069}
+  ic: {fileID: 0}
   pm: {fileID: 0}
   velocity: {x: 0, y: 0, z: 0}
   groundMoveSpeed: {x: 50, y: 50}
@@ -464,7 +441,7 @@ MonoBehaviour:
   interactMask:
     serializedVersion: 2
     m_Bits: 524288
-  collector: {fileID: 5283553225955702069}
+  collector: {fileID: 0}
   pm: {fileID: 5084491368473432253}
   interactPrompt: {fileID: 5622550877555725879}
 --- !u!114 &4978696837037512856
@@ -3439,7 +3416,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 1430274595006817669}
-  ic: {fileID: 5283553225955702069}
+  ic: {fileID: 0}
   pm: {fileID: 5084491368473432253}
   animator: {fileID: 405410265148226183}
   networkAnimator: {fileID: 3313194723189211648}
@@ -3490,7 +3467,7 @@ MonoBehaviour:
     Layer: 0
     OriginatingState: 125937960
     DestinationState: 137525990
-    TransitionDuration: 0.034615338
+    TransitionDuration: 0.089999944
     TriggerNameHash: 137525990
     TransitionIndex: 0
   - IsCrossFadeExit: 0

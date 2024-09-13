@@ -63,7 +63,7 @@ namespace Opus
                     ""id"": ""42db9cb2-0e8d-47bc-a468-26a6bd2a2725"",
                     ""expectedControlType"": """",
                     ""processors"": """",
-                    ""interactions"": ""Press(behavior=2)"",
+                    ""interactions"": ""Press"",
                     ""initialStateCheck"": false
                 },
                 {

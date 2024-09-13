@@ -284,6 +284,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 552639f11face0148983a89bdbb51d1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  time: 0.1
   scene:
     asset: {fileID: 102900000, guid: a8e114d64a35d6a45b3501f5931af370, type: 3}
     guid: a8e114d64a35d6a45b3501f5931af370

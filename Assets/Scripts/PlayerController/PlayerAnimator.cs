@@ -31,8 +31,8 @@ namespace Opus
             if (IsOwner)
             {
                 rb = rb != null ? rb : GetComponentInParent<Rigidbody>();
-                ic = ic != null ? ic : GetComponentInParent<InputCollector>();
                 pm = pm != null ? pm : GetComponentInParent<PlayerMotor>();
+                ic = ic != null ? ic : pm.ic;
                 pwm = pwm != null ? pwm : GetComponentInParent<PlayerWeaponManager>();
 
                 horizontalMoveID = Animator.StringToHash("Horizontal");

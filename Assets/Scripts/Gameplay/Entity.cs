@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Opus
 {
-    public class Entity : NetworkBehaviour
+    public class Entity : Damageable
     {
         public NetworkVariable<float> currentHealth = new NetworkVariable<float>();
         public NetworkVariable<bool> isAlive = new NetworkVariable<bool>(true);
@@ -41,6 +41,10 @@ namespace Opus
             {
                 currentHealth.Value = maxHealth;
             }
+        }
+        public override void TakeDamage(float damage)
+        {
+            currentHealth.Value -= damage;
         }
     }
 }

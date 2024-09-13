@@ -18,13 +18,9 @@ namespace Opus
             {
                 for (int i = 0; i < hits; i++)
                 {
-                    if (cols[i].attachedRigidbody && cols[i].attachedRigidbody.TryGetComponent(out Entity e))
+                    if (cols[i].TryGetComponent(out Damageable d))
                     {
-                        print($"hit entity {e.name} for {damage} dmg");
-                    }
-                    else if (cols[i].TryGetComponent(out Fragment f))
-                    {
-                        f.HitFragment(secondaryDamage);
+                        d.TakeDamage(damage);
                     }
                 }
             }

@@ -1,25 +1,28 @@
+using Unity.Netcode;
 using UnityEngine;
 
 namespace Opus
 {
-    public class Fragment : MonoBehaviour
+    public class Fragment : Damageable
     {
-        public float health;
+        public NetworkVariable<float> health = new();
         public float maxHealth = 25;
         public FragmentController controller;
         new public MeshRenderer renderer;
         new public MeshCollider collider;
-        private void Awake()
+        public override void OnNetworkSpawn()
         {
-            health = maxHealth;
+            base.OnNetworkSpawn();
+            health.Value = maxHealth;
             renderer = GetComponent<MeshRenderer>();
             collider = GetComponent<MeshCollider>();
-            renderer.enabled = false;
+            renderer.enabled = controller.hasBeenHit.Value;
         }
-        public void HitFragment(float damage)
+        public override void TakeDamage(float damage)
         {
-            health -= damage;
-            if(health <= 0)
+            base.TakeDamage(damage);
+            health.Value -= damage;
+            if(health.Value <= 0)
             {
                 renderer.enabled = false;
                 collider.enabled = false;

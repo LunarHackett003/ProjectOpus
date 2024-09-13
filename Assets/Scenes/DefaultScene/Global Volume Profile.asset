@@ -60,11 +60,11 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 1
   m_CloudPreset:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   densityMultiplier:
     m_OverrideState: 0
-    m_Value: 0.4
+    m_Value: 1
   densityCurve:
     m_OverrideState: 0
     m_Value:
@@ -204,11 +204,11 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0
   globalOrientation:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
   globalSpeed:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 90
   shapeSpeedMultiplier:
     m_OverrideState: 0
     m_Value: 1
@@ -219,8 +219,8 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 0.25
   verticalShapeWindSpeed:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 30
   verticalErosionWindSpeed:
     m_OverrideState: 0
     m_Value: 0

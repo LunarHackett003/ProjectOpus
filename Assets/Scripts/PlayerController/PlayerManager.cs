@@ -29,6 +29,7 @@ namespace Opus
             playerManagers.Add(this);
             InputCollector = GetComponent<InputCollector>();
             loadoutManager = FindAnyObjectByType<LoadoutManager>();
+            print($"owner: {OwnerClientId}");
             if (IsOwner)
             {
                 playerName.Value = SteamClient.Name;
@@ -39,8 +40,21 @@ namespace Opus
                 }
             }
         }
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            playerManagers.Remove(this);
+            if (IsOwner)
+            {
+                if (loadoutManager)
+                {
+                    loadoutManager.onLoadoutUpdated -= UpdateLoadout;
+                }
+            }
+        }
         public void UpdateLoadout()
         {
+            print("Updating loadout");
             primaryIndex.Value = loadoutManager.primaryIndex;
             secondaryIndex.Value = loadoutManager.secondaryIndex;
             gadgetOneIndex.Value = loadoutManager.gadget1Index;

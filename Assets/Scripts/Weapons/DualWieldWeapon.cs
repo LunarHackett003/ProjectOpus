@@ -5,6 +5,8 @@ namespace Opus
     public class DualWieldWeapon : BaseWeapon
     {
         public BaseWeapon weaponOne, weaponTwo;
+        public string reloadKey2;
+        int reloadHash2;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
