@@ -16,6 +16,8 @@ namespace Opus
          * Weapons should also make liberal use of Scriptable Object-driven configuration
          */
 
+        public bool doLogging = false;
+
         public OpusNetworkAnimator animator;
         public WeaponManager manager;
         public bool PrimaryInput { get; internal set; }
@@ -36,8 +38,12 @@ namespace Opus
             SecondaryInput = input;
         }
 
+        public virtual void SwitchToWeapon()
+        {
 
+        }
         public bool isPlayerWeapon;
+        public bool isCurrentWeapon;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();

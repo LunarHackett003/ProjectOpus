@@ -15,6 +15,9 @@
 		<property name="overrideRange">
 			<value>true</value>
 		</property>
+		<property name="userLFELevel">
+			<value>-5.5</value>
+		</property>
 		<property name="LFEUpmixEnabled">
 			<value>true</value>
 		</property>

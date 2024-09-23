@@ -77,6 +77,8 @@ namespace Opus
                 NetworkObject nob = NetworkManager.SpawnManager.InstantiateAndSpawn(loadoutManager.ValidLoadoutItemContainer.secondary[secondaryIndex.Value].prefab, OwnerClientId);
                 weaponManager.secondaryWeaponRef.Value = nob.GetComponent<BaseWeapon>();
             }
+            print("Updating weapons on clients");
+            weaponManager.UpdateWeapons_RPC();
         }
 
         private void SceneLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)

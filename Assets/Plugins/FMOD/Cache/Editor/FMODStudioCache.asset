@@ -66,7 +66,7 @@ MonoBehaviour:
   Path: OPUS/Build/Desktop/Music.bank
   Name: Music
   StudioPath: bank:/Music
-  lastModified: 638604583927762939
+  lastModified: 638620436225063401
   FileSizes:
   - Name: Desktop
     Value: 10454368
@@ -218,7 +218,7 @@ MonoBehaviour:
   Path: OPUS/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638604583870658286
+  lastModified: 638620436222989991
   FileSizes:
   - Name: Desktop
     Value: 15592
@@ -265,10 +265,10 @@ MonoBehaviour:
   Path: OPUS/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638604583870708662
+  lastModified: 638620436223012589
   FileSizes:
   - Name: Desktop
-    Value: 4052
+    Value: 4088
   Exists: 1
 --- !u!114 &-6484326461499483070
 MonoBehaviour:
@@ -384,6 +384,30 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 0
+--- !u!114 &-5860385909137707440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/AK74/Cover
+  m_EditorClassIdentifier: 
+  Name: Cover
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 183230778
+    data2: 398621196
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &-5780571885084184881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -458,6 +482,34 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &-5063783252145092488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Weapons/AK74
+  m_EditorClassIdentifier: 
+  Path: event:/Weapons/AK74
+  Guid:
+    Data1: -1233936890
+    Data2: 1329098269
+    Data3: 1729824446
+    Data4: -505204573
+  Banks:
+  - {fileID: -1479308524821251416}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: -5860385909137707440}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 702
 --- !u!114 &-4940795884130248094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -692,10 +744,10 @@ MonoBehaviour:
   Path: OPUS/Build/Desktop/SFX.bank
   Name: SFX
   StudioPath: bank:/SFX
-  lastModified: 638604584021727950
+  lastModified: 638620436230111931
   FileSizes:
   - Name: Desktop
-    Value: 21580256
+    Value: 21716416
   Exists: 1
 --- !u!114 &-979912664785116587
 MonoBehaviour:
@@ -859,12 +911,13 @@ MonoBehaviour:
   - {fileID: -486321717225963102}
   - {fileID: -7732700732847464076}
   - {fileID: 5278063091080690841}
+  - {fileID: -5063783252145092488}
   EditorParameters: []
   MasterBanks:
   - {fileID: -7352510543878684077}
   StringsBanks:
   - {fileID: -6518066122866846282}
-  cacheTime: 638604584025105869
+  cacheTime: 638620436231578450
   cacheVersion: 131619
 --- !u!114 &94190890574788778
 MonoBehaviour:
@@ -881,7 +934,7 @@ MonoBehaviour:
   Path: OPUS/Build/Desktop/Vehicles.bank
   Name: Vehicles
   StudioPath: bank:/Vehicles
-  lastModified: 638604584024276041
+  lastModified: 638620436231578450
   FileSizes:
   - Name: Desktop
     Value: 222464

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6fde86df04a3fa46b9b7c164f905e49, type: 3}
+  m_Name: PP19_Animations
+  m_EditorClassIdentifier: 
+  attackTiming: 0
+  animationOverrides:
+  - name: Equip
+    clip: {fileID: 7400000, guid: 3727af861828d8f49aa32981a833f8e6, type: 2}
+  - name: PrimaryFire
+    clip: {fileID: 7400000, guid: 5d8a000e2bc72e449af47c4d60e18736, type: 2}
+  - name: ReloadEmpty
+    clip: {fileID: 7400000, guid: 1c5d7f266bae72a4d88433fe1cbc68cd, type: 2}
+  - name: ReloadQuick
+    clip: {fileID: 7400000, guid: a28de2d607981c247a46694c1e039169, type: 2}
+  attackAnimationCount: 2

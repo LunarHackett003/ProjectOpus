@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: ValidLoadoutItems
   m_EditorClassIdentifier: 
   primary:
+  - {fileID: 11400000, guid: 0f949fb2b25528a4b814b3c1cbf35cba, type: 2}
+  - {fileID: 11400000, guid: 08d9b7baef0233e49867bffca2445a52, type: 2}
   - {fileID: 11400000, guid: 657cd0d670368004085734e0ee25a086, type: 2}
-  - {fileID: 11400000, guid: 270be9ce5d7c0f744a5b2b4c8eb0b346, type: 2}
   secondary: []
   gadget: []
   special: []

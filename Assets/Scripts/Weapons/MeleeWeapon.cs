@@ -11,23 +11,35 @@ namespace Opus
         public override void AttackServer(float damage)
         {
             base.AttackServer(damage);
-
+            print("trying to hit...");
             Collider[] cols = new Collider[maxHits];
+            int charactersHit = 0;
             int hits = Physics.OverlapSphereNonAlloc(manager.attackOrigin.TransformPoint(attackOffset), attackRadius, cols, MatchController.Instance.damageLayermask);
             if (hits > 0)
             {
                 for (int i = 0; i < hits; i++)
                 {
-                    if (cols[i].TryGetComponent(out Damageable d))
+                    if (cols[i].TryGetComponent(out Damageable d) && d.NetworkObject != manager.NetworkObject)
                     {
-                        d.TakeDamage(damage);
+                        if(d is Entity e && charactersHit < maxEntityHits)
+                        {
+                            print($"Hit entity {e.name} for {damage} dmg");
+                            charactersHit++;
+                            e.TakeDamage(damage);
+                        }
+                        else
+                        {
+                            print($"Hit damagable {d.name} for {damage} dmg");
+                            d.TakeDamage(damage);
+                        }
                     }
                 }
             }
         }
 
         public Vector3 attackOffset;
-        public int maxHits;
+        public int maxHits = 20;
+        public int maxEntityHits = 3;
         int currentAttackIndex;
         public float attackRadius, primaryDamage, secondaryDamage;
         public override void OnNetworkSpawn()
@@ -35,13 +47,15 @@ namespace Opus
             base.OnNetworkSpawn();
             if(manager is PlayerWeaponManager p)
             {
+                print("subscribing to animation events for melee");
                 p.PlayerAnimator.onPrimaryWeaponHit += PrimaryHit;
                 p.PlayerAnimator.onSecondaryWeaponHit += SecondaryHit;
             }
         }
         void PrimaryHit(int increment)
         {
-            if (IsServer)
+            print($"primary hit with {name}");
+            if (IsServer || IsHost)
             {
                 AttackServer(primaryDamage);
             }
@@ -57,7 +71,8 @@ namespace Opus
         }
         void SecondaryHit(int increment)
         {
-            if (IsServer)
+            print($"secondary hit with {name}");
+            if (IsServer || IsHost)
             {
                 AttackServer(secondaryDamage);
             }
@@ -80,7 +95,14 @@ namespace Opus
         }
         private void OnDrawGizmos()
         {
-            Gizmos.DrawWireSphere(transform.position + attackOffset, attackRadius );
+            if (manager)
+            {
+                Gizmos.DrawWireSphere(manager.attackOrigin.TransformPoint(attackOffset), attackRadius);
+            }
+            else
+            {
+                Gizmos.DrawWireSphere(transform.position + attackOffset, attackRadius );
+            }
         }
     }
 }

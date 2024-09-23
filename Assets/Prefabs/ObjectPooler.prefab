@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3736389166
+  GlobalObjectIdHash: 2634001106
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -68,4 +68,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PooledPrefabsList:
   - Prefab: {fileID: 171386463691624132, guid: 4e1a33c6eb8ea6141b7d4a7cec56746a, type: 3}
-    PrewarmCount: 100
+    PrewarmCount: 2500
+  - Prefab: {fileID: 171386463691624132, guid: f0a0e662540a8d74282a001eaf0900e1, type: 3}
+    PrewarmCount: 2500

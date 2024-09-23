@@ -104,17 +104,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22093f100f647dd479410750c53f0a4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doLogging: 0
   animator: {fileID: 0}
   manager: {fileID: 0}
-  primaryInput:
-    m_InternalValue: 0
-  secondaryInput:
-    m_InternalValue: 0
   animationModule: {fileID: 11400000, guid: 8e394fb6ecf93594b9bbb1bc82866f16, type: 2}
-  isPlayerWeapon: 0
-  attackOffset: {x: 0, y: 0, z: 0.4}
-  maxHits: 3
-  attackRadius: 0.33
+  isPlayerWeapon: 1
+  attackOffset: {x: 0, y: -0.48, z: 0.7}
+  maxHits: 5
+  attackRadius: 0.64
   primaryDamage: 90
   secondaryDamage: 200
 --- !u!114 &3216724015618125842

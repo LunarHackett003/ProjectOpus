@@ -44,13 +44,8 @@ namespace Opus
                 quickMeleeID = Animator.StringToHash("QuickMelee");
                 inspectID = Animator.StringToHash("Animator");
             }
-
-            aoc = new(animator.runtimeAnimatorController);
-            animator.runtimeAnimatorController = aoc;
-
-            clipOverrides = new(aoc.overridesCount);
-            aoc.GetOverrides(clipOverrides);
-            UpdateAnimations(pwm.primaryWeapon);
+            if(pwm.primaryWeapon != null)
+                UpdateAnimations(pwm.primaryWeapon);
         }
         public void UpdateAnimations(NetworkBehaviourReference netref)
         {
@@ -58,13 +53,27 @@ namespace Opus
             {
                 return;
             }
+            if (b == null || b.animationModule == null || b.animationModule.animationOverrides.Length == 0)
+                return;
+            print("Weapon: " + b.name);
+
+            if(aoc == null)
+            {
+                aoc = new(animator.runtimeAnimatorController);
+                animator.runtimeAnimatorController = aoc;
+            }
+            clipOverrides = new(aoc.overridesCount);
+            aoc.GetOverrides(clipOverrides);
+
 
             foreach (var item in b.animationModule.animationOverrides)
             {
-                clipOverrides[item.name] = item.clip;
+                if (!string.IsNullOrEmpty(item.name))
+                {
+                    print($"overriding {item.name} with {item.clip.name}");
+                    clipOverrides[item.name] = item.clip;
+                }
             }
-
-
             aoc.ApplyOverrides(clipOverrides);
             animator.Rebind();
             
@@ -129,6 +138,74 @@ namespace Opus
         {
             onSecondaryWeaponHit?.Invoke(increment);
         }
-
+        public void ReloadLeftWeapon()
+        {
+            if (IsServer && pwm.equipmentDict[pwm.currentSlot.Value] is DualWieldWeapon d)
+            {
+                pwm.ClearReloadFlag();
+                d.weaponOne.ReloadWeapon();
+            }
+        }
+        public void ReloadRightweapon()
+        {
+            if (IsServer && pwm.equipmentDict[pwm.currentSlot.Value] is DualWieldWeapon d)
+            {
+                pwm.ClearReloadFlag();
+                d.weaponTwo.ReloadWeapon();
+            }
+        }
+        public void ReloadWeapon()
+        {
+            if(IsServer && pwm.equipmentDict[pwm.currentSlot.Value] is RangedWeapon r)
+            {
+                r.ReloadWeapon();
+                pwm.ClearReloadFlag();
+            }
+        }
+        public void RecockWeapon()
+        {
+            if(pwm.equipmentDict[pwm.currentSlot.Value] is RangedWeapon r)
+            {
+                r.RecockWeapon();
+            }
+        }
+        public void RoundToWeapon(int rounds, RangedWeapon w)
+        {
+            if(IsServer)
+                w.currentAmmunition.Value += rounds;
+        }
+        public void CheckAmmo()
+        {
+            if (pwm.equipmentDict[pwm.currentSlot.Value] is RangedWeapon w)
+            {
+                if (w.currentAmmunition.Value == (w.MaxAmmo - 1))
+                {
+                    w.animator.SetTrigger("CountedReloadFinish");
+                    networkAnimator.SetTrigger("CountedReloadFinish");
+                }
+                else if(w.currentAmmunition.Value == (w.MaxAmmo - 2))
+                {
+                    w.animator.SetTrigger("CountedReloadSingle");
+                    networkAnimator.SetTrigger("CountedReloadSingle");
+                }
+                else
+                {
+                    w.animator.SetTrigger("CountedReloadDouble");
+                    networkAnimator.SetTrigger("CountedReloadDouble");
+                }
+            }
+        }
+        public void RoundToLeftWeapon(int rounds)
+        {
+            RoundToWeapon(rounds, (pwm.equipmentDict[pwm.currentSlot.Value] as DualWieldWeapon).weaponTwo);
+        }
+        public void RoundToRightWeapon(int rounds)
+        {
+            RoundToWeapon(rounds, (pwm.equipmentDict[pwm.currentSlot.Value] as DualWieldWeapon).weaponOne);
+        }
+        public void RoundToRegularWeapon(int rounds)
+        {
+            RoundToWeapon(rounds, pwm.equipmentDict[pwm.currentSlot.Value] as RangedWeapon);
+        }
     }
 }

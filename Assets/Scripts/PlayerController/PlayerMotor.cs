@@ -1,7 +1,9 @@
 
 using System.Linq;
+using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace Opus
 {
@@ -39,6 +41,9 @@ namespace Opus
         }
         public MovementState moveState;
         public ZiplineMotor zipMotor;
+
+        public CinemachineCamera worldCineCam, viewCineCam;
+        public Camera viewmodelCamera;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -49,7 +54,13 @@ namespace Opus
             {
                 rb.isKinematic = true;
                 enabled = false;
+                worldCineCam.enabled = false;
+                viewCineCam.enabled = false;
                 return;
+            }
+            else
+            {
+                Camera.main.GetUniversalAdditionalCameraData().cameraStack.Add(viewmodelCamera);
             }
             SpawnPlayer();
         }

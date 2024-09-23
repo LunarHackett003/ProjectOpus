@@ -87,7 +87,7 @@ PrefabInstance:
       addedObject: {fileID: -2813117665980886366}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: de9f6f8ede7b9fd47882cc24412ead00, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7858619790803144233}
+      addedObject: {fileID: 2352289194427201224}
   m_SourcePrefab: {fileID: 100100000, guid: de9f6f8ede7b9fd47882cc24412ead00, type: 3}
 --- !u!1 &3701307010789677457 stripped
 GameObject:
@@ -137,7 +137,7 @@ MonoBehaviour:
   cameraLayerMask:
     serializedVersion: 2
     m_Bits: 0
---- !u!114 &7858619790803144233
+--- !u!114 &2352289194427201224
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -146,13 +146,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 3701307010789677457}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9eb54f5af61756b4683f7fbe35a2e8ec, type: 3}
+  m_Script: {fileID: 11500000, guid: 78e3e1bbd5db5084184f86ae8a09930a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  doLogging: 0
   animator: {fileID: 0}
   manager: {fileID: 0}
   animationModule: {fileID: 11400000, guid: 30b3860b7ad546a4cade35fa3f8e3aa7, type: 2}
-  isPlayerWeapon: 0
+  isPlayerWeapon: 1
   primaryAnimatorKey: PrimaryFire
   secondaryAnimatorKey: SecondaryFire
   aimAmountKey: Aim
@@ -160,25 +161,10 @@ MonoBehaviour:
   muzzleFlash: {fileID: 162600229921524351}
   canAutoFire: 1
   timeBetweenShots: 0.08
-  projectilePrefab: {fileID: 171386463691624132, guid: 4e1a33c6eb8ea6141b7d4a7cec56746a, type: 3}
-  projectileHitPrefab: {fileID: 0}
-  hitPrefabDespawnTime: 5
-  projectileExpireDestroyTime: 3.1
-  useProjectileDamage: 0
-  maxProjectileLifetime: 5
-  spawnHitPrefabOnExpire: 0
-  projectileFireSpeed: 350
-  maxBounces: 0
-  minBounceAlignment: 0
-  projectileDrag: 5
-  projectileGravityModifier: 0
-  bounceOnDamageable: 0
-  bounciness: 0.7
+  projectileModule: {fileID: 11400000, guid: e7e326e1e881ce84f89fae986bd210b7, type: 2}
   projectileOrigin: {fileID: 6291248096448632365}
-  range: {x: 0.3, y: 5}
-  damageAtRange: {x: 20, y: 0}
-  maxCastEntries: 10
-  projectileRadius: 0.0025
+  hitscanIterations: 10
+  tracerSpeed: 300
 --- !u!4 &4041558114677834539 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: de9f6f8ede7b9fd47882cc24412ead00, type: 3}

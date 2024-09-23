@@ -19,6 +19,7 @@ namespace Opus
         public bool interactInput;
         public bool scoreboardInput, sprintInput;
         public bool primaryInput, secondaryInput;
+        public bool reloadInput;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -51,7 +52,29 @@ namespace Opus
             cs.Player.SecondaryInput.canceled += OnSecondaryInput;
             cs.Player.Pause.performed += OnPause;
             cs.Player.Pause.canceled += OnPause;
+            cs.Player.Reload.performed += OnReload;
+            cs.Player.Reload.canceled += OnReload;
+            cs.Player.SwitchWeapon.performed += OnSwitchDirect;
+
+
+
         }
+
+        private void OnSwitchDirect(InputAction.CallbackContext obj)
+        {
+            Vector2 target = obj.ReadValue<Vector2>();
+
+            float angle = Mathf.Atan2(target.y, target.x);
+            int quadrant = Mathf.RoundToInt(4 * angle / (2 * Mathf.PI + 4)) % 4;
+            playerManager.weaponManager.SwitchWeapon((EquipmentSlot)quadrant);
+        }
+
+
+        private void OnReload(InputAction.CallbackContext obj)
+        {
+            reloadInput = obj.ReadValueAsButton();
+        }
+
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
@@ -72,6 +95,8 @@ namespace Opus
             cs.Player.SecondaryInput.canceled -= OnSecondaryInput;
             cs.Player.Pause.performed -= OnPause;
             cs.Player.Pause.canceled -= OnPause;
+            cs.Player.Reload.performed -= OnReload;
+            cs.Player.Reload.canceled -= OnReload;
             cs.Disable();
             cs.Dispose();
         }
