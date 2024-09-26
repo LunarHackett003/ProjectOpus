@@ -64,8 +64,10 @@ namespace Opus
         {
             Vector2 target = obj.ReadValue<Vector2>();
 
-            float angle = Mathf.Atan2(target.y, target.x);
-            int quadrant = Mathf.RoundToInt(4 * angle / (2 * Mathf.PI + 4)) % 4;
+            float angle = (Mathf.Atan2(target.y, target.x) * Mathf.Rad2Deg + 360) % 360;
+            //int quadrant = (Mathf.RoundToInt(4 * angle / (2 * Mathf.PI + 4)) % 4) + 1;
+            int quadrant = (Mathf.RoundToInt(angle / 90) % 4) + 1;
+            print($"{angle}, {quadrant}");
             playerManager.weaponManager.SwitchWeapon((EquipmentSlot)quadrant);
         }
 

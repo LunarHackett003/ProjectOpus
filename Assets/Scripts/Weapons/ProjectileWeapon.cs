@@ -36,7 +36,8 @@ namespace Opus
                     lastPosition = projectileOrigin.position,
                     timeAlive = 0,
                     velocity = fireVector,
-                    speed = fireVector.magnitude
+                    speed = fireVector.magnitude,
+                    bouncesLeft = projectileModule.maxBounces
                 };
                 ps[i] = p;
             }
@@ -44,7 +45,9 @@ namespace Opus
         }
         protected bool CanBounce(Vector3 directionIn, Vector3 normal)
         {
-            return Vector3.Dot(directionIn.normalized, normal) > projectileModule.minBounceAlignment;
+            float dot = Vector3.Dot(directionIn.normalized, normal);
+            print($"bounce dot product: {dot}, must be greater than {projectileModule.minBounceAlignment}");
+            return dot > projectileModule.minBounceAlignment;
         }
         protected bool TryBounce(ref PretendProjectile p, RaycastHit hit, bool damageable)
         {
@@ -57,6 +60,7 @@ namespace Opus
             {
                 p.bouncesLeft--;
                 p.velocity = Vector3.Reflect(p.velocity, hit.normal) * projectileModule.bounciness;
+                print("Bounced projectile");
                 bounced = true;
             }
             else
@@ -65,9 +69,9 @@ namespace Opus
                 {
                     StartCoroutine(ReturnObjectToNetworkPool(NetworkObject.InstantiateAndSpawn(projectileModule.projectileHitPrefab, NetworkManager, OwnerClientId, position: hit.point)));
                 }
+                print("Could not bounce projectile");
                 p.timeAlive = projectileModule.maxProjectileLifetime;
             }
-            p.projectile.position = hit.point;
             return bounced;
         }
 
@@ -120,7 +124,7 @@ namespace Opus
             RaycastHit[] hits = new RaycastHit[projectileCheckIterations];
             if (projectileModule.projectileRadius > 0)
             {
-                Physics.SphereCastNonAlloc(p.lastPosition, projectileModule.projectileRadius, p.velocity, hits, p.speed * Time.fixedDeltaTime, MatchController.Instance.damageLayermask);
+                Physics.SphereCastNonAlloc(p.lastPosition, projectileModule.projectileRadius, p.velocity.normalized, hits, p.speed * Time.fixedDeltaTime, MatchController.Instance.damageLayermask);
             }
             else
             {

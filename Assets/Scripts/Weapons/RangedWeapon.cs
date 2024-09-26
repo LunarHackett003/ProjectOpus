@@ -37,7 +37,17 @@ namespace Opus
         bool playingRecockAnimation;
         public bool useCountedReload;
         public bool useRecockAnimation;
-
+        [Tooltip("How much the first shot is delayed by")]
+        public float delayBeforeFire;
+        [Tooltip("How many times the weapon fires in a burst")]
+        public int burstShotCount;
+        [Tooltip("How long, in seconds, the weapon waits between bursts before allowing to fire again")]
+        public float burstCooldown;
+        public bool UseBurst => burstShotCount > 0;
+        public bool UseFireDelay => delayBeforeFire > 0;
+        bool delayDone;
+        bool burstFiring;
+        int currentBurstCount;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -81,27 +91,91 @@ namespace Opus
             {
                 if (!fireCooldown && (canAutoFire || !firePressed) && (!recockAfterShots || shotsFiredForRecock < recockShotsRequired) && (!UseAmmo || currentAmmunition.Value > 0))
                 {
-                    if (IsServer)
-                    {
-                        AttackServer(0);
-                        ClientAttack_RPC();
-                    }
-                    if (IsOwner)
-                    {
-                        AttackClient();
-                        if(manager is PlayerWeaponManager p)
-                        {
-                            p.Animator.SetTrigger(primaryAnimatorHash);
-                        }
-                    }
-                    StartCoroutine(SetFireCooldown());
-                    shotsFiredForRecock++;
-                    firePressed = true;
+                    PreFire();
                 }
             }
             else
             {
+                delayDone = false;
                 firePressed = false;
+            }
+        }
+        protected virtual void PreFire()
+        {
+            if (!UseFireDelay || delayDone)
+            {
+                CheckBurst();
+            }
+            else
+            {
+                StartCoroutine(FireDelay());
+            }
+            StartCoroutine(SetFireCooldown());
+            shotsFiredForRecock++;
+            firePressed = true;
+        }
+        IEnumerator FireDelay()
+        {
+            delayDone = true;
+            yield return new WaitForSeconds(delayBeforeFire);
+            if (UseBurst)
+            {
+                CheckBurst();
+            }
+        }
+        void CheckBurst()
+        {
+            if (!UseBurst)
+            {
+                PostFire();
+            }
+            else if (!burstFiring)
+            {
+                StartCoroutine(BurstFire());
+            }
+        }
+        IEnumerator BurstFire()
+        {
+            burstFiring = true;
+            while (currentBurstCount < burstShotCount && currentAmmunition.Value > 0)
+            {
+                PostFire();
+                currentBurstCount++;
+                if(currentBurstCount == burstShotCount - 1)
+                {
+                    yield return new WaitForSeconds(burstCooldown);
+                }
+                else
+                {
+                    yield return new WaitForSeconds(timeBetweenShots);
+                }
+            }
+            if (!canAutoFire)
+            {
+                while (PrimaryInput)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
+            }
+            burstFiring = false;
+            currentBurstCount = 0;
+            yield break;
+        }
+        public virtual void PostFire()
+        {
+            if (IsServer)
+            {
+                AttackServer(0);
+                ClientAttack_RPC();
+            }
+            if (IsOwner)
+            {
+                AttackClient();
+                if (manager is PlayerWeaponManager p)
+                {
+                    p.Animator.SetTrigger(primaryAnimatorHash);
+                    animator.SetTrigger(primaryAnimatorHash);
+                }
             }
         }
         protected IEnumerator ReturnObjectToNetworkPool(NetworkObject n)

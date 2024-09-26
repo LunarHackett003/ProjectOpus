@@ -16,6 +16,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0f949fb2b25528a4b814b3c1cbf35cba, type: 2}
   - {fileID: 11400000, guid: 08d9b7baef0233e49867bffca2445a52, type: 2}
   - {fileID: 11400000, guid: 657cd0d670368004085734e0ee25a086, type: 2}
-  secondary: []
+  - {fileID: 11400000, guid: f5da8eb921dd39041a3a7a16b4c70d23, type: 2}
+  secondary:
+  - {fileID: 11400000, guid: 3495775ce983b2f41a5a655f4f682c88, type: 2}
   gadget: []
   special: []

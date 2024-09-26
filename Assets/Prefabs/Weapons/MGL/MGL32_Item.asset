@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1e69c6b6e9178f489e1d361dc7faa09, type: 3}
+  m_Name: MGL32_Item
+  m_EditorClassIdentifier: 
+  slot: 1
+  displayName: MGL-32
+  icon: {fileID: 5609056023324268681, guid: 4a6e6e90a61df7049a52ff2db11a370c, type: 3}
+  prefab: {fileID: 4951153475242369975, guid: 25d6f450a1904454fb1ee380fd102256, type: 3}

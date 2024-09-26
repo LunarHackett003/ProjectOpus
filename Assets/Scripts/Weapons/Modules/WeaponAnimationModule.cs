@@ -8,6 +8,7 @@ namespace Opus
     {
         public AttackAnimationTiming attackTiming;
         public AnimationOverrideSet[] animationOverrides;
+        public AnimationOverrideSet[] weaponOverrides;
 
         public int attackAnimationCount;
     }

@@ -74,6 +74,27 @@ namespace Opus
                     clipOverrides[item.name] = item.clip;
                 }
             }
+
+
+            if(b.animator != null && b.animator.Animator.runtimeAnimatorController is not AnimatorOverrideController)
+            {
+                AnimatorOverrideController aoc2 = new(b.animator.Animator.runtimeAnimatorController);
+                b.animator.Animator.runtimeAnimatorController = aoc2;
+
+                AnimationClipOverrides overrides2 = new(aoc2.overridesCount);
+                aoc2.GetOverrides(overrides2);
+
+                foreach (var item in b.animationModule.weaponOverrides)
+                {
+                    if (!string.IsNullOrEmpty(item.name))
+                    {
+                        print($"overriding {item.name} with {item.clip.name}");
+                        overrides2[item.name] = item.clip;
+                    }
+                }
+                aoc2.ApplyOverrides(overrides2);
+                b.animator.Animator.Rebind();
+            }
             aoc.ApplyOverrides(clipOverrides);
             animator.Rebind();
             
@@ -206,6 +227,10 @@ namespace Opus
         public void RoundToRegularWeapon(int rounds)
         {
             RoundToWeapon(rounds, pwm.equipmentDict[pwm.currentSlot.Value] as RangedWeapon);
+        }
+        public void FinishWeaponSwitch()
+        {
+            pwm.ConfirmWeaponSwitch();
         }
     }
 }

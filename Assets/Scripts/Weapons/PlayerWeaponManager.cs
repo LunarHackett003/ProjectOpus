@@ -233,12 +233,13 @@ namespace Opus
 
 
 
-        EquipmentSlot pendingSlot;
+        [SerializeField] EquipmentSlot pendingSlot;
         [SerializeField] bool switchingWeapons;
         public void SwitchWeapon(EquipmentSlot targetSlot)
         {
             pendingSlot = targetSlot;
-            if (IsOwner && !switchingWeapons && currentSlot.Value != targetSlot)
+            if (IsOwner && equipmentDict.ContainsKey(targetSlot) && equipmentDict[targetSlot] != null && 
+                !switchingWeapons && currentSlot.Value != targetSlot)
             {
                 switchingWeapons = true;
 
@@ -248,6 +249,10 @@ namespace Opus
                     equipmentDict[currentSlot.Value].animator.SetTrigger("SwitchWeapon");
                 }
             }
+            else
+            {
+                print($"{IsOwner}, {equipmentDict.ContainsKey(targetSlot)}, {equipmentDict[targetSlot] != null}");
+            }
         }
         public void ConfirmWeaponSwitch()
         {
@@ -256,6 +261,7 @@ namespace Opus
                 currentSlot.Value = pendingSlot;
                 switchingWeapons = false;
             }
+            PlayerAnimator.UpdateAnimations(equipmentDict[currentSlot.Value]);
         }
         private void FixedUpdate()
         {

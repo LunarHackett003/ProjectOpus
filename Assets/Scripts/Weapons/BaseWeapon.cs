@@ -27,6 +27,7 @@ namespace Opus
         public OnKilledEntity onKilledEntity;
 
         public WeaponAnimationModule animationModule;
+        public bool attackOnPress, attackOnRelease;
         [Rpc(SendTo.Server)]
         public void SetPrimaryInput_RPC(bool input)
         {

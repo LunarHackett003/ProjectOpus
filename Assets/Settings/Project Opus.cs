@@ -438,7 +438,7 @@ namespace Opus
                 {
                     ""name"": ""up"",
                     ""id"": ""fdf13250-8b0b-47d4-846c-a6a378093a01"",
-                    ""path"": ""<Keyboard>/4"",
+                    ""path"": ""<Keyboard>/2"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
@@ -449,7 +449,7 @@ namespace Opus
                 {
                     ""name"": ""down"",
                     ""id"": ""228d5910-b49c-4de1-bbf9-ab64e9e89939"",
-                    ""path"": ""<Keyboard>/2"",
+                    ""path"": ""<Keyboard>/4"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
