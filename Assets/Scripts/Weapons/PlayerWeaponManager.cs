@@ -182,7 +182,7 @@ namespace Opus
             }
         }
         [SerializeField] bool playingReloadAnimation;
-
+        public bool PlayingReloadAnimation => playingReloadAnimation;
         public void ClearReloadFlag()
         {
             playingReloadAnimation = false;

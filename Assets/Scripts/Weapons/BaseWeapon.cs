@@ -1,3 +1,4 @@
+using FMODUnity;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace Opus
          */
 
         public bool doLogging = false;
-
+        
         public OpusNetworkAnimator animator;
         public WeaponManager manager;
         public bool PrimaryInput { get; internal set; }
@@ -28,6 +29,9 @@ namespace Opus
 
         public WeaponAnimationModule animationModule;
         public bool attackOnPress, attackOnRelease;
+
+        public EventReference primaryEventRef, secondaryEventRef;
+
         [Rpc(SendTo.Server)]
         public void SetPrimaryInput_RPC(bool input)
         {
@@ -56,9 +60,9 @@ namespace Opus
         /// <summary>
         /// Where everything that clients see when somebody attacks is performed
         /// </summary>
-        public virtual void AttackClient()
+        public virtual void AttackClient(bool secondaryAttack = false)
         {
-
+            RuntimeManager.PlayOneShot(secondaryAttack ? secondaryEventRef : primaryEventRef, manager.attackOrigin.position);
         }
         /// <summary>
         /// Where the attack itself executes.

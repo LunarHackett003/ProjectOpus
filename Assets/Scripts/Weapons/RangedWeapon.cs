@@ -48,6 +48,13 @@ namespace Opus
         bool delayDone;
         bool burstFiring;
         int currentBurstCount;
+        public bool useAim;
+        public bool canAimReload;
+        public float aimSpeed;
+        public Vector3 aimViewPosition, aimLocalWeaponPos, aimRemoteWeaponPos;
+        public float aimAmount;
+        
+        
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -98,6 +105,24 @@ namespace Opus
             {
                 delayDone = false;
                 firePressed = false;
+            }
+
+            if (useAim)
+            {
+                bool canAim = useAim;
+                if(manager is PlayerWeaponManager p)
+                {
+                    canAim &= p.PlayingReloadAnimation && canAimReload;
+                }
+                if (canAim && SecondaryInput)
+                {
+                    aimAmount = aimAmount >= 1 ? 1 : Mathf.Clamp(aimAmount + (Time.fixedDeltaTime * aimSpeed), 0, 1);
+                }
+                else 
+                {
+
+                    aimAmount = aimAmount <= 0 ? 0 : Mathf.Clamp(aimAmount - (Time.fixedDeltaTime * aimSpeed), 0, 1);
+                }
             }
         }
         protected virtual void PreFire()
@@ -207,7 +232,7 @@ namespace Opus
         {
             AttackClient();
         }
-        public override void AttackClient()
+        public override void AttackClient(bool secondaryAttack = false)
         {
             base.AttackClient();
             if (muzzleFlash != null)

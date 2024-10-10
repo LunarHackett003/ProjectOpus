@@ -152,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 955224828
+  GlobalObjectIdHash: 709084701
   InScenePlacedSourceGlobalObjectIdHash: 709084701
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -179,6 +179,20 @@ MonoBehaviour:
   animationModule: {fileID: 11400000, guid: b67b7d395368dd641b731d564f037986, type: 2}
   attackOnPress: 0
   attackOnRelease: 0
+  primaryEventRef:
+    Guid:
+      Data1: -1233936890
+      Data2: 1329098269
+      Data3: 1729824446
+      Data4: -505204573
+    Path: event:/Weapons/AK74
+  secondaryEventRef:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   isPlayerWeapon: 1
   isCurrentWeapon: 0
   primaryAnimatorKey: PrimaryFire

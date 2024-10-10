@@ -20,10 +20,10 @@ MonoBehaviour:
   maxProjectileLifetime: 10
   spawnHitPrefabOnExpire: 1
   projectileFireSpeed: 25
-  maxBounces: 2
+  maxBounces: 1
   minBounceAlignment: -1
   projectileDrag: 0.2
-  projectileGravityModifier: 1
+  projectileGravityModifier: 2
   bounceOnDamageable: 1
   bounciness: 0.6
   range: {x: 0, y: 0}

@@ -65,16 +65,19 @@ namespace Opus
             }
             else
             {
-                if (projectileModule.projectileHitPrefab != null)
-                {
-                    StartCoroutine(ReturnObjectToNetworkPool(NetworkObject.InstantiateAndSpawn(projectileModule.projectileHitPrefab, NetworkManager, OwnerClientId, position: hit.point)));
-                }
+                ProjectileHit(hit);
                 print("Could not bounce projectile");
                 p.timeAlive = projectileModule.maxProjectileLifetime;
             }
             return bounced;
         }
-
+        protected void ProjectileHit(RaycastHit hit)
+        {
+            if (projectileModule.projectileHitPrefab != null)
+            {
+                StartCoroutine(ReturnObjectToNetworkPool(NetworkObject.InstantiateAndSpawn(projectileModule.projectileHitPrefab, NetworkManager, OwnerClientId, position: hit.point)));
+            }
+        }
         protected void ProjectileSimulate()
         {
             for (int i = projectiles.Count - 1; i > -1; i--)
@@ -84,6 +87,10 @@ namespace Opus
                 if (p.projectile != null && p.timeAlive >= projectileModule.maxProjectileLifetime)
                 {
                     StartCoroutine(ReturnObjectToNetworkPool(p.projectile.GetComponent<NetworkObject>()));
+                    if (projectileModule.spawnHitPrefabOnExpire)
+                    {
+                        ProjectileHit(new() { point = p.projectile.position});
+                    }
                     projectiles.RemoveAt(i);
                 }
                 else

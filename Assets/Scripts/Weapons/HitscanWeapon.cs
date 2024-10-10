@@ -83,7 +83,7 @@ namespace Opus
             }
             this.tracers.AddRange(tracers);
         }
-        public override void AttackClient()
+        public override void AttackClient(bool secondaryAttack = false)
         {
             base.AttackClient();
         }

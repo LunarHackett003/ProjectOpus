@@ -2,18 +2,28 @@
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace Opus
 {
     public class MatchController : NetworkBehaviour
     {
-        [System.Serializable]
-        public struct TeamMember
+        [System.Serializable, GenerateSerializationForGenericParameter(0)]
+        public struct TeamMember : INetworkSerializable
         {
             public ulong playerID;
-            public int team, kills, deaths, assists, revives, amountHealed;
+            public int team, kills, deaths, assists, revives, supportScore;
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref playerID);
+                serializer.SerializeValue(ref team);
+                serializer.SerializeValue(ref kills);
+                serializer.SerializeValue(ref deaths);
+                serializer.SerializeValue(ref assists);
+                serializer.SerializeValue(ref revives);
+                serializer.SerializeValue(ref supportScore);
+            }
         }
         public NetworkObject objectPoolPrefab;
 
@@ -26,6 +36,7 @@ namespace Opus
         /// Value = Number of players on that team
         /// </summary>
         public NetworkVariable<Dictionary<int, int>> teamNumbers = new(new());
+        public NetworkVariable<Dictionary<ulong, int>> kills = new(new());
         public List<TeamMember> localTeamMembers = new();
         public int numberOfTeams = 4;
 
@@ -145,7 +156,7 @@ namespace Opus
                 deaths = t.deaths + deathDelta,
                 assists = t.assists + assistDelta,
                 revives = t.revives + reviveDelta,
-                amountHealed = t.amountHealed + healDelta,
+                supportScore = t.supportScore + healDelta,
             };
         }
     }

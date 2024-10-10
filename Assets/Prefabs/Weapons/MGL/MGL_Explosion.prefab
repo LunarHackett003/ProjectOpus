@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6823394091599941775}
   - component: {fileID: 4759579375601155394}
   - component: {fileID: 6385817827802619087}
+  - component: {fileID: 7783057948905814693}
   m_Layer: 0
   m_Name: MGL_Explosion
   m_TagString: Untagged
@@ -175,3 +176,22 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &7783057948905814693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8416831554791046203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b53134e408a63f438ac4911bec06f90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundbite:
+    Guid:
+      Data1: -1428022397
+      Data2: 1239313583
+      Data3: -1011410788
+      Data4: 1496256554
+    Path: event:/Weapons/Explosion2

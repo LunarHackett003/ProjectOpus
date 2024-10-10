@@ -4,7 +4,7 @@ namespace Opus
 {
     public class MeleeWeapon : BaseWeapon
     {
-        public override void AttackClient()
+        public override void AttackClient(bool secondaryAttack = false)
         {
             base.AttackClient();
         }
@@ -80,7 +80,7 @@ namespace Opus
             {
                 currentAttackIndex = PrimaryInput ? (currentAttackIndex + increment) % animationModule.attackAnimationCount : 0;
             }
-            AttackClient();
+            AttackClient(true);
         }
         private void FixedUpdate()
         {

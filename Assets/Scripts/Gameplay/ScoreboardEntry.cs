@@ -36,7 +36,7 @@ namespace Opus
                 deaths.text = t.deaths.ToString();
                 assists.text = t.assists.ToString();
                 revives.text = t.revives.ToString();
-                amountHealed.text = t.amountHealed.ToString();
+                amountHealed.text = t.supportScore.ToString();
                 return t.team;
             }
         }
@@ -48,7 +48,7 @@ namespace Opus
             deaths.text = member.deaths.ToString();
             assists.text = member.assists.ToString();
             revives.text = member.revives.ToString();
-            amountHealed.text = member.amountHealed.ToString();
+            amountHealed.text = member.supportScore.ToString();
             return member.team;
         }
     }
