@@ -331,6 +331,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1092171622
   InScenePlacedSourceGlobalObjectIdHash: 3808013546
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -338,6 +340,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &5084491368473432253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -350,6 +354,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6269087b272b754783696b6a0b8b57a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   rb: {fileID: 1430274595006817669}
   ic: {fileID: 0}
   pm: {fileID: 0}
@@ -479,6 +484,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d53a722c01d1f4843949d25ac996893c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AuthorityMode: 0
+  TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
@@ -496,6 +505,7 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
 --- !u!114 &1147175392677230003
@@ -510,6 +520,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkRigidbodyBaseExpanded: 0
+  UseRigidBodyForMotion: 0
+  AutoUpdateKinematicState: 1
+  AutoSetKinematicOnDespawn: 1
 --- !u!114 &1162397933718457639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -522,6 +537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91546b09927ce884eaa99bac7183eb9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   primaryInput: 0
   secondaryInput: 0
   attackOrigin: {fileID: 3747489304118117281}
@@ -1004,6 +1020,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d53a722c01d1f4843949d25ac996893c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AuthorityMode: 0
+  TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 0
   SyncPositionY: 0
@@ -1021,6 +1041,7 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 1
+  SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
 --- !u!1 &3736978896045212470
@@ -1347,7 +1368,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1208756920554900805
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1804,10 +1825,10 @@ MonoBehaviour:
   m_RendererIndex: 1
   m_VolumeLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 1048576
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -3501,6 +3522,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 392659073465980165, guid: ebfd6f651c7356744a2fb31db3fde385, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9003383746769162201}
+    - targetCorrespondingSourceObject: {fileID: -4188824260619321221, guid: ebfd6f651c7356744a2fb31db3fde385, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1569595485422080104}
   m_SourcePrefab: {fileID: 100100000, guid: ebfd6f651c7356744a2fb31db3fde385, type: 3}
 --- !u!4 &311124298438770008 stripped
 Transform:
@@ -3547,6 +3571,23 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5392390209365313541, guid: ebfd6f651c7356744a2fb31db3fde385, type: 3}
   m_PrefabInstance: {fileID: 8008788517158626530}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3096963883685438617 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -4188824260619321221, guid: ebfd6f651c7356744a2fb31db3fde385, type: 3}
+  m_PrefabInstance: {fileID: 8008788517158626530}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1569595485422080104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3096963883685438617}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48948dfe9d76b07488dacd46a7955fa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3184000345624822865 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4831018558786363571, guid: ebfd6f651c7356744a2fb31db3fde385, type: 3}
@@ -3686,6 +3727,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db4e39eb0aaf9dc47b1a6ca4d83a2801, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   rb: {fileID: 1430274595006817669}
   ic: {fileID: 0}
   pm: {fileID: 5084491368473432253}
@@ -3726,6 +3768,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6e6784fc101083428fe6e48949755a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
     Layer: 0
@@ -3917,6 +3960,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05403e70115bbfa44ad380599ce2eb39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   localLayerName: LocalPlayer
   remoteLayerName: Default
   renderers:

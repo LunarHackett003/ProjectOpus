@@ -30,4 +30,21 @@ MonoBehaviour:
     clip: {fileID: 7400000, guid: dee82606ba167a6468c9857ffda666a1, type: 2}
   - name: Holster
     clip: {fileID: 7400000, guid: 39df34df070a1d540818ed23e271541f, type: 2}
+  weaponOverrides:
+  - name: Equip
+    clip: {fileID: 7400000, guid: 502c74a91db6fe64a99a49fcabd23169, type: 2}
+  - name: PrimaryFire
+    clip: {fileID: 7400000, guid: 4fb151b8dbeeab040916b3b895f6a017, type: 2}
+  - name: Recock
+    clip: {fileID: 7400000, guid: 67c95778566001040858540cb721d1a5, type: 2}
+  - name: CountedReloadStart
+    clip: {fileID: 7400000, guid: 34ccb96669a444e4f8d683d95752dda0, type: 2}
+  - name: CountedReloadSingle
+    clip: {fileID: 7400000, guid: e0e22b123d2db5d4c86102e58c330cd5, type: 2}
+  - name: CountedReloadDouble
+    clip: {fileID: 7400000, guid: 53d2987a3b896ee448511ddcb53675fd, type: 2}
+  - name: CountedReloadEnd
+    clip: {fileID: 7400000, guid: 211c1e4a61c15084bb1c372ef13452ad, type: 2}
+  - name: Holster
+    clip: {fileID: 7400000, guid: b5bbe5b26a782b0448ad5898fbbc5f6f, type: 2}
   attackAnimationCount: 2

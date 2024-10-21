@@ -2,6 +2,7 @@ using Netcode.Extensions;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.VFX;
 
@@ -52,8 +53,11 @@ namespace Opus
         public bool canAimReload;
         public float aimSpeed;
         public Vector3 aimViewPosition, aimLocalWeaponPos, aimRemoteWeaponPos;
+        public Quaternion localAimOffsetRotation = Quaternion.identity, remoteAimOffsetRotation = Quaternion.identity;
         public float aimAmount;
-        
+        [Tooltip("How much of the ")] public float aimedRotationInfluence;
+
+        [SerializeField] protected ParticleSystem roundEjectSystem;
         
         public override void OnNetworkSpawn()
         {
@@ -68,6 +72,11 @@ namespace Opus
             secondaryAnimatorHash = Animator.StringToHash(secondaryAnimatorKey);
             reloadHash = Animator.StringToHash(reloadKey);
             aimAmountHash = Animator.StringToHash(aimAmountKey);
+        }
+        public virtual void EjectRound()
+        {
+            if(roundEjectSystem != null)
+                roundEjectSystem.Play();
         }
         public virtual void ReloadWeapon()
         {
@@ -112,7 +121,7 @@ namespace Opus
                 bool canAim = useAim;
                 if(manager is PlayerWeaponManager p)
                 {
-                    canAim &= p.PlayingReloadAnimation && canAimReload;
+                    canAim &= (p.PlayingReloadAnimation && canAimReload) || !p.PlayingReloadAnimation;
                 }
                 if (canAim && SecondaryInput)
                 {

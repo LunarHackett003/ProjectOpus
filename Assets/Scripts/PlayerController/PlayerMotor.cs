@@ -115,11 +115,15 @@ namespace Opus
                 if (IsOwner)
                 {
                     viewmodelCamera.transform.localPosition = Vector3.Lerp(Vector3.zero, r.aimViewPosition, r.aimAmount);
-                    pm.weaponManager.weaponPoint.transform.localPosition = Vector3.Lerp(Vector3.zero, r.aimLocalWeaponPos, r.aimAmount);
+                    pm.weaponManager.weaponPoint.transform.SetLocalPositionAndRotation(Vector3.Lerp(Vector3.zero, r.aimLocalWeaponPos, r.aimAmount),
+                        Quaternion.Lerp(pm.weaponManager.weaponPoint.transform.localRotation, Quaternion.identity, r.aimAmount * (1 - r.aimedRotationInfluence)) 
+                        * Quaternion.Lerp(Quaternion.identity, r.localAimOffsetRotation, r.aimAmount));
                 }
                 else
                 {
-                    pm.weaponManager.weaponPoint.transform.localPosition = Vector3.Lerp(Vector3.zero, r.aimRemoteWeaponPos, r.aimAmount);
+                    pm.weaponManager.weaponPoint.transform.SetLocalPositionAndRotation(Vector3.Lerp(Vector3.zero, r.aimRemoteWeaponPos, r.aimAmount),
+                        Quaternion.Lerp(pm.weaponManager.weaponPoint.transform.localRotation, Quaternion.identity, r.aimAmount * (1 - r.aimedRotationInfluence))
+                        * Quaternion.Lerp(Quaternion.identity, r.remoteAimOffsetRotation, r.aimAmount));
                 }
             }
             else
@@ -131,6 +135,8 @@ namespace Opus
         }
         void RegularMovement()
         {
+            if (PauseMenu.Instance.GamePaused)
+                return;
             Vector2 moveMultiplier = ic.sprintInput ? new()
             {
                 x = sprintMultiplier.x,

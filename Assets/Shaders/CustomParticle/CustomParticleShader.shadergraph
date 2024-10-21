@@ -5,6 +5,9 @@
     "m_Properties": [
         {
             "m_Id": "e93adafd96834dd29f8d8cd6c9121c83"
+        },
+        {
+            "m_Id": "b76e7b81ad7143b9a36920d57b803d39"
         }
     ],
     "m_Keywords": [],
@@ -834,6 +837,9 @@
     "m_ChildObjectList": [
         {
             "m_Id": "e93adafd96834dd29f8d8cd6c9121c83"
+        },
+        {
+            "m_Id": "b76e7b81ad7143b9a36920d57b803d39"
         }
     ]
 }
@@ -1143,6 +1149,36 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Texture2DShaderProperty",
+    "m_ObjectId": "b76e7b81ad7143b9a36920d57b803d39",
+    "m_Guid": {
+        "m_GuidSerialized": "5fe65526-1370-4bbf-be1f-9fb42fd9752b"
+    },
+    "m_Name": "NormalMap",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "NormalMap",
+    "m_DefaultReferenceName": "_NormalMap",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_Value": {
+        "m_SerializedTexture": "",
+        "m_Guid": ""
+    },
+    "isMainTexture": false,
+    "useTilingAndOffset": false,
+    "m_Modifiable": true,
+    "m_DefaultType": 0
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.BlockNode",
     "m_ObjectId": "b77549bda7e14b63a3c329a900592162",
     "m_Group": {
@@ -1225,10 +1261,10 @@
         "w": 1.0
     },
     "m_DefaultValue": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
+        "x": 1.0,
+        "y": 1.0,
+        "z": 1.0,
+        "w": 1.0
     },
     "m_Labels": []
 }

@@ -62,6 +62,9 @@ namespace Opus
 
         private void OnSwitchDirect(InputAction.CallbackContext obj)
         {
+            if (PauseMenu.Instance.GamePaused)
+                return;
+
             Vector2 target = obj.ReadValue<Vector2>();
 
             float angle = (Mathf.Atan2(target.y, target.x) * Mathf.Rad2Deg + 360) % 360;
@@ -74,6 +77,11 @@ namespace Opus
 
         private void OnReload(InputAction.CallbackContext obj)
         {
+            if (PauseMenu.Instance.GamePaused)
+            {
+                reloadInput = false;
+                return;
+            }
             reloadInput = obj.ReadValueAsButton();
         }
 
@@ -114,16 +122,22 @@ namespace Opus
 
         private void OnSecondaryInput(InputAction.CallbackContext obj)
         {
+            if (PauseMenu.Instance.GamePaused)
+                secondaryInput = false;
             secondaryInput = obj.ReadValueAsButton();
         }
 
         private void OnFire(InputAction.CallbackContext obj)
         {
+            if (PauseMenu.Instance.GamePaused)
+                primaryInput = false;
             primaryInput = obj.ReadValueAsButton();
         }
 
         private void OnSprint(InputAction.CallbackContext obj)
         {
+            if (PauseMenu.Instance.GamePaused)
+                sprintInput = false;
             sprintInput = obj.ReadValueAsButton();
         }
 
@@ -147,20 +161,29 @@ namespace Opus
 
         public void OnMove(InputAction.CallbackContext context)
         {
-            moveInput = context.ReadValue<Vector2>();
+            if (PauseMenu.Instance.GamePaused)
+                moveInput = Vector2.zero;
+                moveInput = context.ReadValue<Vector2>();
         }
         public void OnLook(InputAction.CallbackContext context)
         {
+            if (PauseMenu.Instance.GamePaused)
+                return;
+
             oldLook = lookInput;
             lookInput += lookSpeed * Time.deltaTime * context.ReadValue<Vector2>();
             lookInput.y = Mathf.Clamp(lookInput.y, -lookClamp, lookClamp);
         }
         public void OnJump(InputAction.CallbackContext context)
         {
+            if (PauseMenu.Instance.GamePaused)
+                jumpInput = false;
             jumpInput = context.ReadValueAsButton();
         }
         public void OnInteract(InputAction.CallbackContext context)
         {
+            if (PauseMenu.Instance.GamePaused)
+                interactInput = false;
             interactInput = context.ReadValueAsButton();
         }
         public bool TryConsumeJump()

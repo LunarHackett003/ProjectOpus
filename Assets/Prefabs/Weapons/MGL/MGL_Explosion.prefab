@@ -66,33 +66,72 @@ VisualEffect:
         m_Overridden: 1
       - m_Value: {x: 3, y: 6}
         m_Name: FlashSizeRandom
-        m_Overridden: 1
-      - m_Value: {x: 0.1, y: 0.23}
+        m_Overridden: 0
+      - m_Value: {x: 0.1, y: 0.3}
         m_Name: FlashLifetimeRandom
-        m_Overridden: 1
-      - m_Value: {x: 0.02, y: 0.5}
+        m_Overridden: 0
+      - m_Value: {x: 0.18, y: 0.5}
         m_Name: FlamesSpeedRandom
         m_Overridden: 1
-      - m_Value: {x: 0.14, y: 0.5}
+      - m_Value: {x: 0.5, y: 0.7}
         m_Name: FlamesLifetimeRandom
         m_Overridden: 1
-      - m_Value: {x: 0.4, y: 2}
+      - m_Value: {x: 2, y: 5}
         m_Name: FlameSizeRandom
         m_Overridden: 1
-      - m_Value: {x: 0.2, y: 10}
+      - m_Value: {x: 1, y: 2}
         m_Name: SmokeLifetimeRandom
         m_Overridden: 1
+      - m_Value: {x: 2, y: 4}
+        m_Name: SmokeSizeRandom
+        m_Overridden: 1
+      - m_Value: {x: 5, y: 20}
+        m_Name: SpawnCountRandom
+        m_Overridden: 1
+      - m_Value: {x: 1, y: 4}
+        m_Name: FlamesCountRandom
+        m_Overridden: 1
+      - m_Value: {x: 4, y: 12}
+        m_Name: SmokeSpawnCount
+        m_Overridden: 1
+      - m_Value: {x: 0.2, y: 0.5}
+        m_Name: SparksLifetimeRandom
+        m_Overridden: 1
     m_Vector3f:
-      m_Array: []
+      m_Array:
+      - m_Value: {x: -5, y: 0, z: -5}
+        m_Name: SmokeMinVelocity
+        m_Overridden: 1
+      - m_Value: {x: 5, y: 0, z: 5}
+        m_Name: SmokeMaxVelocity
+        m_Overridden: 1
+      - m_Value: {x: -15, y: 0, z: -15}
+        m_Name: SmokeMinVelocityLinear
+        m_Overridden: 1
+      - m_Value: {x: 15, y: 0, z: 15}
+        m_Name: SmokeMaxVelocityLinear
+        m_Overridden: 1
+      - m_Value: {x: 0, y: 0, z: 0}
+        m_Name: SmokeMaxVelocityAngular
+        m_Overridden: 1
+      - m_Value: {x: 0, y: 90, z: 0}
+        m_Name: SmokeMinVelocityAngular
+        m_Overridden: 1
+      - m_Value: {x: -15, y: -5, z: -15}
+        m_Name: SmokeMaxRotation
+        m_Overridden: 1
+      - m_Value: {x: 15, y: 5, z: 15}
+        m_Name: SmokeMinRotation
+        m_Overridden: 1
     m_Vector4f:
       m_Array:
       - m_Value: {x: 32, y: 6.19062, z: 0, w: 0}
         m_Name: FlashColour
         m_Overridden: 1
-      - m_Value: {x: 3.6981132, y: 0.7074263, z: 0, w: 0}
+      - m_Value: {x: 3.6981132, y: 0.7074263, z: 0, w: 1}
         m_Name: FlamesColour
         m_Overridden: 1
-      - m_Value: {x: 0, y: 0, z: 0, w: 0.11372549}
+      - m_Value: {x: 1, y: 1, z: 1, w: 0.019607844}
         m_Name: SmokeColour
         m_Overridden: 1
       - m_Value: {x: 16, y: 4.6586356, z: 0, w: 0}
@@ -105,7 +144,103 @@ VisualEffect:
     m_Matrix4x4f:
       m_Array: []
     m_AnimationCurve:
-      m_Array: []
+      m_Array:
+      - m_Value:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 9.997642
+            outSlope: 9.997642
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0.25771564
+          - serializedVersion: 3
+            time: 0.123574704
+            value: 1.1200972
+            inSlope: 1.325275
+            outSlope: 1.325275
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0.51321393
+            outWeight: 0.33333334
+          - serializedVersion: 3
+            time: 0.99108887
+            value: 2
+            inSlope: 0.04207437
+            outSlope: 0.04207437
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0.11311598
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        m_Name: SmokeSizeOverLife
+        m_Overridden: 1
+      - m_Value:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 0.86393976
+            value: 0.9604666
+            inSlope: -0.25774515
+            outSlope: -0.25774515
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0.33333334
+            outWeight: 0.31821698
+          - serializedVersion: 3
+            time: 1
+            value: 0.011792481
+            inSlope: -4.910271
+            outSlope: -4.910271
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0.16334394
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        m_Name: FlamesSizeOverLife
+        m_Overridden: 1
+      - m_Value:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 1
+            inSlope: -1
+            outSlope: -1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 0
+            inSlope: -1
+            outSlope: -1
+            tangentMode: 34
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        m_Name: FlamesAlphaOverLife
+        m_Overridden: 1
     m_Gradient:
       m_Array: []
     m_NamedObject:
@@ -167,8 +302,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2341396070
+  GlobalObjectIdHash: 2183685974
   InScenePlacedSourceGlobalObjectIdHash: 2341396070
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -176,6 +313,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &7783057948905814693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,6 +327,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b53134e408a63f438ac4911bec06f90, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   soundbite:
     Guid:
       Data1: -1428022397

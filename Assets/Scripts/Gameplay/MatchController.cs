@@ -65,7 +65,7 @@ namespace Opus
             print($"added Player {t.playerID} to team {teamToAssign}");
             teamMembers.Value.Add(t);
             teamNumbers.Value[teamToAssign] += 1;
-            NetworkManager.ConnectedClients[t.playerID].PlayerObject.GetComponent<PlayerManager>().BestowPlayer();
+            NetworkManager.ConnectedClients[t.playerID].PlayerObject.GetComponent<PlayerManager>().BestowPlayer(ID);
         }
         
         public static MatchController Instance { get; private set; }
@@ -143,7 +143,7 @@ namespace Opus
         {
             TeamMember t = teamMembers.Value.Find(x => x.playerID == ID);
             teamMembers.Value.RemoveAt(t.team);
-            teamNumbers.Value.Add(t.team, teamNumbers.Value[t.team] - 1);
+            //teamNumbers.Value.Add(t.team, teamNumbers.Value[t.team] - 1);
         }
         public void UpdateScoreForPlayer(ulong ID, int killDelta = 0, int deathDelta = 0, int assistDelta = 0, int reviveDelta = 0, int healDelta = 0)
         {

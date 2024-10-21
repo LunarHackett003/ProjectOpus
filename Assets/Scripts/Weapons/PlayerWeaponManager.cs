@@ -267,9 +267,8 @@ namespace Opus
         {
             if (!IsOwner || IC == null)
                 return;
-            primaryInput = IC.primaryInput && !cannotFire && !playingReloadAnimation && !switchingWeapons;
-            secondaryInput = IC.secondaryInput && !cannotFire && !playingReloadAnimation && !switchingWeapons;
-
+            primaryInput = !PauseMenu.Instance.GamePaused && IC.primaryInput && !cannotFire && !playingReloadAnimation && !switchingWeapons;
+            secondaryInput = !PauseMenu.Instance.GamePaused && IC.secondaryInput && !cannotFire && !playingReloadAnimation && !switchingWeapons;
             foreach (var item in equipmentDict)
             {
                 if (item.Value == null)

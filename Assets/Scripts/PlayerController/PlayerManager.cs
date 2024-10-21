@@ -3,6 +3,7 @@ using Steamworks;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Opus
@@ -61,7 +62,7 @@ namespace Opus
             gadgetTwoIndex.Value = loadoutManager.gadget2Index;
             specialIndex.Value = loadoutManager.specialIndex;
         }
-        public void BestowPlayer()
+        public void BestowPlayer(ulong clientID)
         {
             NetworkManager.SceneManager.OnLoadComplete += SceneLoadComplete;
         }
@@ -84,7 +85,9 @@ namespace Opus
         private void SceneLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
         {
             //Wait until the player has loaded into the scene
-            NetworkManager.SpawnManager.InstantiateAndSpawn(playerPrefab, OwnerClientId, false, false, false, transform.position, Quaternion.identity);
+            //Hopefully, this fixes all players being given to the host.
+            NetworkManager.SpawnManager.InstantiateAndSpawn(playerPrefab, clientId, false, false, false, transform.position, Quaternion.identity);
+            Debug.Log($"Spawned player for client {clientId}");
         }
     }
 }
