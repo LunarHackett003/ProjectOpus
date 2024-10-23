@@ -75,7 +75,7 @@ namespace Opus
         {
             if (projectileModule.projectileHitPrefab != null)
             {
-                StartCoroutine(ReturnObjectToNetworkPool(NetworkObject.InstantiateAndSpawn(projectileModule.projectileHitPrefab, NetworkManager, OwnerClientId, position: hit.point)));
+                StartCoroutine(ReturnObjectToNetworkPool(NetworkObject.InstantiateAndSpawn(projectileModule.projectileHitPrefab, NetworkManager, OwnerClientId, position: hit.point + (hit.normal * hitEffectOffsetMultiplier))));
             }
         }
         protected void ProjectileSimulate()
@@ -89,7 +89,7 @@ namespace Opus
                     StartCoroutine(ReturnObjectToNetworkPool(p.projectile.GetComponent<NetworkObject>()));
                     if (projectileModule.spawnHitPrefabOnExpire)
                     {
-                        ProjectileHit(new() { point = p.projectile.position});
+                        ProjectileHit(new() { point = p.projectile.position, normal = Vector3.zero});
                     }
                     projectiles.RemoveAt(i);
                 }

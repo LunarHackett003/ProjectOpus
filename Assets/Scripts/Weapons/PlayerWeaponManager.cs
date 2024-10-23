@@ -34,7 +34,7 @@ namespace Opus
         public Dictionary<EquipmentSlot, BaseWeapon> equipmentDict = new();
 
         public Transform weaponPoint, primaryHolster, secondaryHolster, gadget1Holster, gadget2Holster, specialHolster;
-
+        public Transform weaponRepositionTarget;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -79,7 +79,8 @@ namespace Opus
                 primaryWeapon.manager = this;
                 if(currentSlot.Value == 0)
                 {
-                    currentSlot.Value = EquipmentSlot.primary;
+                    if(IsOwner)
+                        currentSlot.Value = EquipmentSlot.primary;
                 }
                 if (currentSlot.Value == EquipmentSlot.primary)
                 {
@@ -110,7 +111,8 @@ namespace Opus
                         //we have either updated the weapon via a testing loadout menu, or we've respawned and haven't correctly disposed of the previous weapon.
                         b.NetworkObject.Despawn();
                     }
-                    equipmentDict[slot] = weapon;
+                    if(IsOwner)
+                        equipmentDict[slot] = weapon;
                 }
                 else
                 {
@@ -124,6 +126,10 @@ namespace Opus
                 {
                     equipmentDict.Remove(slot);
                 }
+            }
+            if(PlayerAnimator != null)
+            {
+                PlayerAnimator.UpdateAnimations(weapon);
             }
         }
 
@@ -164,12 +170,14 @@ namespace Opus
             foreach (var item in equipmentDict)
             {
                 if (item.Value == null)
+                {
+                    print("null weapon");
                     continue;
+                }
                 item.Value.transform.SetPositionAndRotation(weaponPoint.position, weaponPoint.rotation);
                 if(item.Key == currentSlot.Value)
                 {
                     item.Value.transform.localScale = Vector3.one;
-
                 }
                 else
                 {
@@ -230,9 +238,6 @@ namespace Opus
                     break;
             }
         }
-
-
-
         [SerializeField] EquipmentSlot pendingSlot;
         [SerializeField] bool switchingWeapons;
         public void SwitchWeapon(EquipmentSlot targetSlot)

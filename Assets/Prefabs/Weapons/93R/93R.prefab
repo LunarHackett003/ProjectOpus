@@ -240,6 +240,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 2066041715
   InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -247,6 +249,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &6032873240196245040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -259,6 +263,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78e3e1bbd5db5084184f86ae8a09930a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   doLogging: 0
   animator: {fileID: 305429100759776920}
   manager: {fileID: 0}
@@ -281,6 +286,7 @@ MonoBehaviour:
     Path: 
   isPlayerWeapon: 1
   isCurrentWeapon: 0
+  hitEffectOffsetMultiplier: 0.1
   primaryAnimatorKey: PrimaryFire
   secondaryAnimatorKey: SecondaryFire
   aimAmountKey: Aim
@@ -301,6 +307,17 @@ MonoBehaviour:
   delayBeforeFire: 0
   burstShotCount: 3
   burstCooldown: 0.1
+  useAim: 1
+  canAimReload: 0
+  aimSpeed: 6
+  aimViewPosition: {x: 0, y: 0, z: 0.16}
+  aimLocalWeaponPos: {x: -0.053, y: 0.06, z: 0}
+  aimRemoteWeaponPos: {x: -0.053, y: 0.1, z: 0}
+  localAimOffsetRotation: {x: 0, y: 0, z: 0, w: 1}
+  remoteAimOffsetRotation: {x: 0, y: 0, z: 0, w: 1}
+  aimAmount: 0
+  aimedRotationInfluence: 0
+  roundEjectSystem: {fileID: 0}
   hitscanIterations: 10
   tracerSpeed: 300
 --- !u!114 &305429100759776920
@@ -315,6 +332,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6e6784fc101083428fe6e48949755a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
     Layer: 0
@@ -430,6 +448,13 @@ MonoBehaviour:
     TransitionIndex: 1
   - IsCrossFadeExit: 0
     Layer: 2
+    OriginatingState: 526151365
+    DestinationState: 485141296
+    TransitionDuration: 0.026390076
+    TriggerNameHash: 485141296
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 2
     OriginatingState: 1824937608
     DestinationState: 485141296
     TransitionDuration: 0.026390076
@@ -512,6 +537,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05403e70115bbfa44ad380599ce2eb39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   localLayerName: LocalPlayer
   remoteLayerName: Default
   renderers:

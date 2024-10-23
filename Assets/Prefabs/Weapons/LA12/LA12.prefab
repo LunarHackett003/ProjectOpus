@@ -278,6 +278,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 1304540666
   InScenePlacedSourceGlobalObjectIdHash: 1304540666
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -285,6 +287,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &6730215908752878855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -297,12 +301,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78e3e1bbd5db5084184f86ae8a09930a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   doLogging: 0
   animator: {fileID: 2147938385822755910}
   manager: {fileID: 0}
   animationModule: {fileID: 11400000, guid: 28317b308f7b3fe4882efa24d6c67f45, type: 2}
+  attackOnPress: 0
+  attackOnRelease: 0
+  primaryEventRef:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  secondaryEventRef:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   isPlayerWeapon: 1
   isCurrentWeapon: 0
+  hitEffectOffsetMultiplier: 0.1
   primaryAnimatorKey: PrimaryFire
   secondaryAnimatorKey: SecondaryFire
   aimAmountKey: Aim
@@ -320,6 +342,20 @@ MonoBehaviour:
   projectileOrigin: {fileID: 3678008175325537808}
   useCountedReload: 1
   useRecockAnimation: 1
+  delayBeforeFire: 0
+  burstShotCount: 0
+  burstCooldown: 0
+  useAim: 1
+  canAimReload: 0
+  aimSpeed: 4
+  aimViewPosition: {x: 0, y: 0, z: 0}
+  aimLocalWeaponPos: {x: -0.133, y: 0.055, z: 0}
+  aimRemoteWeaponPos: {x: -0.023, y: 0, z: 0}
+  localAimOffsetRotation: {x: 0, y: 0, z: 0, w: 1}
+  remoteAimOffsetRotation: {x: 0, y: 0, z: 0, w: 1}
+  aimAmount: 0
+  aimedRotationInfluence: 0.1
+  roundEjectSystem: {fileID: 0}
   hitscanIterations: 10
   tracerSpeed: 200
 --- !u!114 &2147938385822755910
@@ -334,6 +370,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6e6784fc101083428fe6e48949755a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
     Layer: 0
@@ -394,6 +431,13 @@ MonoBehaviour:
   - IsCrossFadeExit: 0
     Layer: 2
     OriginatingState: 1356640909
+    DestinationState: 1083991931
+    TransitionDuration: 0.05634916
+    TriggerNameHash: 1083991931
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 2
+    OriginatingState: 1356640909
     DestinationState: 1506173579
     TransitionDuration: 0.05634916
     TriggerNameHash: 1356640909
@@ -437,6 +481,13 @@ MonoBehaviour:
     Layer: 2
     OriginatingState: 485141296
     DestinationState: 1824937608
+    TransitionDuration: 0.026390076
+    TriggerNameHash: 485141296
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 2
+    OriginatingState: 526151365
+    DestinationState: 485141296
     TransitionDuration: 0.026390076
     TriggerNameHash: 485141296
     TransitionIndex: 1
@@ -502,6 +553,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05403e70115bbfa44ad380599ce2eb39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
   localLayerName: LocalPlayer
   remoteLayerName: Default
   renderers:

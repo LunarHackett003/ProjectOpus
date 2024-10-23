@@ -1,9 +1,9 @@
 
 using Steamworks;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Opus
@@ -20,13 +20,14 @@ namespace Opus
         public PauseMenu pauseMenu;
         public LoadoutManager loadoutManager;
 
-
+        public float spawnDelay = 1f;
         public NetworkVariable<int> primaryIndex = new(writePerm: NetworkVariableWritePermission.Owner), secondaryIndex = new(writePerm:NetworkVariableWritePermission.Owner),
             gadgetOneIndex = new(writePerm:NetworkVariableWritePermission.Owner), gadgetTwoIndex = new(writePerm:NetworkVariableWritePermission.Owner), specialIndex = new(writePerm:NetworkVariableWritePermission.Owner);
-
+        bool pendingRespawn;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            transform.position = Vector3.up;
             playerManagers.Add(this);
             InputCollector = GetComponent<InputCollector>();
             loadoutManager = FindAnyObjectByType<LoadoutManager>();
@@ -62,9 +63,12 @@ namespace Opus
             gadgetTwoIndex.Value = loadoutManager.gadget2Index;
             specialIndex.Value = loadoutManager.specialIndex;
         }
-        public void BestowPlayer(ulong clientID)
+        private void FixedUpdate()
         {
-            NetworkManager.SceneManager.OnLoadComplete += SceneLoadComplete;
+            if (IsOwner && playerMotor != null && playerMotor.transform.position.y < -50 && !pendingRespawn)
+            {
+                pendingRespawn = true;
+            }
         }
         public void BestowWeapons()
         {
@@ -81,13 +85,36 @@ namespace Opus
             print("Updating weapons on clients");
             weaponManager.UpdateWeapons_RPC();
         }
-
-        private void SceneLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
+        public void SpawnPlayer(Vector3 position, Quaternion rotation, ulong clientID)
         {
-            //Wait until the player has loaded into the scene
-            //Hopefully, this fixes all players being given to the host.
-            NetworkManager.SpawnManager.InstantiateAndSpawn(playerPrefab, clientId, false, false, false, transform.position, Quaternion.identity);
-            Debug.Log($"Spawned player for client {clientId}");
+            if(playerMotor == null)
+            {
+                if (!IsServer)
+                {
+                    //Cannot spawn, do nothing here. We shouldn't even get here anyway.
+                    print("How did you get here?");
+                }
+                else
+                {
+                    //Spawn the player at the position and rotation provided by the spawn manager
+                    NetworkManager.SpawnManager.InstantiateAndSpawn(playerPrefab, clientID, position: position, rotation: rotation);
+                }
+            }
+            else
+            {
+                SendPlayerSpawn_RPC(position, rotation);
+            }
+        }
+        [Rpc(SendTo.Server)]
+        public void RequestRespawn_RPC()
+        {
+            MatchController.Instance.SpawnPlayer(OwnerClientId);
+        }
+        [Rpc(SendTo.Owner)]
+        public void SendPlayerSpawn_RPC(Vector3 position, Quaternion rotation)
+        {
+            pendingRespawn = false;
+            playerMotor.transform.SetPositionAndRotation(position, rotation);
         }
     }
 }

@@ -33,6 +33,7 @@ namespace Opus
 
         public Vector2 movementVector;
         public PlayerAnimator animator;
+        public Quaternion baseWeaponRotation;
         public enum MovementState
         {
             none = 0,
@@ -63,8 +64,9 @@ namespace Opus
                 Camera.main.GetUniversalAdditionalCameraData().cameraStack.Add(viewmodelCamera);
                 worldCineCam.Prioritize();
                 viewCineCam.Prioritize();
+
+                //Spawn the player somehow
             }
-            SpawnPlayer();
         }
 
         private void Update()
@@ -101,35 +103,33 @@ namespace Opus
                 rb.isKinematic = true;
             }
 
-            if (IsServer && transform.position.y < -50 && !outofboundsChecked)
+            if (IsServer && transform.position.y < -50)
             {
-                OutOfBounds();
+
             }
             else
             {
-                outofboundsChecked = false;
+
             }
 
             if (pm.weaponManager != null && pm.weaponManager.equipmentDict.Count > 0 && pm.weaponManager.equipmentDict[pm.weaponManager.currentSlot.Value] is RangedWeapon r && r.useAim)
             {
                 if (IsOwner)
                 {
-                    viewmodelCamera.transform.localPosition = Vector3.Lerp(Vector3.zero, r.aimViewPosition, r.aimAmount);
-                    pm.weaponManager.weaponPoint.transform.SetLocalPositionAndRotation(Vector3.Lerp(Vector3.zero, r.aimLocalWeaponPos, r.aimAmount),
-                        Quaternion.Lerp(pm.weaponManager.weaponPoint.transform.localRotation, Quaternion.identity, r.aimAmount * (1 - r.aimedRotationInfluence)) 
-                        * Quaternion.Lerp(Quaternion.identity, r.localAimOffsetRotation, r.aimAmount));
+                    viewCineCam.transform.localPosition = Vector3.Lerp(Vector3.zero, r.aimViewPosition, r.aimAmount);
+                    pm.weaponManager.weaponPoint.SetLocalPositionAndRotation(Vector3.Lerp(Vector3.zero, r.aimLocalWeaponPos, r.aimAmount),
+                        baseWeaponRotation * Quaternion.Lerp(Quaternion.identity, r.localAimOffsetRotation, r.aimAmount));
                 }
                 else
                 {
-                    pm.weaponManager.weaponPoint.transform.SetLocalPositionAndRotation(Vector3.Lerp(Vector3.zero, r.aimRemoteWeaponPos, r.aimAmount),
-                        Quaternion.Lerp(pm.weaponManager.weaponPoint.transform.localRotation, Quaternion.identity, r.aimAmount * (1 - r.aimedRotationInfluence))
-                        * Quaternion.Lerp(Quaternion.identity, r.remoteAimOffsetRotation, r.aimAmount));
+                    pm.weaponManager.weaponPoint.SetLocalPositionAndRotation(Vector3.Lerp(Vector3.zero, r.aimRemoteWeaponPos, r.aimAmount), 
+                        baseWeaponRotation * Quaternion.Lerp(Quaternion.identity, r.remoteAimOffsetRotation, r.aimAmount));
                 }
             }
             else
             {
                 if(IsOwner)
-                    viewmodelCamera.transform.localPosition = Vector3.zero;
+                    viewCineCam.transform.localPosition = Vector3.zero;
                 pm.weaponManager.weaponPoint.transform.localPosition = Vector3.zero;
             }
         }
@@ -183,34 +183,7 @@ namespace Opus
             Gizmos.DrawWireSphere(transform.position + groundCheckOrigin, 0.3f);
             Gizmos.DrawWireSphere(transform.position + groundCheckOrigin + (Vector3.down * groundCheckDistance), 0.3f);
         }
-        bool outofboundsChecked;
-        public void OutOfBounds()
-        {
-            outofboundsChecked = true;
-            OutOfBoundsResetPlayer_RPC();
-            
-        }
-        [Rpc(SendTo.Owner)]
-        void OutOfBoundsResetPlayer_RPC()
-        {
-            SpawnPlayer(true);
-        }
-        [Rpc(SendTo.Server)]
-        void OutOfBoundsReset_RPC()
-        {
-            outofboundsChecked = false;
-        }
-        public void SpawnPlayer(bool outOfBounds = false)
-        {
-            SceneData sd = FindAnyObjectByType<SceneData>();
-            Transform t = sd.GetSpawnPoint(MatchController.Instance.teamMembers.Value.FindIndex(x => x.playerID == OwnerClientId));
-            transform.SetPositionAndRotation(t.position, t.rotation);
 
-            if (outOfBounds)
-            {
-                OutOfBoundsReset_RPC();
-            }
-        }
         public void SendJump()
         {
             if (grounded)

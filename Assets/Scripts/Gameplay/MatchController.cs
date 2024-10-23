@@ -42,6 +42,8 @@ namespace Opus
 
         public LayerMask damageLayermask;
 
+        SceneData sceneData;
+
         public void AssignPlayerToTeam(ulong ID)
         {
             int teamToAssign = 0;
@@ -65,7 +67,7 @@ namespace Opus
             print($"added Player {t.playerID} to team {teamToAssign}");
             teamMembers.Value.Add(t);
             teamNumbers.Value[teamToAssign] += 1;
-            NetworkManager.ConnectedClients[t.playerID].PlayerObject.GetComponent<PlayerManager>().BestowPlayer(ID);
+            //NetworkManager.ConnectedClients[t.playerID].PlayerObject.GetComponent<PlayerManager>().BestowPlayer(ID);
         }
         
         public static MatchController Instance { get; private set; }
@@ -77,7 +79,7 @@ namespace Opus
             teamMembers.OnValueChanged += TeamMembersUpdated;
             if (IsOwner)
             {
-                NetworkManager.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
+                NetworkManager.SceneManager.OnLoadComplete += SceneLoaded;
                 for (int i = 0; i < numberOfTeams; i++)
                 {
                     teamNumbers.Value.Add(i, 0);
@@ -87,10 +89,17 @@ namespace Opus
                 NetworkManager.OnConnectionEvent += PlayerConnectionEvent;
             }
         }
-
-        private void SceneManager_OnLoadComplete(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
+        public void SpawnPlayer(ulong clientId)
+        {
+            if (!sceneData)
+                sceneData = FindAnyObjectByType<SceneData>();
+            Transform spawnPos = sceneData.GetSpawnPoint(teamMembers.Value.Find(x => x.playerID == clientId).team);
+            NetworkManager.ConnectedClients[clientId].PlayerObject.GetComponent<PlayerManager>().SpawnPlayer(spawnPos.position, spawnPos.rotation, clientId);
+        }
+        private void SceneLoaded(ulong clientId, string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode)
         {
             NetworkManager.SpawnManager.InstantiateAndSpawn(objectPoolPrefab);
+            SpawnPlayer(clientId);
         }
 
         void InitialiseTeamNumbers()

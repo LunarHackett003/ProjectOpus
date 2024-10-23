@@ -49,6 +49,7 @@ namespace Opus
         }
         public bool isPlayerWeapon;
         public bool isCurrentWeapon;
+        public float hitEffectOffsetMultiplier = 0.1f; 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();

@@ -17,7 +17,7 @@ MonoBehaviour:
   hitPrefabDespawnTime: 4
   projectileExpireDestroyTime: 3
   useProjectileDamage: 0
-  maxProjectileLifetime: 10
+  maxProjectileLifetime: 4
   spawnHitPrefabOnExpire: 1
   projectileFireSpeed: 25
   maxBounces: 1
