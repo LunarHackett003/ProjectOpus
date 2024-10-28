@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: TeamColour
-  m_Shader: {fileID: 4800000, guid: 4e76d4023d7e0411297c670f878973e2, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 3d8324828a3de26468e3e565cc6c6e7d, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -38,7 +38,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _NormalExpandDistance: 0.02
+    - _NormalExpandDistance: 0.14
     - _OutlineWidth: 0.65
     - _QueueControl: 0
     - _QueueOffset: 0

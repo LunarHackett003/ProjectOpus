@@ -16,6 +16,7 @@ namespace Opus
             if(Instance == null)
             {
                 Instance = this;
+                DontDestroyOnLoad(gameObject);
             }
             else
             {
@@ -28,15 +29,27 @@ namespace Opus
         {
             NetworkManager.Singleton.OnClientStarted += Singleton_OnClientStarted;
             NetworkManager.Singleton.OnClientStopped += Singleton_OnClientStopped;
+
+            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
         }
+
+        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
+        {
+            SetLoadScreenActive(false);
+        }
+
         private void OnApplicationQuit()
         {
-            NetworkManager.Singleton.OnClientStarted -= Singleton_OnClientStarted;
-            NetworkManager.Singleton.OnClientStopped -= Singleton_OnClientStopped;
+            if(NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.OnClientStarted -= Singleton_OnClientStarted;
+                NetworkManager.Singleton.OnClientStopped -= Singleton_OnClientStopped;
+            }
         }
         private void Singleton_OnClientStopped(bool obj)
         {
             SetLoadScreenActive(true);
+            LoadWithScreen(SessionManager.Instance.menuScene);
         }
 
         private void Singleton_OnClientStarted()

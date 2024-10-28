@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NetworkManagerExpanded: 0
   NetworkConfig:
-    ProtocolVersion: 0
+    ProtocolVersion: 1
     NetworkTransport: {fileID: 5545390258040877747}
     PlayerPrefab: {fileID: 873489922690566246, guid: 24856744f2d90c946b203d9cfad7d746, type: 3}
     Prefabs:
@@ -71,7 +71,7 @@ MonoBehaviour:
     NetworkTopology: 0
     UseCMBService: 0
     AutoSpawnPlayerPrefabClientSide: 1
-    NetworkMessageMetrics: 1
+    NetworkMessageMetrics: 0
     NetworkProfilingMetrics: 1
     OldPrefabList: []
   RunInBackground: 1
@@ -102,6 +102,6 @@ MonoBehaviour:
     Port: 7777
     ServerListenAddress: 127.0.0.1
   DebugSimulator:
-    PacketDelayMS: 0
+    PacketDelayMS: 25
     PacketJitterMS: 0
     PacketDropRate: 0

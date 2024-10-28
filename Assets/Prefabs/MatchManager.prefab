@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3753373782
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 4040660507
+  InScenePlacedSourceGlobalObjectIdHash: 274474607
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -71,10 +71,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  numberOfTeamsAllowed: 4
+  numberOfTeamsAllowed: 2
   spawnpointHolder: {fileID: 0}
-  teamColours:
-  - {r: 0, g: 0.51799965, b: 1, a: 1}
-  - {r: 1, g: 0.46264225, b: 0, a: 1}
-  - {r: 0.14471596, g: 1, b: 0.06132078, a: 1}
-  - {r: 0.6240229, g: 0.41037738, b: 1, a: 1}

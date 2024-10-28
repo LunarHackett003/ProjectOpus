@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Opus
@@ -26,6 +27,7 @@ namespace Opus
         {
             NetworkManager.OnConnectionEvent -= ConnectionEvent;
             NetworkManager.SceneManager.OnSceneEvent -= SceneManager_OnSceneEvent;
+            Instance = null;
             base.OnNetworkDespawn();
         }
         private void SceneManager_OnSceneEvent(SceneEvent sceneEvent)
@@ -35,11 +37,26 @@ namespace Opus
                 if (IsServer)
                 {
                     spawnpointHolder = FindAnyObjectByType<SpawnpointHolder>();
-                    PlayerSpawn(sceneEvent.ClientId, true);
+                    SetPlayerTeam(sceneEvent.ClientId);
                 }
             }
         }
-        void PlayerSpawn(ulong clientID, bool updateSpawnpoint)
+        [Rpc(SendTo.Server)]
+        public void RequestSpawn_RPC(ulong clientID)
+        {
+            if (PlayerManager.playersByID.TryGetValue(clientID, out PlayerManager p))
+            {
+                if (p.LivingPlayer == null)
+                {
+                    p.LivingPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(p.playerPrefab, clientID).GetComponent<PlayerController>();
+                }
+                (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint();
+
+                p.LivingPlayer.transform.SetPositionAndRotation(pos, rot);
+                p.SpawnPlayer_RPC();
+            }
+        }
+        void SetPlayerTeam(ulong clientID)
         {
             uint team = FindSmallestTeam();
             clientsOnTeams.Value.TryAdd(clientID, team);
@@ -51,11 +68,6 @@ namespace Opus
                 p.UpdateTeamIndex(0, 0);
             else
                 p.teamIndex.Value = team;
-            if (updateSpawnpoint)
-            {
-                (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint();
-                n.GetComponent<NetworkTransform>().Teleport(pos, rot, Vector3.one);
-            }
         }
         private void ConnectionEvent(NetworkManager manager, ConnectionEventData eventData)
         {

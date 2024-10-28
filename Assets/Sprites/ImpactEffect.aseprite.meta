@@ -241,7 +241,7 @@ ScriptedImporter:
     layerType: 0
     blendMode: 0
     cells:
-    - name: ImpactEffect_Frame_0
+    - name: Frame_0
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
@@ -250,7 +250,7 @@ ScriptedImporter:
         width: 6
         height: 6
       spriteId: 2a991327eb02abe4d982c1447bda7328
-    - name: ImpactEffect_Frame_1
+    - name: Frame_1
       frameIndex: 1
       additiveSortOrder: 0
       cellRect:
@@ -259,7 +259,7 @@ ScriptedImporter:
         width: 34
         height: 15
       spriteId: f5688f2f0ec168a41b15d9a8e214be15
-    - name: ImpactEffect_Frame_2
+    - name: Frame_2
       frameIndex: 2
       additiveSortOrder: 0
       cellRect:
@@ -268,7 +268,7 @@ ScriptedImporter:
         width: 60
         height: 60
       spriteId: 42fe0830d50642947bcc1b4806f004bd
-    - name: ImpactEffect_Frame_3
+    - name: Frame_3
       frameIndex: 3
       additiveSortOrder: 0
       cellRect:
@@ -277,7 +277,7 @@ ScriptedImporter:
         width: 60
         height: 60
       spriteId: b0189051e69d96f40823f7ca1164fded
-    - name: ImpactEffect_Frame_4
+    - name: Frame_4
       frameIndex: 4
       additiveSortOrder: 0
       cellRect:
