@@ -42,7 +42,7 @@ namespace Opus
             }
         }
         [Rpc(SendTo.Server)]
-        public void RequestSpawn_RPC(ulong clientID)
+        public void RequestSpawn_RPC(ulong clientID, int primaryWeaponIndex = -1, int secondaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int specialIndex = -1)
         {
             if (PlayerManager.playersByID.TryGetValue(clientID, out PlayerManager p))
             {
@@ -53,8 +53,58 @@ namespace Opus
                 (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint();
 
                 p.LivingPlayer.transform.SetPositionAndRotation(pos, rot);
+                SpawnWeaponsForPlayer(clientID, primaryWeaponIndex, secondaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, specialIndex);
+
+
                 p.SpawnPlayer_RPC();
             }
+        }
+        void SpawnWeaponsForPlayer(ulong clientID, int primaryWeaponIndex = -1, int secondaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int specialIndex = -1)
+        {
+            if (primaryWeaponIndex > -1)
+            {
+                print($"Valid primary weapon (Index {primaryWeaponIndex}) - spawning one for player {clientID}");
+            }
+            else
+            {
+                print($"No primary weapon selected for player {clientID}");
+            }
+            if (secondaryWeaponIndex > -1)
+            {
+                print($"Valid secondary weapon (Index {secondaryWeaponIndex}) - spawning one for player {clientID}");
+            }
+            else
+            {
+                print($"No secondary weapon selected for player {clientID}");
+            }
+            if (gadgetOneIndex > -1)
+            {
+                print($"Valid primary gadget (Index {gadgetOneIndex}) - spawning one for player {clientID}");
+            }
+            else
+            {
+                print($"No primary gadget selected for player {clientID}");
+            }
+            if (gadgetTwoIndex > -1)
+            {
+                print($"Valid secondary gadget (Index {gadgetTwoIndex}) - spawning one for player {clientID}");
+            }
+            else
+            {
+                print($"No secondary gadget for player {clientID}");
+            }
+            if (specialIndex > -1)
+            {
+                print($"Valid specialisation (Index {specialIndex}) - spawning one for player {clientID}");
+            }
+            else
+            {
+                print($"No specialisation selected for player {clientID}");
+            }
+        }
+        void SpawnWeapon(ulong clientID, NetworkObject netPrefab)
+        {
+
         }
         void SetPlayerTeam(ulong clientID)
         {

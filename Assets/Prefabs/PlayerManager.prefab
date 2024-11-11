@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2433016922
+  GlobalObjectIdHash: 1638164249
   InScenePlacedSourceGlobalObjectIdHash: 3541034774
   DeferredDespawnTick: 0
   Ownership: 1
@@ -422,7 +422,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -313
   m_TargetDisplay: 0
 --- !u!114 &8033031024339011083
 MonoBehaviour:

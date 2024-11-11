@@ -21,6 +21,8 @@ namespace Opus
         public NetworkVariable<uint> assists = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> revives = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> supportPoints = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        public NetworkVariable<uint> combatPoints = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
 
         public Color myTeamColour;
         public Vector3 spawnPos;
@@ -30,6 +32,7 @@ namespace Opus
         public CanvasGroup gameplayUI, deadUI;
 
         public Button readyButton;
+        bool requestingSpawn = true;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -86,6 +89,7 @@ namespace Opus
             {
                 gameplayUI.alpha = 1;
             }
+            requestingSpawn = false;
         }
         public void ReadyUpPressed()
         {
@@ -96,6 +100,30 @@ namespace Opus
         {
             LivingPlayer = spawnedPlayer;
             LivingPlayer.transform.SetPositionAndRotation(spawnPos, spawnRot);
+        }
+        private void FixedUpdate()
+        {
+
+            if (!IsOwner)
+                return;
+            if(LivingPlayer != null)
+            {
+
+                if(LivingPlayer.transform.position.y < -20)
+                {
+                    if (!requestingSpawn)
+                    {
+                        MatchManager.Instance.RequestSpawn_RPC(OwnerClientId);
+                        requestingSpawn = true;
+                    }
+                    //The player has fallen out of bounds, we need to do something about this.
+                }
+                else
+                {
+                    if(requestingSpawn)
+                        requestingSpawn = false;
+                }
+            }
         }
     }
 }

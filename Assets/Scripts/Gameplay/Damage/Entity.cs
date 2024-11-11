@@ -1,0 +1,18 @@
+using Unity.Netcode;
+using UnityEngine;
+
+namespace Opus
+{
+    public class Entity : NetworkBehaviour
+    {
+        public virtual void ReceiveDamage(float damageIn)
+        {
+            print($"Received {damageIn} damage from empty source");
+        }
+
+        public virtual void ReceiveDamage(float damageIn, ulong sourceClientID)
+        {
+            print($"Received {damageIn} damage from client {sourceClientID}");
+        }
+    }
+}
