@@ -40,14 +40,33 @@ namespace Opus
         [Tooltip("ground normal y values less than this value will be unwalkable.")]
         public float walkableGroundThreshold;
         int ticksSinceJump;
+        int ticksSinceWallride;
         public int minJumpTicks;
+        public int minWallrideTicks;
         int ticksSinceGrounded;
         public float groundStickDistance;
         public Vector3 groundStickOffset;
         bool jumped;
+        public int jumpsAllowed;
+        int jumps;
         #endregion
 
+
+        Vector3 wallrideNormal;
+        public Vector3 wallrideBounds;
+        public Vector3 wallrideOffset;
+        public float wallrideCheckDistance;
+        public float wallrideFallForce;
+        public float wallrideMoveForce;
+        public float wallrideStickForce;
+        public float wallrideMaxTime;
+        public float wallrideTurnSpeed;
+        public float wallrideMaxDeviation;
+        float wallrideCurrentDeviation;
+        bool wallrideOnRight;
+        bool wallriding;
         public CinemachineCamera worldCineCam;
+        GUIContent content;
         #endregion
         public override void OnNetworkSpawn()
         {
@@ -79,7 +98,7 @@ namespace Opus
                     brain = Camera.main.AddComponent<CinemachineBrain>();
                     brain.UpdateMethod = CinemachineBrain.UpdateMethods.LateUpdate;
                 }
-
+                content = new(new Texture2D(32, 32));
             }
             else
             {
@@ -154,20 +173,26 @@ namespace Opus
                 CheckGround();
                 if (ticksSinceJump < minJumpTicks)
                     ticksSinceJump++;
+                if(ticksSinceWallride < minWallrideTicks)
+                    ticksSinceWallride++;
                 if (isGrounded || SnapToGround())
                 {
-
                     rb.linearDamping = groundDrag;
-                    if (jumpInput)
+                    if (wallriding)
                     {
-                        Jump();
+                        CancelWallride();
                     }
                 }
                 else
                 {
                     rb.linearDamping = airDrag;
                 }
+                if (jumpInput && jumps > 0)
+                {
+                    Jump();
+                }
                 MovePlayer();
+                rb.useGravity = !wallriding;
             }
         }
         void CheckGround()
@@ -180,6 +205,8 @@ namespace Opus
                     isGrounded = true && ticksSinceJump >= minJumpTicks;
                     if (hit.distance > (groundCheckDistance + groundCheckRadius))
                         SnapToGround();
+                    jumps = jumpsAllowed;
+
                     return;
                 }
             }
@@ -187,11 +214,28 @@ namespace Opus
             isGrounded = false; 
         }
 
+        private void OnGUI()
+        {
+            GUI.contentColor = wallriding ? Color.green : Color.red;
+            GUI.Box(new Rect(0, 0, 32, 32), content);
+            GUI.contentColor = wallrideOnRight ? Color.green : Color.red;
+            GUI.Box(new Rect(32, 0, 32, 32), content);
+            GUI.contentColor = ticksSinceJump >= minJumpTicks ? Color.green : Color.red;
+            GUI.Box(new Rect(64, 0, 32, 32), $"{ticksSinceJump}/{minJumpTicks}");
+            GUI.contentColor = ticksSinceWallride >= minWallrideTicks ? Color.green : Color.red;
+            GUI.Box(new Rect(96, 0, 32, 32), $"{ticksSinceWallride}/{minWallrideTicks}");
+            float speed = rb.linearVelocity.magnitude;
+            GUI.contentColor = Color.Lerp(Color.red, Color.green, speed / 100);
+            GUI.Box(new(0, 32, 64, 32), $"speed: {speed:0.0}");
+            GUI.Box(new(64, 32, 128, 32), $"{rb.linearVelocity:0.0}");
+            GUI.contentColor = Color.Lerp(Color.green, Color.red, Mathf.InverseLerp(0, wallrideMaxDeviation, Mathf.Abs(wallrideCurrentDeviation)));
+            GUI.Box(new(0, 64, 32, 32), $"{wallrideCurrentDeviation:0.0}");
+        }
+
         bool SnapToGround()
         {
             if (ticksSinceGrounded > 1 || ticksSinceJump < minJumpTicks)
                 return false;
-            Debug.DrawRay(transform.position, Vector3.down * groundStickDistance, Color.red, .25f);
             if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, groundStickDistance, groundLayermask, QueryTriggerInteraction.Ignore))
             {
                 if (hit.normal.y > walkableGroundThreshold)
@@ -205,34 +249,121 @@ namespace Opus
                     }
                     rb.linearVelocity = velocity;
                     rb.MovePosition(hit.point + groundStickOffset);
+                    isGrounded = true;
                     return true;
                 }
             }
             return false;
         }
+        Vector3 moveVec;
         void MovePlayer()
         {
-            Vector3 moveVec;
             if (isGrounded)
             {
                 Vector3 right = Vector3.Cross(-transform.forward, groundNormal);
                 Vector3 forward = Vector3.Cross(right, groundNormal);
-                Debug.DrawRay(transform.position, right, Color.red);
-                Debug.DrawRay(transform.position, forward, Color.blue);
-                Debug.DrawRay(transform.position, groundNormal, Color.green);
                 moveVec = groundMoveForce * ((right * moveInput.x) + (forward * moveInput.y));
                 rb.AddForce(Vector3.ProjectOnPlane(-Physics.gravity, groundNormal));
             }
             else
             {
-                moveVec = airMoveForce * ((transform.forward * moveInput.y) + (transform.right * moveInput.x));
+                if (WallrideCheck())
+                {
+                    DoWallride();
+                }
+                else
+                {
+                    moveVec = airMoveForce * ((transform.forward * moveInput.y) + (transform.right * moveInput.x));
+                }
             }
             rb.AddForce(moveVec, ForceMode.Acceleration);
+        }
+        bool WallrideCheck()
+        {
+            if (ticksSinceJump < minJumpTicks || ticksSinceWallride < minWallrideTicks)
+                return false;
+            if (WallrideBoxCast(out RaycastHit hit, false))
+            {
+                wallrideOnRight = true;
+                if (Vector3.Dot(hit.normal, -transform.right) > 0)
+                {
+                    wallriding = true;
+                    wallrideNormal = hit.normal;
+                    return true;
+                }
+            }
+            if(WallrideBoxCast(out hit, true))
+            {
+                wallrideOnRight = false;
+                if (Vector3.Dot(hit.normal, transform.right) > 0)
+                {
+                    wallriding = true;
+                    wallrideNormal = hit.normal;
+                    Debug.DrawRay(hit.point, hit.normal, Color.magenta);
+                    return true;
+                }
+            }
+            if (wallriding)
+            {
+                CancelWallride();
+            }
+            return false;
+        }
+        float currwallridetime;
+        float wallrideLerp;
+        Vector3 forwardVec;
+        void DoWallride()
+        {
+            if (currwallridetime < wallrideMaxTime)
+            {
+                jumps = jumpsAllowed;
+                wallrideLerp = Mathf.Clamp01(Mathf.InverseLerp(0, wallrideMaxTime, currwallridetime));
+                currwallridetime += Time.fixedDeltaTime;
+                rb.AddForce((wallrideFallForce * wallrideLerp * -transform.up) + (-wallrideNormal * wallrideStickForce), ForceMode.Acceleration);
+                forwardVec = Vector3.Cross(-wallrideNormal, wallrideOnRight ? transform.up : -transform.up);
+                transform.forward = Vector3.Lerp(transform.forward, forwardVec, wallrideTurnSpeed * Time.fixedDeltaTime);
+                if ((wallrideOnRight && moveInput.x < -0.1f) || (moveInput.x > 0.1f))
+                {
+                    CancelWallride();
+                }
+                moveVec = moveInput.y * wallrideMoveForce * Vector3.Cross(transform.right, transform.up);
+            }
+            else
+            {
+                CancelWallride();
+                ticksSinceWallride = 0;
+            }
+        }
+        bool WallrideBoxCast(out RaycastHit hit, bool leftSide = false)
+        {
+            Debug.DrawRay(transform.position, leftSide ? - transform.right : transform.right, Color.green, 0.1f);
+            return Physics.BoxCast(transform.TransformPoint(wallrideOffset), wallrideBounds / 2, leftSide ? -transform.right : transform.right, 
+                out hit, transform.rotation, wallrideCheckDistance, groundLayermask);
+        }
+        void CancelWallride()
+        {
+            Debug.Log("Cancelling wallride");
+            wallriding = false;
+            currwallridetime = 0;
+            wallrideNormal = Vector3.zero;
+            lookInput = new(0.00001f, 0.00001f);
+            ticksSinceJump = 0;
         }
         void Jump()
         {
             jumpInput = false;
-            rb.AddForce(transform.up * jumpForce, ForceMode.VelocityChange);
+            jumps--;
+            if (wallriding)
+            {
+                wallriding = false;
+                rb.AddForce((transform.up + (transform.right * (wallrideOnRight ? -1 : 1))) * jumpForce, ForceMode.VelocityChange);
+                ticksSinceWallride = minWallrideTicks;
+                CancelWallride();
+            }
+            else
+            {
+                rb.AddForce((transform.up * jumpForce) + (Vector3.up * -rb.linearVelocity.y), ForceMode.VelocityChange);
+            }
             ticksSinceJump = 0;
         }
         private void Update()
@@ -245,16 +376,25 @@ namespace Opus
             if(lookInput != Vector2.zero)
             {
                 aimAngle += lookInput * new Vector2(PlayerSettings.Instance.settingsContainer.mouseLookSpeedX, PlayerSettings.Instance.settingsContainer.mouseLookSpeedY) * Time.deltaTime;
-                aimAngle.x %= 360;
                 aimAngle.y = Mathf.Clamp(aimAngle.y, -85f, 85f);
+                if (wallriding && wallrideCurrentDeviation < wallrideMaxDeviation)
+                {
+                    wallrideCurrentDeviation += aimAngle.x;
+                }
+                else
+                {
+                    //Consume the current deviation and add it to the local rotation
+                    transform.localRotation = Quaternion.Euler(0, transform.localEulerAngles.y + aimAngle.x + wallrideCurrentDeviation, 0);
+                    wallrideCurrentDeviation = 0;
+                }
                 if (headTransform)
                 {
-                    headTransform.localRotation = Quaternion.Euler(-aimAngle.y, 0, 0);
+                    headTransform.localRotation = Quaternion.Euler(-aimAngle.y, wallriding ? wallrideCurrentDeviation : 0, 0);
                 }
-                transform.localRotation = Quaternion.Euler(0, aimAngle.x, 0);
             }
             aimDelta = oldAimAngle - aimAngle;
             aimDelta.x %= 360;
+            aimAngle.x = 0;
         }
 
         private void OnDrawGizmosSelected()
@@ -267,10 +407,15 @@ namespace Opus
 
             Gizmos.color = Color.yellow;
             Gizmos.DrawRay(Vector3.zero, Vector3.down * groundStickDistance);
+
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(wallrideOffset, wallrideBounds);
+            Gizmos.DrawWireCube(wallrideOffset + (Vector3.right * wallrideCheckDistance), wallrideBounds);
+            Gizmos.DrawWireCube(wallrideOffset - (Vector3.right * wallrideCheckDistance), wallrideBounds);
         }
         private void OnCollisionEnter(Collision collision)
         {
-            Debug.Log(collision.impulse);
+
         }
     }
 }
