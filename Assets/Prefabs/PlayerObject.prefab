@@ -1075,8 +1075,12 @@ MonoBehaviour:
   wallrideMoveForce: 15
   wallrideStickForce: 15
   wallrideMaxTime: 5
-  wallrideTurnSpeed: 60
+  wallrideTurnSpeed: 8
   wallrideMaxDeviation: 45
+  wallClimbBounds: {x: 0.22, y: 0.99, z: 0.28}
+  wallClimbDistance: 0.66
+  wallClimbForce: 8
+  wallClimbMaxTime: 1.2
   worldCineCam: {fileID: 2137123554432413254}
 --- !u!114 &3169015906510250101
 MonoBehaviour:
