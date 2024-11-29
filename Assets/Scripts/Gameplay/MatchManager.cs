@@ -16,6 +16,11 @@ namespace Opus
         public NetworkVariable<Dictionary<int, int>> teamScores = new(new(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         public SpawnpointHolder spawnpointHolder;
+
+        [Tooltip("The amount added to the mech readiness every tick. This is synchronised with the players every 10 seconds.")]
+        public float mechReadySpeed;
+        [Tooltip("The amount added to the mech's special readiness every tick. This is synchronised with the players every 10 seconds.")]
+        public float mechSpecialSpeed;
         public override void OnNetworkSpawn()
         {
             Instance = this;
@@ -165,6 +170,33 @@ namespace Opus
                     }
                 }
                 return smallestTeamIndex;
+            }
+        }
+        float specialSyncTime;
+        bool syncingSpecialTime;
+        private void FixedUpdate()
+        {
+            if (!IsHost && !IsServer)
+                return;
+
+            specialSyncTime += Time.fixedDeltaTime;
+            if(specialSyncTime > 10)
+            {
+                specialSyncTime = 0;
+            }
+            if(PlayerManager.playersByID.Count > 0)
+            {
+                foreach (KeyValuePair<ulong, PlayerManager> item in PlayerManager.playersByID)
+                {
+                    if (item.Value.specialPercentage.Value < 1)
+                    {
+                        item.Value.specialPercentage.Value += (item.Value.mechDeployed.Value ? mechSpecialSpeed : mechReadySpeed) * Time.fixedDeltaTime;
+                    }
+                    if (item.Value.specialPercentage.Value > 1)
+                    {
+                        item.Value.specialPercentage.Value = 1;
+                    }
+                }
             }
         }
     }

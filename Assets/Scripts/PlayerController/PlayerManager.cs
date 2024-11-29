@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +8,9 @@ namespace Opus
 {
     public class PlayerManager : NetworkBehaviour
     {
+        public delegate void OnSpawnReceived();
+        public OnSpawnReceived onSpawnReceived;
+
         public static Dictionary<ulong, PlayerManager> playersByID = new();
 
         public static uint MyTeam;
@@ -22,7 +24,10 @@ namespace Opus
         public NetworkVariable<uint> revives = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> supportPoints = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> combatPoints = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        public NetworkVariable<float> specialPercentage = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        public NetworkVariable<bool> mechDeployed = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+        public float specialPercentage_noSync;
 
         public Color myTeamColour;
         public Vector3 spawnPos;
@@ -39,15 +44,21 @@ namespace Opus
             teamIndex.OnValueChanged += UpdateTeamIndex;
             UpdateTeamIndex(0, teamIndex.Value);
             playersByID.TryAdd(OwnerClientId, this);
-            if (!IsOwner)
+            if (IsOwner)
             {
-                myUI.gameObject.SetActive(false);
+                MyTeam = teamIndex.Value;
+
+                specialPercentage.OnValueChanged += SpecialPercentageChanged;
             }
             else
             {
-                MyTeam = teamIndex.Value;
+                myUI.gameObject.SetActive(false);
             }
             UpdateAllPlayerColours();
+        }
+        void SpecialPercentageChanged(float previous, float current)
+        {
+            specialPercentage_noSync = current;
         }
         public override void OnNetworkDespawn()
         {
@@ -90,6 +101,8 @@ namespace Opus
                 gameplayUI.alpha = 1;
             }
             requestingSpawn = false;
+
+            onSpawnReceived?.Invoke();
         }
         public void ReadyUpPressed()
         {
@@ -123,6 +136,13 @@ namespace Opus
                     if(requestingSpawn)
                         requestingSpawn = false;
                 }
+            }
+            if (MatchManager.Instance != null)
+            {
+                if (specialPercentage_noSync < 1)
+                {
+                    specialPercentage_noSync += Time.fixedDeltaTime * (mechDeployed.Value ? MatchManager.Instance.mechSpecialSpeed : MatchManager.Instance.mechReadySpeed);
+                } 
             }
         }
     }

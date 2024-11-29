@@ -1,6 +1,5 @@
 using Unity.Cinemachine;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Opus
@@ -73,6 +72,7 @@ namespace Opus
         bool wallClimbing;
 
         public CinemachineCamera worldCineCam;
+        public PlayerHUD hud;
         GUIContent content;
         #endregion
         public override void OnNetworkSpawn()
@@ -102,10 +102,13 @@ namespace Opus
 
                 if(!Camera.main.TryGetComponent(out CinemachineBrain brain))
                 {
-                    brain = Camera.main.AddComponent<CinemachineBrain>();
+                    brain = Camera.main.gameObject.AddComponent<CinemachineBrain>();
                     brain.UpdateMethod = CinemachineBrain.UpdateMethods.LateUpdate;
                 }
                 content = new(new Texture2D(32, 32));
+
+                MyPlayerManager.onSpawnReceived += SpawnReceived;
+
             }
             else
             {
@@ -118,6 +121,23 @@ namespace Opus
                     item.enabled = false;
                 }
             }
+
+            if(hud != null)
+            {
+                if (IsOwner)
+                {
+                    hud.InitialiseHUD();
+                }
+                else
+                {
+                    hud.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        void SpawnReceived()
+        {
+            aimAngle.x = transform.eulerAngles.y;
         }
         #region Input Callbacks
         private void Crouch_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
@@ -388,6 +408,8 @@ namespace Opus
             currwallridetime = 0;
             wallrideNormal = Vector3.zero;
             lookInput = new(0.00001f, 0.00001f);
+            aimAngle.x = transform.eulerAngles.y + wallrideCurrentDeviation;
+            wallrideCurrentDeviation = 0;
             ticksSinceJump = 0;
         }
         void Jump()
@@ -418,16 +440,18 @@ namespace Opus
             oldAimAngle = aimAngle;
             if(lookInput != Vector2.zero)
             {
-                aimAngle += lookInput * new Vector2(PlayerSettings.Instance.settingsContainer.mouseLookSpeedX, PlayerSettings.Instance.settingsContainer.mouseLookSpeedY) * Time.deltaTime;
-                aimAngle.y = Mathf.Clamp(aimAngle.y, -85f, 85f);
+
                 if (wallriding && wallrideCurrentDeviation < wallrideMaxDeviation)
                 {
-                    wallrideCurrentDeviation += aimAngle.x;
+                    wallrideCurrentDeviation += lookInput.x * PlayerSettings.Instance.settingsContainer.mouseLookSpeedX * Time.deltaTime;
+                    aimAngle.y += lookInput.y * PlayerSettings.Instance.settingsContainer.mouseLookSpeedY * Time.deltaTime;
                 }
                 else
                 {
                     //Consume the current deviation and add it to the local rotation
-                    transform.localRotation = Quaternion.Euler(0, transform.localEulerAngles.y + aimAngle.x + wallrideCurrentDeviation, 0);
+                    transform.localRotation = Quaternion.Euler(0, aimAngle.x + wallrideCurrentDeviation, 0);
+                    aimAngle += lookInput * new Vector2(PlayerSettings.Instance.settingsContainer.mouseLookSpeedX, PlayerSettings.Instance.settingsContainer.mouseLookSpeedY) * Time.deltaTime;
+                    aimAngle.y = Mathf.Clamp(aimAngle.y, -85f, 85f);
                     wallrideCurrentDeviation = 0;
                 }
                 if (headTransform)
@@ -437,7 +461,6 @@ namespace Opus
             }
             aimDelta = oldAimAngle - aimAngle;
             aimDelta.x %= 360;
-            aimAngle.x = 0;
         }
 
         private void OnDrawGizmosSelected()
