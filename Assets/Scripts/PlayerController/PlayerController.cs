@@ -4,12 +4,11 @@ using UnityEngine;
 
 namespace Opus
 {
-    public class PlayerController : NetworkBehaviour
+    public class PlayerController : HealthyEntity
     {
         #region Definitions
         public PlayerManager MyPlayerManager;
-        public Renderer[] renderers;
-        public Renderer[] hideOnHostRenderers;
+
         public Outline outlineComponent;
 
         public ControlScheme controls;
@@ -23,6 +22,8 @@ namespace Opus
         public Vector2 aimDelta;
 
         public Transform headTransform;
+
+
 
         public float groundMoveForce, airMoveForce, jumpForce;
         public float groundDrag, airDrag;
@@ -74,6 +75,7 @@ namespace Opus
         public CinemachineCamera worldCineCam;
         public PlayerHUD hud;
         GUIContent content;
+        public CharacterRenderable characterRender;
         #endregion
         public override void OnNetworkSpawn()
         {
@@ -114,13 +116,7 @@ namespace Opus
             {
                 worldCineCam.enabled = false;
             }
-            foreach (var item in hideOnHostRenderers)
-            {
-                if (item != null)
-                {
-                    item.enabled = false;
-                }
-            }
+
 
             if(hud != null)
             {
@@ -132,6 +128,11 @@ namespace Opus
                 {
                     hud.gameObject.SetActive(false);
                 }
+            }
+
+            if(TryGetComponent(out characterRender))
+            {
+                characterRender.InitialiseViewable(this);
             }
         }
 
@@ -168,28 +169,7 @@ namespace Opus
             Debug.Log($"Updating client {NetworkManager.LocalClientId}'s perception of this object, on team {MyPlayerManager.teamIndex.Value}", gameObject);
             if (MyPlayerManager)
             {
-                if (outlineComponent)
-                {
-                    if(!IsOwner)
-                    {
-                        if(MyPlayerManager.teamIndex.Value != PlayerManager.MyTeam)
-                        {
-                            outlineComponent.enabled = true;
-                            outlineComponent.OutlineMode = Outline.Mode.OutlineVisible;
-                        }
-                        else
-                        {
-                            outlineComponent.enabled = true;
-                            outlineComponent.OutlineMode = Outline.Mode.OutlineAll;
-                            outlineComponent.OutlineColor = MyPlayerManager.myTeamColour;
-                        }
-                    }
-                }
-                foreach (Renderer renderer in renderers)
-                {
-                    if(renderer != null && renderer.enabled)
-                        renderer.material.color = MyPlayerManager.myTeamColour;
-                }
+                
                 MyPlayerManager.SetPlayerOnSpawn(this);
             }
         }

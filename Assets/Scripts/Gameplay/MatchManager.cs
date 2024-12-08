@@ -180,21 +180,28 @@ namespace Opus
                 return;
 
             specialSyncTime += Time.fixedDeltaTime;
-            if(specialSyncTime > 10)
+            if (specialSyncTime > 10)
             {
                 specialSyncTime = 0;
+                syncingSpecialTime = true;
             }
+            else
+                syncingSpecialTime = false;
             if(PlayerManager.playersByID.Count > 0)
             {
                 foreach (KeyValuePair<ulong, PlayerManager> item in PlayerManager.playersByID)
                 {
-                    if (item.Value.specialPercentage.Value < 1)
+                    if (item.Value.specialPercentage_noSync < 1)
                     {
-                        item.Value.specialPercentage.Value += (item.Value.mechDeployed.Value ? mechSpecialSpeed : mechReadySpeed) * Time.fixedDeltaTime;
+                        item.Value.specialPercentage_noSync += (item.Value.mechDeployed.Value ? mechSpecialSpeed : mechReadySpeed) * Time.fixedDeltaTime;
                     }
-                    if (item.Value.specialPercentage.Value > 1)
+                    if (item.Value.specialPercentage_noSync > 1)
                     {
-                        item.Value.specialPercentage.Value = 1;
+                        item.Value.specialPercentage_noSync = 1;
+                    }
+                    if (syncingSpecialTime)
+                    {
+                        item.Value.specialPercentage.Value = item.Value.specialPercentage_noSync;
                     }
                 }
             }

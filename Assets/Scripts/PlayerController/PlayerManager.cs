@@ -137,11 +137,13 @@ namespace Opus
                         requestingSpawn = false;
                 }
             }
-            if (MatchManager.Instance != null)
+            //We don't want to execute this if we are the host, as we already do this maths on the game manager.
+            if (MatchManager.Instance != null && !IsHost)
             {
                 if (specialPercentage_noSync < 1)
                 {
                     specialPercentage_noSync += Time.fixedDeltaTime * (mechDeployed.Value ? MatchManager.Instance.mechSpecialSpeed : MatchManager.Instance.mechReadySpeed);
+                    specialPercentage_noSync = Mathf.Clamp01(specialPercentage_noSync);
                 } 
             }
         }
