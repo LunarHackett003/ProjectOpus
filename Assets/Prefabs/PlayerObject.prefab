@@ -1096,7 +1096,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2393250272
+  GlobalObjectIdHash: 2017441141
   InScenePlacedSourceGlobalObjectIdHash: 2017441141
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1170,13 +1170,29 @@ MonoBehaviour:
   lookInput: {x: 0, y: 0}
   jumpInput: 0
   crouchInput: 0
+  sprintInput: 0
   aimAngle: {x: 0, y: 0}
   oldAimAngle: {x: 0, y: 0}
   aimDelta: {x: 0, y: 0}
   headTransform: {fileID: 8574904564153925361}
+  weaponOffset: {fileID: 7552879174924872816}
+  lookSwayPosScale: {x: 0.01, y: 0.01, z: 0}
+  lookSwayEulerScale: {x: -2, y: 1, z: -1}
+  lookSwayPosDampTime: 0.13
+  lookSwayEulerDampTime: 0.13
+  maxLookSwayPos: 0.034
+  maxLookSwayEuler: 5
+  moveSwayPosScale: {x: 0.01, y: 0.01, z: 0}
+  moveSwayEulerScale: {x: -1, y: -2, z: 0}
+  moveSwayPosDampTime: 0.2
+  moveSwayEulerDampTime: 0.1
+  maxMoveSwayPos: 0.05
+  maxMoveSwayEuler: 5
+  verticalVelocitySwayScale: -0.003
   groundMoveForce: 25
   airMoveForce: 2
   jumpForce: 5
+  sprintMultiplier: 2
   groundDrag: 4
   airDrag: 0.1
   isGrounded: 0
@@ -1208,6 +1224,7 @@ MonoBehaviour:
   wallClimbMaxTime: 1.2
   worldCineCam: {fileID: 8362311783344848850}
   hud: {fileID: 6174855310269554075}
+  characterRender: {fileID: 0}
 --- !u!114 &3169015906510250101
 MonoBehaviour:
   m_ObjectHideFlags: 0

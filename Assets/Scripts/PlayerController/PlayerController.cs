@@ -1,6 +1,7 @@
 using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Opus
 {
@@ -18,14 +19,27 @@ namespace Opus
         public Vector2 moveInput, lookInput;
         public bool jumpInput;
         public bool crouchInput;
+        public bool sprintInput;
         public Vector2 aimAngle, oldAimAngle;
         public Vector2 aimDelta;
 
         public Transform headTransform;
+        public Transform weaponOffset;
 
+        Vector3 lookSwayPos, lookSwayEuler, v_lookswaypos, v_lookswayeuler;
+        //Sway and rotation based on movement
+        Vector3 moveSwayPos, moveSwayEuler, v_moveswaypos, v_moveswayeuler;
+        Quaternion swayInitialRotation;
+        public Vector3 lookSwayPosScale, lookSwayEulerScale;
+        public float lookSwayPosDampTime, lookSwayEulerDampTime, maxLookSwayPos, maxLookSwayEuler;
 
+        public Vector3 moveSwayPosScale, moveSwayEulerScale;
+        public float moveSwayPosDampTime, moveSwayEulerDampTime, maxMoveSwayPos, maxMoveSwayEuler;
 
-        public float groundMoveForce, airMoveForce, jumpForce;
+        //Sway and rotation based on vertical velocity
+        public float verticalVelocitySwayScale;
+
+        public float groundMoveForce, airMoveForce, jumpForce, sprintMultiplier;
         public float groundDrag, airDrag;
         #region Ground Checking
         public bool isGrounded;
@@ -100,6 +114,9 @@ namespace Opus
 
                 controls.Player.Crouch.performed += Crouch_performed;
                 controls.Player.Crouch.canceled += Crouch_performed;
+
+                controls.Player.Sprint.performed += Sprint_performed;
+                controls.Player.Sprint.canceled += Sprint_performed;
                 controls.Enable();
 
                 if(!Camera.main.TryGetComponent(out CinemachineBrain brain))
@@ -134,29 +151,37 @@ namespace Opus
             {
                 characterRender.InitialiseViewable(this);
             }
+            swayInitialRotation = weaponOffset.localRotation;
         }
+
 
         void SpawnReceived()
         {
             aimAngle.x = transform.eulerAngles.y;
         }
+
+
         #region Input Callbacks
-        private void Crouch_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+        private void Sprint_performed(InputAction.CallbackContext obj)
+        {
+            sprintInput = obj.ReadValueAsButton();
+        }
+        private void Crouch_performed(InputAction.CallbackContext obj)
         {
             crouchInput = obj.ReadValueAsButton();
         }
 
-        private void Jump_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+        private void Jump_performed(InputAction.CallbackContext obj)
         {
             jumpInput = obj.ReadValueAsButton();
         }
 
-        private void Look_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+        private void Look_performed(InputAction.CallbackContext obj)
         {
             lookInput = obj.ReadValue<Vector2>();
         }
 
-        private void Move_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+        private void Move_performed(InputAction.CallbackContext obj)
         {
             moveInput = obj.ReadValue<Vector2>();
         }
@@ -272,7 +297,7 @@ namespace Opus
             {
                 Vector3 right = Vector3.Cross(-transform.forward, groundNormal);
                 Vector3 forward = Vector3.Cross(right, groundNormal);
-                moveVec = groundMoveForce * ((right * moveInput.x) + (forward * moveInput.y));
+                moveVec = groundMoveForce * (sprintInput ? sprintMultiplier : 1) * ((right * moveInput.x) + (forward * moveInput.y));
                 rb.AddForce(Vector3.ProjectOnPlane(-Physics.gravity, groundNormal));
             }
             else
@@ -441,6 +466,28 @@ namespace Opus
             }
             aimDelta = oldAimAngle - aimAngle;
             aimDelta.x %= 360;
+            aimAngle.x %= 360;
+
+            UpdateSway();
+        }
+        void UpdateSway()
+        {
+            lookSwayPos = Vector3.SmoothDamp(lookSwayPos, 
+                new Vector3(aimDelta.x * lookSwayPosScale.x, aimDelta.y * lookSwayPosScale.y).ClampMagnitude(maxLookSwayPos),
+                ref v_lookswaypos, lookSwayPosDampTime);
+            lookSwayEuler = Vector3.SmoothDamp(lookSwayEuler, 
+                new Vector3(aimDelta.y * lookSwayEulerScale.x, aimDelta.x * lookSwayEulerScale.y, aimDelta.x * lookSwayEulerScale.z).ClampMagnitude(maxLookSwayEuler), 
+                ref v_lookswayeuler, lookSwayEulerDampTime);
+
+            moveSwayPos = Vector3.SmoothDamp(moveSwayPos, 
+                new Vector3(moveInput.x * moveSwayPosScale.x, rb.linearVelocity.y * verticalVelocitySwayScale, moveInput.y * moveSwayPosScale.y).ClampMagnitude(maxMoveSwayPos), 
+                ref v_moveswaypos, moveSwayPosDampTime);
+            moveSwayEuler = Vector3.SmoothDamp(moveSwayEuler, 
+                new Vector3(0, moveInput.x * moveSwayEulerScale.y, moveInput.x * moveSwayEuler.z).ClampMagnitude(maxMoveSwayEuler), 
+                ref v_moveswayeuler, moveSwayEulerDampTime);
+
+
+            weaponOffset.SetLocalPositionAndRotation(lookSwayPos + moveSwayPos, swayInitialRotation * Quaternion.Euler(lookSwayEuler + moveSwayEuler));
         }
 
         private void OnDrawGizmosSelected()
