@@ -58,13 +58,13 @@ namespace Opus
                 (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint();
 
                 p.LivingPlayer.transform.SetPositionAndRotation(pos, rot);
-                SpawnWeaponsForPlayer(clientID, primaryWeaponIndex, secondaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, specialIndex);
+                SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, secondaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, specialIndex);
 
 
                 p.SpawnPlayer_RPC();
             }
         }
-        void SpawnWeaponsForPlayer(ulong clientID, int primaryWeaponIndex = -1, int secondaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int specialIndex = -1)
+        void SpawnWeaponsForPlayer(ulong clientID, PlayerManager p, int primaryWeaponIndex = -1, int secondaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int specialIndex = -1)
         {
             if (primaryWeaponIndex > -1)
             {
@@ -107,9 +107,9 @@ namespace Opus
                 print($"No specialisation selected for player {clientID}");
             }
         }
-        void SpawnWeapon(ulong clientID, NetworkObject netPrefab)
+        void SpawnWeapon(ulong clientID, NetworkObject netPrefab, Slot weaponSlot)
         {
-
+            netPrefab = NetworkManager.SpawnManager.InstantiateAndSpawn(netPrefab, clientID, false, false, false, Vector3.zero, Quaternion.identity);
         }
         void SetPlayerTeam(ulong clientID)
         {

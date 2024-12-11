@@ -20,6 +20,8 @@ namespace Opus
         public bool jumpInput;
         public bool crouchInput;
         public bool sprintInput;
+        public bool fireInput;
+        public bool secondaryInput;
         public Vector2 aimAngle, oldAimAngle;
         public Vector2 aimDelta;
 
@@ -37,7 +39,9 @@ namespace Opus
         public float moveSwayPosDampTime, moveSwayEulerDampTime, maxMoveSwayPos, maxMoveSwayEuler;
 
         //Sway and rotation based on vertical velocity
-        public float verticalVelocitySwayScale;
+        public float verticalVelocitySwayScale, verticalVelocityEulerScale, verticalVelocitySwayPosTime, verticalVelocitySwayEulerTime, verticalVelocityPosClamp, verticalVelocityEulerClamp;
+        float v_verticalvelocityswaypos, v_verticalvelocityswayeuler;
+        float verticalVelocitySwayPos, verticalVelocitySwayEuler;
 
         public float groundMoveForce, airMoveForce, jumpForce, sprintMultiplier;
         public float groundDrag, airDrag;
@@ -90,6 +94,9 @@ namespace Opus
         public PlayerHUD hud;
         GUIContent content;
         public CharacterRenderable characterRender;
+
+
+        public bool canWallrun;
         #endregion
         public override void OnNetworkSpawn()
         {
@@ -117,6 +124,12 @@ namespace Opus
 
                 controls.Player.Sprint.performed += Sprint_performed;
                 controls.Player.Sprint.canceled += Sprint_performed;
+
+                controls.Player.Fire.performed += Fire_performed;
+                controls.Player.Fire.canceled += Fire_performed;
+
+                controls.Player.SecondaryInput.performed += SecondaryInput_performed;
+                controls.Player.SecondaryInput.canceled += SecondaryInput_performed;
                 controls.Enable();
 
                 if(!Camera.main.TryGetComponent(out CinemachineBrain brain))
@@ -184,6 +197,15 @@ namespace Opus
         private void Move_performed(InputAction.CallbackContext obj)
         {
             moveInput = obj.ReadValue<Vector2>();
+        }
+        private void SecondaryInput_performed(InputAction.CallbackContext obj)
+        {
+            secondaryInput = obj.ReadValueAsButton();
+        }
+
+        private void Fire_performed(InputAction.CallbackContext obj)
+        {
+            fireInput = obj.ReadValueAsButton();
         }
         #endregion
         /// <summary>
@@ -302,7 +324,7 @@ namespace Opus
             }
             else
             {
-                if (WallrideCheck())
+                if (canWallrun && WallrideCheck())
                 {
                     DoWallride();
                 }
@@ -470,8 +492,15 @@ namespace Opus
 
             UpdateSway();
         }
-        void UpdateSway()
+        void UpdateSway()                                                                                                                                                                                                                                    //Fish was here 8----D
         {
+            verticalVelocitySwayPos = Mathf.SmoothDamp(verticalVelocitySwayPos, rb.linearVelocity.y * verticalVelocitySwayScale, 
+                ref v_verticalvelocityswaypos, verticalVelocitySwayPosTime).Clamp(-verticalVelocityPosClamp, verticalVelocityPosClamp);
+            verticalVelocitySwayEuler = Mathf.SmoothDampAngle(verticalVelocitySwayEuler, (rb.linearVelocity.y * verticalVelocityEulerScale).Clamp(-verticalVelocityEulerClamp, verticalVelocityEulerClamp), 
+                ref v_verticalvelocityswayeuler, verticalVelocitySwayEulerTime);
+
+
+
             lookSwayPos = Vector3.SmoothDamp(lookSwayPos, 
                 new Vector3(aimDelta.x * lookSwayPosScale.x, aimDelta.y * lookSwayPosScale.y).ClampMagnitude(maxLookSwayPos),
                 ref v_lookswaypos, lookSwayPosDampTime);
@@ -480,14 +509,15 @@ namespace Opus
                 ref v_lookswayeuler, lookSwayEulerDampTime);
 
             moveSwayPos = Vector3.SmoothDamp(moveSwayPos, 
-                new Vector3(moveInput.x * moveSwayPosScale.x, rb.linearVelocity.y * verticalVelocitySwayScale, moveInput.y * moveSwayPosScale.y).ClampMagnitude(maxMoveSwayPos), 
+                new Vector3(moveInput.x * moveSwayPosScale.x, 0, moveInput.y * moveSwayPosScale.y).ClampMagnitude(maxMoveSwayPos), 
                 ref v_moveswaypos, moveSwayPosDampTime);
             moveSwayEuler = Vector3.SmoothDamp(moveSwayEuler, 
                 new Vector3(0, moveInput.x * moveSwayEulerScale.y, moveInput.x * moveSwayEuler.z).ClampMagnitude(maxMoveSwayEuler), 
                 ref v_moveswayeuler, moveSwayEulerDampTime);
 
 
-            weaponOffset.SetLocalPositionAndRotation(lookSwayPos + moveSwayPos, swayInitialRotation * Quaternion.Euler(lookSwayEuler + moveSwayEuler));
+            weaponOffset.SetLocalPositionAndRotation(lookSwayPos + moveSwayPos + new Vector3(0, verticalVelocitySwayPos, 0),
+                swayInitialRotation * Quaternion.Euler(lookSwayEuler + moveSwayEuler + new Vector3(verticalVelocitySwayEuler, 0, 0)));
         }
 
         private void OnDrawGizmosSelected()
