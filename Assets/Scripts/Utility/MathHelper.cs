@@ -12,5 +12,19 @@ namespace Opus
         {
             return Mathf.Clamp(f, min, max);
         }
+        public static Vector3 ScaleReturn(this Vector3 vec, Vector3 scale)
+        {
+            return new(vec.x * scale.x, vec.y * scale.y, vec.z * scale.z);
+        }
+    }
+
+    [System.Serializable]
+    public struct VectorAnimationCurve
+    {
+        public AnimationCurve x, y, z;
+        public readonly Vector3 Evaluate(float t)
+        {
+            return new(x.Evaluate(t), y.Evaluate(t), z.Evaluate(t));
+        }
     }
 }

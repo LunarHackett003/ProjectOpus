@@ -2,6 +2,7 @@ using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering.Universal;
 
 namespace Opus
 {
@@ -91,10 +92,12 @@ namespace Opus
         bool wallClimbing;
 
         public CinemachineCamera worldCineCam;
+        public CinemachineCamera viewCineCam;
+        public Camera viewmodelCamera;
         public PlayerHUD hud;
         GUIContent content;
         public CharacterRenderable characterRender;
-
+        WeaponController wc;
 
         public bool canWallrun;
         #endregion
@@ -140,11 +143,14 @@ namespace Opus
                 content = new(new Texture2D(32, 32));
 
                 MyPlayerManager.onSpawnReceived += SpawnReceived;
-
+                Camera.main.GetUniversalAdditionalCameraData().cameraStack.Add(viewmodelCamera);
+                Camera.main.GetUniversalAdditionalCameraData().renderPostProcessing = false;
             }
             else
             {
                 worldCineCam.enabled = false;
+                viewCineCam.enabled = false;
+                viewmodelCamera.enabled = false;
             }
 
 
@@ -165,6 +171,8 @@ namespace Opus
                 characterRender.InitialiseViewable(this);
             }
             swayInitialRotation = weaponOffset.localRotation;
+
+            wc = GetComponent<WeaponController>();
         }
 
 
@@ -516,8 +524,8 @@ namespace Opus
                 ref v_moveswayeuler, moveSwayEulerDampTime);
 
 
-            weaponOffset.SetLocalPositionAndRotation(lookSwayPos + moveSwayPos + new Vector3(0, verticalVelocitySwayPos, 0),
-                swayInitialRotation * Quaternion.Euler(lookSwayEuler + moveSwayEuler + new Vector3(verticalVelocitySwayEuler, 0, 0)));
+            weaponOffset.SetLocalPositionAndRotation(lookSwayPos + moveSwayPos + new Vector3(0, verticalVelocitySwayPos, 0) + (wc != null ? wc.linearMoveBob : Vector3.zero),
+                swayInitialRotation * Quaternion.Euler(lookSwayEuler + moveSwayEuler + new Vector3(verticalVelocitySwayEuler, 0, 0) + (wc != null ? wc.angularMoveBob : Vector3.zero)));
         }
 
         private void OnDrawGizmosSelected()

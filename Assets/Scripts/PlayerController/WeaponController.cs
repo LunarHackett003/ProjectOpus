@@ -27,6 +27,10 @@ namespace Opus
         public NetworkVariable<NetworkBehaviourReference> specialRef = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
 
+
+        public Vector3 linearMoveBob, angularMoveBob;
+        float moveBobTime, dampedMove, vdampedmove, swaytime;
+
         public ClientNetworkAnimator networkAnimator;
         void SetUpWeaponSlot(Slot slot, BaseEquipment be)
         {
@@ -50,6 +54,8 @@ namespace Opus
                 default:
                     break;
             }
+            be.myController = this;
+            be.cr.InitialiseViewable(pc);
         }
         public override void OnNetworkSpawn()
         {
@@ -67,7 +73,7 @@ namespace Opus
 
             if (weapon)
             {
-                weapon.myController = this;
+                SetUpWeaponSlot(Slot.primary, weapon);
             }
 
             if(weaponRef.Value.TryGet(out BaseEquipment e))
@@ -122,31 +128,41 @@ namespace Opus
         {
             if(weapon != null)
             {
-                SetInputs(weapon, Slot.primary);
+                UpdateActiveEquipment(weapon, Slot.primary);
             }
             if(gadget1 != null)
             {
-                SetInputs(gadget1, Slot.gadget1);
+                UpdateActiveEquipment(gadget1, Slot.gadget1);
             }
             if(gadget2 != null)
             {
-                SetInputs(gadget2, Slot.gadget2);
+                UpdateActiveEquipment(gadget2, Slot.gadget2);
             }
             if(gadget3 != null)
             {
-                SetInputs(gadget3, Slot.gadget3);
+                UpdateActiveEquipment(gadget3, Slot.gadget3);
             }
             if(special != null)
             {
-                SetInputs(special, Slot.special);
+                UpdateActiveEquipment(special, Slot.special);
             }
         }
-        void SetInputs(BaseEquipment be, Slot slot)
+        void UpdateActiveEquipment(BaseEquipment be, Slot slot)
         {
-            if(be != null)
+            if (be != null)
             {
                 be.fireInput = pc.fireInput && currentSlot == slot;
                 be.secondaryInput = pc.secondaryInput && currentSlot == slot;
+                if (slot == currentSlot)
+                {
+                    dampedMove = Mathf.SmoothDamp(dampedMove, pc.moveInput.sqrMagnitude * (pc.isGrounded ? 1 : 0)
+                        * (pc.sprintInput ? be.swayContainer.sprintMultiplier : 1)
+                        * (pc.crouchInput ? .5f : 1), ref vdampedmove, pc.moveSwayPosDampTime);
+                    swaytime += (dampedMove * Time.fixedDeltaTime * be.swayContainer.speed);
+                    moveBobTime = (swaytime % 1f) ;
+                    linearMoveBob = be.swayContainer.linearMoveBob.Evaluate(moveBobTime).ScaleReturn(be.swayContainer.linearMoveScale) * dampedMove;
+                    angularMoveBob = be.swayContainer.angularMoveBob.Evaluate(moveBobTime).ScaleReturn(be.swayContainer.angularMoveScale) * dampedMove;
+                }
             }
         }
         public void ReceiveShot()

@@ -7,7 +7,10 @@ namespace Opus
     public class CharacterRenderable : NetworkBehaviour
     {
         public Renderer[] renderers;
+        public Renderer[] viewmodelRenderer;
         public Renderer[] hideOnHostRenderers;
+        
+        public int localRender;
 
         PlayerManager owningPlayer;
 
@@ -29,6 +32,14 @@ namespace Opus
             {
                 if (renderer != null && renderer.enabled)
                     renderer.material.color = owningPlayer.myTeamColour;
+            }
+            if (IsOwner)
+            {
+                foreach (var item in viewmodelRenderer)
+                {
+                    print("Changed layer for local renderer");
+                    item.gameObject.layer = localRender;
+                }
             }
 
             if (fromThis.outlineComponent)

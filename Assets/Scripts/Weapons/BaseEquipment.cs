@@ -8,6 +8,10 @@ namespace Opus
         public bool fireInput;
         public bool secondaryInput;
 
+        public SwayContainerSO swayContainer;
+
         public WeaponController myController;
+
+        public CharacterRenderable cr;
     }
 }

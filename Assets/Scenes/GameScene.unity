@@ -6809,7 +6809,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1759405757}
+  m_Mesh: {fileID: 375580580}
 --- !u!33 &345089000
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -8722,7 +8722,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2097079
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -8750,7 +8750,7 @@ MonoBehaviour:
   ShowCameraFrustum: 1
   IgnoreTimeScale: 0
   WorldUpOverride: {fileID: 0}
-  ChannelMask: -1
+  ChannelMask: 1
   UpdateMethod: 1
   BlendUpdateMethod: 1
   LensModeOverride:
@@ -14279,7 +14279,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 178518563}
+  m_Mesh: {fileID: 2019449205}
 --- !u!33 &643952386
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -33955,7 +33955,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 2019449205}
+  m_Mesh: {fileID: 117878638}
 --- !u!33 &1242690186
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -42597,7 +42597,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1404116547}
+  m_Mesh: {fileID: 1759405757}
 --- !u!33 &1383046257
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -44774,7 +44774,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 117878638}
+  m_Mesh: {fileID: 1404116547}
 --- !u!33 &1553920444
 MeshFilter:
   m_ObjectHideFlags: 10
