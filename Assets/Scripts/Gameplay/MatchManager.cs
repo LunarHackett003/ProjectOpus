@@ -17,6 +17,10 @@ namespace Opus
 
         public SpawnpointHolder spawnpointHolder;
 
+        public EquipmentList weapons;
+        public EquipmentList gadgets;
+
+
         [Tooltip("The amount added to the mech readiness every tick. This is synchronised with the players every 10 seconds.")]
         public float mechReadySpeed;
         [Tooltip("The amount added to the mech's special readiness every tick. This is synchronised with the players every 10 seconds.")]
@@ -47,7 +51,7 @@ namespace Opus
             }
         }
         [Rpc(SendTo.Server)]
-        public void RequestSpawn_RPC(ulong clientID, int primaryWeaponIndex = -1, int secondaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int specialIndex = -1)
+        public void RequestSpawn_RPC(ulong clientID, int primaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int gadgetThreeIndex = -1, int specialIndex = -1)
         {
             if (PlayerManager.playersByID.TryGetValue(clientID, out PlayerManager p))
             {
@@ -58,58 +62,86 @@ namespace Opus
                 (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint();
 
                 p.LivingPlayer.transform.SetPositionAndRotation(pos, rot);
-                SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, secondaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, specialIndex);
+                SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, gadgetThreeIndex, specialIndex);
 
 
                 p.SpawnPlayer_RPC();
             }
         }
-        void SpawnWeaponsForPlayer(ulong clientID, PlayerManager p, int primaryWeaponIndex = -1, int secondaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int specialIndex = -1)
+        void SpawnWeaponsForPlayer(ulong clientID, PlayerManager p, int primaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int gadgetThreeIndex = -1, int specialIndex = -1)
         {
-            if (primaryWeaponIndex > -1)
+            if (primaryWeaponIndex > -1 && primaryWeaponIndex < weapons.equipment.Length)
             {
                 print($"Valid primary weapon (Index {primaryWeaponIndex}) - spawning one for player {clientID}");
+                if(p.LivingPlayer != null)
+                {
+                    p.LivingPlayer.wc.weaponRef.Value = SpawnWeapon(clientID, weapons.equipment[primaryWeaponIndex].equipmentPrefab, Slot.primary);
+                }
             }
             else
             {
                 print($"No primary weapon selected for player {clientID}");
             }
-            if (secondaryWeaponIndex > -1)
+            if (gadgetThreeIndex > -1 && gadgetThreeIndex < gadgets.equipment.Length)
             {
-                print($"Valid secondary weapon (Index {secondaryWeaponIndex}) - spawning one for player {clientID}");
+                print($"Valid tertiary gadget (Index {gadgetThreeIndex}) - spawning one for player {clientID}");
+                if (p.LivingPlayer != null)
+                {
+                    p.LivingPlayer.wc.gadget3Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetThreeIndex].equipmentPrefab, Slot.gadget3);
+                }
             }
             else
             {
                 print($"No secondary weapon selected for player {clientID}");
             }
-            if (gadgetOneIndex > -1)
+            if (gadgetOneIndex > -1 && gadgetOneIndex < gadgets.equipment.Length)
             {
                 print($"Valid primary gadget (Index {gadgetOneIndex}) - spawning one for player {clientID}");
+                if (p.LivingPlayer != null)
+                {
+                    p.LivingPlayer.wc.gadget1Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetOneIndex].equipmentPrefab, Slot.gadget1);
+                }
             }
             else
             {
                 print($"No primary gadget selected for player {clientID}");
             }
-            if (gadgetTwoIndex > -1)
+            if (gadgetTwoIndex > -1 && gadgetTwoIndex < gadgets.equipment.Length)
             {
                 print($"Valid secondary gadget (Index {gadgetTwoIndex}) - spawning one for player {clientID}");
+                if (p.LivingPlayer != null)
+                {
+                    p.LivingPlayer.wc.gadget2Ref.Value = SpawnWeapon(clientID, weapons.equipment[gadgetTwoIndex].equipmentPrefab, Slot.gadget2);
+                }
             }
             else
             {
                 print($"No secondary gadget for player {clientID}");
             }
-            if (specialIndex > -1)
+            if (specialIndex > -1 && specialIndex < gadgets.equipment.Length)
             {
                 print($"Valid specialisation (Index {specialIndex}) - spawning one for player {clientID}");
+                if (p.LivingPlayer != null)
+                {
+                    p.LivingPlayer.wc.specialRef.Value = SpawnWeapon(clientID, gadgets.equipment[specialIndex].equipmentPrefab, Slot.special);
+                }
             }
             else
             {
                 print($"No specialisation selected for player {clientID}");
             }
         }
-        void SpawnWeapon(ulong clientID, NetworkObject netPrefab, Slot weaponSlot)
+        BaseEquipment SpawnWeapon(ulong clientID, NetworkObject netPrefab, Slot weaponSlot)
         {
             netPrefab = NetworkManager.SpawnManager.InstantiateAndSpawn(netPrefab, clientID, false, false, false, Vector3.zero, Quaternion.identity);
+            if (netPrefab.TryGetComponent(out BaseEquipment be))
+            {
+                return be;
+            }
+            else
+            {
+                return null;
+            }
         }
         void SetPlayerTeam(ulong clientID)
         {

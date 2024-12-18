@@ -224,4 +224,4 @@ MonoBehaviour:
   linearMoveScale: {x: -0.01, y: -0.005, z: 0}
   angularMoveScale: {x: 8, y: 1, z: -1}
   speed: 1
-  sprintMultiplier: 2
+  sprintMultiplier: 1.7

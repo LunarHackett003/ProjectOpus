@@ -9,6 +9,8 @@ namespace Opus
     public class PlayerController : HealthyEntity
     {
         #region Definitions
+        public AnimatorCustomParamProxy acpp;
+
         public PlayerManager MyPlayerManager;
 
         public Outline outlineComponent;
@@ -94,10 +96,9 @@ namespace Opus
         public CinemachineCamera worldCineCam;
         public CinemachineCamera viewCineCam;
         public Camera viewmodelCamera;
-        public PlayerHUD hud;
         GUIContent content;
         public CharacterRenderable characterRender;
-        WeaponController wc;
+        public WeaponController wc;
 
         public bool canWallrun;
         #endregion
@@ -131,6 +132,9 @@ namespace Opus
                 controls.Player.Fire.performed += Fire_performed;
                 controls.Player.Fire.canceled += Fire_performed;
 
+                controls.Player.Reload.performed += Reload_performed;
+                controls.Player.Reload.canceled += Reload_performed;
+
                 controls.Player.SecondaryInput.performed += SecondaryInput_performed;
                 controls.Player.SecondaryInput.canceled += SecondaryInput_performed;
                 controls.Enable();
@@ -153,19 +157,6 @@ namespace Opus
                 viewmodelCamera.enabled = false;
             }
 
-
-            if(hud != null)
-            {
-                if (IsOwner)
-                {
-                    hud.InitialiseHUD();
-                }
-                else
-                {
-                    hud.gameObject.SetActive(false);
-                }
-            }
-
             if(TryGetComponent(out characterRender))
             {
                 characterRender.InitialiseViewable(this);
@@ -175,6 +166,16 @@ namespace Opus
             wc = GetComponent<WeaponController>();
         }
 
+        private void Reload_performed(InputAction.CallbackContext obj)
+        {
+            if(wc != null)
+            {
+                if (obj.ReadValueAsButton() && !wc.networkAnimator.Animator.GetCurrentAnimatorStateInfo(0).IsTag("Reload"))
+                {
+                    wc.TryReload();
+                }
+            }
+        }
 
         void SpawnReceived()
         {

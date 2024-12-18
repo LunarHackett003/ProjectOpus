@@ -11,31 +11,42 @@ namespace Opus
         /// Current Health is only modifiable by the server.
         /// </summary>
         public NetworkVariable<float> currentHealth = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public enum ScoreAwardingBehaviour
-        {
-            /// <summary>
-            /// Damaging this entity does NOT award score.
-            /// </summary>
-            none = 0,
-            /// <summary>
-            /// Damaging this entity awards combat score to the damager - think a player shooting somebody. Things that heal should NOT use ReceiveDamage.
-            /// </summary>
-            sourceCombat = 1,
-            /// <summary>
-            /// Damaging this entity awards support score to the damager - shooting an enemy device to disable it 
-            /// </summary>
-            sourceSupport = 2,
-            /// <summary>
-            /// In some cases, shooting something might award the owner combat score. Not sure what any of these cases ARE, but it wouldn't hurt to have this anyway.
-            /// </summary>
-            ownerCombat = 3,
-            /// <summary>
-            /// Objects such as shields or barricades might want to award the owner with support score when using them.
-            /// </summary>
-            ownerSupport = 4,
+        protected float localCurrentHealth;
+        public float CurrentHealth { get { return localCurrentHealth; } 
+            set 
+            {
+                if (IsServer)
+                {
+                    localCurrentHealth = value;
+                    currentHealth.Value = value;
+                    if(localCurrentHealth != value)
+                        SetHealth_RPC(localCurrentHealth);
+                }
+                else
+                {
+                    localCurrentHealth = value;
+                }
+            }
         }
-        public ScoreAwardingBehaviour scoreBehaviour;
         public bool healable;
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            if(currentHealth.Value == 0)
+            {
+                localCurrentHealth = currentHealth.Value;
+            }
+            CurrentHealth = maxHealth;
+            
+        }
+        [Rpc(SendTo.ClientsAndHost)]
+        void SetHealth_RPC(float health)
+        {
+            CurrentHealth = health;
+        }
+
         public override void ReceiveDamage(float damageIn)
         {
             base.ReceiveDamage(damageIn);
@@ -48,14 +59,14 @@ namespace Opus
             if (scoreBehaviour != 0)
             {
                 uint value = (uint)Mathf.RoundToInt(damageIn * 10);
-                PlayerManager source;
+                PlayerManager target;
                 switch (scoreBehaviour)
                 {
                     case ScoreAwardingBehaviour.sourceCombat:
-                        if(PlayerManager.playersByID.TryGetValue(sourceClientID, out source))
+                        if(PlayerManager.playersByID.TryGetValue(sourceClientID, out target))
                         {
-                            source.combatPoints.Value += (uint)Mathf.RoundToInt(value);
-                            print($"Awarded {value} combat points to {source.name}//{sourceClientID}");
+                            target.combatPoints.Value += (uint)Mathf.RoundToInt(value);
+                            print($"Awarded {value} combat points to {target.name}//{sourceClientID}");
                             return;
                         }
                         else
@@ -64,10 +75,10 @@ namespace Opus
                         }
                         break;
                     case ScoreAwardingBehaviour.sourceSupport:
-                        if (PlayerManager.playersByID.TryGetValue(sourceClientID, out source))
+                        if (PlayerManager.playersByID.TryGetValue(sourceClientID, out target))
                         {
-                            source.combatPoints.Value += (uint)Mathf.RoundToInt(value);
-                            print($"Awarded {value} support points to {source.name}//{sourceClientID}");
+                            target.combatPoints.Value += (uint)Mathf.RoundToInt(value);
+                            print($"Awarded {value} support points to {target.name}//{sourceClientID}");
                             return;
                         }
                         else
@@ -76,10 +87,10 @@ namespace Opus
                         }
                         break;
                     case ScoreAwardingBehaviour.ownerCombat:
-                        if (PlayerManager.playersByID.TryGetValue(OwnerClientId, out source))
+                        if (PlayerManager.playersByID.TryGetValue(OwnerClientId, out target))
                         {
-                            source.combatPoints.Value += (uint)Mathf.RoundToInt(value);
-                            print($"Awarded {value} combat points to {source.name}//{OwnerClientId}");
+                            target.combatPoints.Value += (uint)Mathf.RoundToInt(value);
+                            print($"Awarded {value} combat points to {target.name}//{OwnerClientId}");
                             return;
                         }
                         else
@@ -88,10 +99,10 @@ namespace Opus
                         }
                         break;
                     case ScoreAwardingBehaviour.ownerSupport:
-                        if (PlayerManager.playersByID.TryGetValue(OwnerClientId, out source))
+                        if (PlayerManager.playersByID.TryGetValue(OwnerClientId, out target))
                         {
-                            source.supportPoints.Value += (uint)Mathf.RoundToInt(value);
-                            print($"Awarded {value} support points to {source.name}//{OwnerClientId}");
+                            target.supportPoints.Value += (uint)Mathf.RoundToInt(value);
+                            print($"Awarded {value} support points to {target.name}//{OwnerClientId}");
                             return;
                         }
                         else

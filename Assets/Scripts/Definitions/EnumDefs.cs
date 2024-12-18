@@ -45,4 +45,49 @@ namespace Opus
         /// </summary>
         mounted = 2,
     }
+    public enum ScoreAwardingBehaviour
+    {
+        /// <summary>
+        /// Damaging this entity does NOT award score.
+        /// </summary>
+        none = 0,
+        /// <summary>
+        /// Damaging this entity awards combat score to the damager - think a player shooting somebody. Things that heal should NOT use ReceiveDamage.
+        /// </summary>
+        sourceCombat = 1,
+        /// <summary>
+        /// Damaging this entity awards support score to the damager - shooting an enemy device to disable it 
+        /// </summary>
+        sourceSupport = 2,
+        /// <summary>
+        /// In some cases, shooting something might award the owner combat score. Not sure what any of these cases ARE, but it wouldn't hurt to have this anyway.
+        /// </summary>
+        ownerCombat = 3,
+        /// <summary>
+        /// Objects such as shields or barricades might want to award the owner with support score when using them.
+        /// </summary>
+        ownerSupport = 4,
+    }
+    /// <summary>
+    /// How an attack behaves when pressed
+    /// </summary>
+    public enum MeleeBehaviour
+    {
+        /// <summary>
+        /// No melee attack behaviour
+        /// </summary>
+        none = 0,
+        /// <summary>
+        /// Attacks when pressed
+        /// </summary>
+        pressAttack = 1,
+        /// <summary>
+        /// Attacks when pressed, loops while held
+        /// </summary>
+        holdAttack = 2,
+        /// <summary>
+        /// Charges up an attack over time
+        /// </summary>
+        chargeAttack = 3
+    }
 }

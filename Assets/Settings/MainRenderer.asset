@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7620276019336366124
+--- !u!114 &-7746330096078943498
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,20 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af24e90db4bf58443aff8888b8b7e207, type: 3}
-  m_Name: VolumetricCloudsURP
+  m_Script: {fileID: 11500000, guid: e32e72b6a3f58a24c9033e2b9275eea0, type: 3}
+  m_Name: ScreenSpaceShadows
   m_EditorClassIdentifier: 
   m_Active: 1
-  material: {fileID: 2100000, guid: 3748131af20412e478461c6445c73923, type: 2}
-  renderingDebugger: 0
-  reflectionProbe: 0
-  resolutionScale: 0.5
-  upscaleMode: 1
-  preferredRenderMode: 1
-  ambientProbe: 1
-  sunAttenuation: 1
-  resetOnStart: 1
-  outputDepth: 0
+  m_Shader: {fileID: 4800000, guid: 0f854b35a0cf61a429bd5dcfea30eddd, type: 3}
 --- !u!114 &-6894170198184140754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65,8 +56,9 @@ MonoBehaviour:
     probeVolumeBlendStatesCS: {fileID: 0}
   m_RendererFeatures:
   - {fileID: 6597400951320210814}
-  - {fileID: -7620276019336366124}
-  m_RendererFeatureMap: 7eed43f035ad8e5bd437079955573f96
+  - {fileID: -7746330096078943498}
+  - {fileID: 284999676209751042}
+  m_RendererFeatureMap: 7eed43f035ad8e5bf60a4cc6d1817f940264950db285f403
   m_UseNativeRenderPass: 0
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -92,6 +84,29 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 0
+--- !u!114 &284999676209751042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af24e90db4bf58443aff8888b8b7e207, type: 3}
+  m_Name: VolumetricCloudsURP
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  material: {fileID: 2100000, guid: 3748131af20412e478461c6445c73923, type: 2}
+  renderingDebugger: 0
+  reflectionProbe: 0
+  resolutionScale: 0.5
+  upscaleMode: 0
+  preferredRenderMode: 1
+  ambientProbe: 0
+  sunAttenuation: 1
+  resetOnStart: 1
+  outputDepth: 0
 --- !u!114 &6597400951320210814
 MonoBehaviour:
   m_ObjectHideFlags: 0

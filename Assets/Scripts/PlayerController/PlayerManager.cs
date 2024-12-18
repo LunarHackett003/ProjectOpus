@@ -34,10 +34,13 @@ namespace Opus
         public Quaternion spawnRot;
 
         public Canvas myUI;
-        public CanvasGroup gameplayUI, deadUI;
 
         public Button readyButton;
         bool requestingSpawn = true;
+
+        public PlayerHUD hud;
+
+        public int primaryWeaponIndex = -1, gadget1Index = -1, gadget2Index = -1, gadget3Index = -1, specialIndex = -1;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -49,6 +52,10 @@ namespace Opus
                 MyTeam = teamIndex.Value;
 
                 specialPercentage.OnValueChanged += SpecialPercentageChanged;
+                if (LoadoutUI.Instance != null)
+                {
+                    LoadoutUI.Instance.pm = this;
+                }
             }
             else
             {
@@ -90,23 +97,18 @@ namespace Opus
         [Rpc(SendTo.Owner)]
         public void SpawnPlayer_RPC()
         {
-            if(deadUI != null)
-            {
-                deadUI.alpha = 0;
-                deadUI.blocksRaycasts = false;
-                deadUI.interactable = false;
-            }
-            if(gameplayUI != null)
-            {
-                gameplayUI.alpha = 1;
-            }
             requestingSpawn = false;
 
             onSpawnReceived?.Invoke();
+
+            if(hud != null)
+            {
+                hud.InitialiseHUD();
+            }
         }
         public void ReadyUpPressed()
         {
-            MatchManager.Instance.RequestSpawn_RPC(OwnerClientId);
+            MatchManager.Instance.RequestSpawn_RPC(OwnerClientId, primaryWeaponIndex, gadget1Index, gadget2Index, gadget3Index, specialIndex);
             readyButton.interactable = false;
         }
         public void SetPlayerOnSpawn(PlayerController spawnedPlayer)

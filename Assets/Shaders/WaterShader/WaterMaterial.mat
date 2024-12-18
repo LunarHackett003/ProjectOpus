@@ -8,8 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: WaterMaterial
-  m_Shader: {fileID: -6465566751694194690, guid: b84937211f891174db18ad1803019d29,
-    type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: b84937211f891174db18ad1803019d29, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -51,21 +50,21 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DepthFadeDistance: 5
+    - _DepthFadeDistance: 0.36
     - _FoamAlpha: 1
-    - _FoamAmount: 1.29
+    - _FoamAmount: 0
     - _FoamCutoff: 1.13
-    - _FoamScale: 500
+    - _FoamScale: 5
     - _FoamSpeed: 0.7
     - _HighWaveFrequency: 1
-    - _NormalStrength: 1
+    - _NormalStrength: 0.363
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RefractionNoiseScaling: 5
-    - _RefractionNormalStrength: 0.76
-    - _RefractionSpeed: 0.003
-    - _RefractionStrength: 0.09
-    - _Smoothness: 0.76
+    - _RefractionNormalStrength: 2.11
+    - _RefractionSpeed: 0.002
+    - _RefractionStrength: 0.04
+    - _Smoothness: 1
     - _WaveAmplitude: 0.01
     - _WaveAngle: 0
     - _WaveFrequencyMagicNumber: 0.6
@@ -73,8 +72,8 @@ Material:
     m_Colors:
     - _DeepColour: {r: 0.33459416, g: 0.554371, b: 0.6886792, a: 0.6392157}
     - _FoamColour: {r: 0.71675867, g: 0.8584906, b: 0.8464024, a: 0.95686275}
-    - _RefractionScale: {r: 1, g: 1, b: 0, a: 0}
-    - _SurfaceColour: {r: 0.5977661, g: 0.9528302, b: 0.9054884, a: 0.80784315}
+    - _RefractionScale: {r: 0.2, g: 0.2, b: 0, a: 0}
+    - _SurfaceColour: {r: 0.59607846, g: 0.7382134, b: 0.9529412, a: 0.80784315}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &6967598997157684
