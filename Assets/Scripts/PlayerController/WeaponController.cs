@@ -33,6 +33,23 @@ namespace Opus
 
         bool reloading;
 
+        protected AnimationClipOverrides clipOverrides;
+        protected AnimatorOverrideController aoc;
+
+        public bool QuerySlot(Slot slot)
+        {
+            return slot switch
+            {
+                Slot.primary => weapon,
+                Slot.gadget1 => gadget1,
+                Slot.gadget2 => gadget2,
+                Slot.gadget3 => gadget3,
+                Slot.special => special,
+                _ => null,
+            } != null;
+        }
+
+
         public ClientNetworkAnimator networkAnimator;
         void SetUpWeaponSlot(Slot slot, BaseEquipment be)
         {
@@ -40,6 +57,7 @@ namespace Opus
             {
                 case Slot.primary:
                     weapon = be;
+                    SwitchWeapon_RPC(0);
                     break;
                 case Slot.gadget1:
                     gadget1 = be;
@@ -58,6 +76,39 @@ namespace Opus
             }
             be.myController = this;
             be.cr.InitialiseViewable(pc);
+        }
+
+        public void TrySwitchWeapon(int input)
+        {
+            if (IsOwner)
+            {
+                int target = ((int)currentSlot + input) % 4;
+                BaseEquipment be = GetEquipment((Slot)target);
+                if(be != null)
+                {
+                    if (MatchManager.Instance != null && !MatchManager.Instance.lockedSlots[target])
+                    {
+                        if (be.hasAnimations)
+                        {
+                            SwitchWeapon_RPC(target);
+                        }
+                        else
+                        {
+                            print($"Slot {target} has no animations, triggering this equipment's effect...");
+                        }
+                    }
+                    else
+                    {
+                        print($"Slot {target} is locked!");
+                    }
+                }
+                else
+                {
+                    print($"Slot {target} is not filled! This could be a result of it being locked. In either case, it should not be equippable.");
+                }
+
+
+            }
         }
         public override void OnNetworkSpawn()
         {
@@ -111,6 +162,19 @@ namespace Opus
                 _ => null,
             };
         }
+
+        public BaseEquipment GetEquipment(Slot slot)
+        {
+            return slot switch
+            {
+                Slot.primary => weapon,
+                Slot.gadget1 => gadget1,
+                Slot.gadget2 => gadget2,
+                Slot.gadget3 => gadget3,
+                Slot.special => special,
+                _ => null,
+            };
+        }
         public void TryReload()
         {
             if (GetCurrentEquipment() is RangedWeapon w)
@@ -129,25 +193,52 @@ namespace Opus
                 }
             }
         }
-        void SwitchWeapon(int target)
+
+        [Rpc(SendTo.Everyone)]
+        void SwitchWeapon_RPC(int targetSlot)
         {
-            currentSlot = (Slot)target;
+            currentSlot = (Slot)targetSlot;
             BaseEquipment w = GetCurrentEquipment();
             switch (w)
             {
                 case RangedWeapon:
-                    networkAnimator.Animator.SetLayerWeight(0,1);
-                    networkAnimator.Animator.SetLayerWeight(1, 0);
-                    networkAnimator.Animator.SetLayerWeight(2, 0);
+                    networkAnimator.Animator.SetInteger("Type",0);
                     break;
                 case MeleeWeapon:
-                    networkAnimator.Animator.SetLayerWeight(0, 0);
-                    networkAnimator.Animator.SetLayerWeight(1, 1);
-                    networkAnimator.Animator.SetLayerWeight(2, 0);
+                    networkAnimator.Animator.SetInteger("Type", 1);
                     break;
                 default:
+                    networkAnimator.Animator.SetInteger("Type", 2);
                     break;
             }
+            SetUpAnimations();
+        }
+
+
+        public void SetUpAnimations()
+        {
+            print($"overriding animations for {OwnerClientId}'s {currentSlot} slot.");
+            if(aoc == null)
+            {
+                aoc = new(networkAnimator.Animator.runtimeAnimatorController);
+                networkAnimator.Animator.runtimeAnimatorController = aoc;
+            }
+
+            clipOverrides = new(aoc.overridesCount);
+            aoc.GetOverrides(clipOverrides);
+
+            BaseEquipment be = GetCurrentEquipment();
+
+            for (int i = 0; i < be.animationSet.animations.Length; i++)
+            {
+                AnimationClipPair acp = be.animationSet.animations[i];
+                if(acp.clip != null && !string.IsNullOrWhiteSpace(acp.name))
+                {
+                    clipOverrides[acp.name] = acp.clip;
+                }
+            }
+            aoc.ApplyOverrides(clipOverrides);
+            networkAnimator.Animator.Rebind();
         }
 
         public void WeaponUpdated(NetworkBehaviourReference old, NetworkBehaviourReference next)
@@ -273,7 +364,7 @@ namespace Opus
         }
         void UpdateActiveEquipment(BaseEquipment be, Slot slot)
         {
-            if (be != null)
+            if (be != null && IsOwner)
             {
                 be.fireInput = pc.fireInput && currentSlot == slot && !be.acpp.customParams[0].boolValue;
                 be.secondaryInput = pc.secondaryInput && currentSlot == slot && !be.acpp.customParams[0].boolValue;

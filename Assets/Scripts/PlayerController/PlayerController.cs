@@ -137,6 +137,8 @@ namespace Opus
 
                 controls.Player.SecondaryInput.performed += SecondaryInput_performed;
                 controls.Player.SecondaryInput.canceled += SecondaryInput_performed;
+
+                controls.Player.CycleWeapon.performed += CycleWeapon_performed;
                 controls.Enable();
 
                 if(!Camera.main.TryGetComponent(out CinemachineBrain brain))
@@ -166,6 +168,21 @@ namespace Opus
             wc = GetComponent<WeaponController>();
         }
 
+
+        void SpawnReceived()
+        {
+            aimAngle.x = transform.eulerAngles.y;
+        }
+
+
+        #region Input Callbacks
+        private void CycleWeapon_performed(InputAction.CallbackContext obj)
+        {
+            if (wc != null)
+            {
+                wc.TrySwitchWeapon(obj.ReadValue<int>());
+            }
+        }
         private void Reload_performed(InputAction.CallbackContext obj)
         {
             if(wc != null)
@@ -176,14 +193,6 @@ namespace Opus
                 }
             }
         }
-
-        void SpawnReceived()
-        {
-            aimAngle.x = transform.eulerAngles.y;
-        }
-
-
-        #region Input Callbacks
         private void Sprint_performed(InputAction.CallbackContext obj)
         {
             sprintInput = obj.ReadValueAsButton();
@@ -261,7 +270,7 @@ namespace Opus
         RaycastHit groundHit;
         void CheckGround()
         {
-            if (Physics.SphereCast(transform.TransformPoint(groundCheckOrigin), groundCheckRadius, -transform.up, out groundHit, groundCheckDistance, groundLayermask, QueryTriggerInteraction.Ignore))
+            if (ticksSinceJump == minJumpTicks && Physics.SphereCast(transform.TransformPoint(groundCheckOrigin), groundCheckRadius, -transform.up, out groundHit, groundCheckDistance, groundLayermask, QueryTriggerInteraction.Ignore))
             {
                 if(groundHit.normal.y >= walkableGroundThreshold)
                 {
@@ -280,22 +289,25 @@ namespace Opus
         float speed;
         private void OnGUI()
         {
-            GUI.contentColor = wallriding ? Color.green : Color.red;
-            GUI.Box(new Rect(0, 0, 32, 32), content);
-            GUI.contentColor = wallClimbing ? Color.green : Color.red;
-            GUI.Box(new Rect(32, 0, 32, 32), content);
-            GUI.contentColor = wallrideOnRight ? Color.green : Color.red;
-            GUI.Box(new Rect(64, 0, 32, 32), content);
-            GUI.contentColor = ticksSinceJump >= minJumpTicks ? Color.green : Color.red;
-            GUI.Box(new Rect(96, 0, 32, 32), $"{ticksSinceJump}/{minJumpTicks}");
-            GUI.contentColor = ticksSinceWallride >= minWallrideTicks ? Color.green : Color.red;
-            GUI.Box(new Rect(128, 0, 32, 32), $"{ticksSinceWallride}/{minWallrideTicks}");
-            speed = rb.linearVelocity.magnitude;
-            GUI.contentColor = Color.Lerp(Color.red, Color.green, speed / 100);
-            GUI.Box(new(0, 32, 64, 32), $"speed: {speed:0.0}");
-            GUI.Box(new(64, 32, 128, 32), $"{rb.linearVelocity:0.0}");
-            GUI.contentColor = Color.Lerp(Color.green, Color.red, Mathf.InverseLerp(0, wallrideMaxDeviation, Mathf.Abs(wallrideCurrentDeviation)));
-            GUI.Box(new(0, 64, 32, 32), $"{wallrideCurrentDeviation:0.0}");
+            if (IsOwner)
+            {
+                GUI.contentColor = wallriding ? Color.green : Color.red;
+                GUI.Box(new Rect(0, 0, 32, 32), content);
+                GUI.contentColor = wallClimbing ? Color.green : Color.red;
+                GUI.Box(new Rect(32, 0, 32, 32), content);
+                GUI.contentColor = wallrideOnRight ? Color.green : Color.red;
+                GUI.Box(new Rect(64, 0, 32, 32), content);
+                GUI.contentColor = ticksSinceJump >= minJumpTicks ? Color.green : Color.red;
+                GUI.Box(new Rect(96, 0, 32, 32), $"{ticksSinceJump}/{minJumpTicks}");
+                GUI.contentColor = ticksSinceWallride >= minWallrideTicks ? Color.green : Color.red;
+                GUI.Box(new Rect(128, 0, 32, 32), $"{ticksSinceWallride}/{minWallrideTicks}");
+                speed = rb.linearVelocity.magnitude;
+                GUI.contentColor = Color.Lerp(Color.red, Color.green, speed / 100);
+                GUI.Box(new(0, 32, 64, 32), $"speed: {speed:0.0}");
+                GUI.Box(new(64, 32, 128, 32), $"{rb.linearVelocity:0.0}");
+                GUI.contentColor = Color.Lerp(Color.green, Color.red, Mathf.InverseLerp(0, wallrideMaxDeviation, Mathf.Abs(wallrideCurrentDeviation)));
+                GUI.Box(new(0, 64, 32, 32), $"{wallrideCurrentDeviation:0.0}");
+            }
         }
 
         bool SnapToGround()

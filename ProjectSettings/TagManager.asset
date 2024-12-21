@@ -30,8 +30,8 @@ TagManager:
   - Carriable
   - Flames
   - Interactable
-  - pp
-  - 
+  - GlobalPostProcess
+  - ViewmodelPostProcess
   - 
   - 
   - 

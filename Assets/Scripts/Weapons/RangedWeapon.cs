@@ -53,6 +53,7 @@ namespace Opus
                 SendAmmo_RPC(CurrentAmmo);
             }
         }
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -80,6 +81,15 @@ namespace Opus
             //    fireInputPressed = false;
             //}
             reloading = acpp.customParams[0].boolValue;
+
+            if (IsOwner)
+            {
+                if (lastFireInput != fireInput)
+                {
+                    lastFireInput = fireInput;
+                    SendFireInput_RPC(fireInput);
+                }
+            }
 
             if (fired || reloading || (maxAmmo > 0 && CurrentAmmo <= 0))
                 return;
@@ -157,7 +167,6 @@ namespace Opus
             {
                 fireInputSynced.Value = input;
             }
-            Fire();
         }
         void Fire()
         {

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -95,13 +96,16 @@ namespace Opus
             }
         }
         [Rpc(SendTo.Owner)]
-        public void SpawnPlayer_RPC()
+        public void SpawnPlayer_RPC(Vector3 pos, Quaternion rot)
         {
+            print("received spawn message, attempting to find us somewhere to spawn!");
             requestingSpawn = false;
 
             onSpawnReceived?.Invoke();
 
-            if(hud != null)
+            LivingPlayer.GetComponent<NetworkTransform>().Teleport(pos, rot, Vector3.one);
+
+            if (hud != null)
             {
                 hud.InitialiseHUD();
             }
@@ -123,12 +127,11 @@ namespace Opus
                 return;
             if(LivingPlayer != null)
             {
-
                 if(LivingPlayer.transform.position.y < -20)
                 {
                     if (!requestingSpawn)
                     {
-                        MatchManager.Instance.RequestSpawn_RPC(OwnerClientId);
+                        MatchManager.Instance.RequestSpawn_RPC(OwnerClientId, primaryWeaponIndex, gadget1Index, gadget2Index, gadget3Index, specialIndex);
                         requestingSpawn = true;
                     }
                     //The player has fallen out of bounds, we need to do something about this.
@@ -138,7 +141,9 @@ namespace Opus
                     if(requestingSpawn)
                         requestingSpawn = false;
                 }
+                LivingPlayer.rb.isKinematic = requestingSpawn;
             }
+
             //We don't want to execute this if we are the host, as we already do this maths on the game manager.
             if (MatchManager.Instance != null && !IsHost)
             {

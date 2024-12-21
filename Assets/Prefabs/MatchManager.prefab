@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 274474607
+  GlobalObjectIdHash: 239638148
   InScenePlacedSourceGlobalObjectIdHash: 274474607
   DeferredDespawnTick: 0
   Ownership: 1
@@ -75,5 +75,6 @@ MonoBehaviour:
   spawnpointHolder: {fileID: 0}
   weapons: {fileID: 11400000, guid: e1ff615e1c3b33e47b7a76ecb0e48358, type: 2}
   gadgets: {fileID: 0}
+  lockedSlots: 0000000000
   mechReadySpeed: 0.1
   mechSpecialSpeed: 0.1

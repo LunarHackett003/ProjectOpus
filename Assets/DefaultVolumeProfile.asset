@@ -219,10 +219,10 @@ MonoBehaviour:
   earthCurvature:
     m_OverrideState: 1
     m_Value: 0
-  globalOrientation:
+  globalSpeed:
     m_OverrideState: 1
     m_Value: 0
-  globalSpeed:
+  globalOrientation:
     m_OverrideState: 1
     m_Value: 0
   shapeSpeedMultiplier:
@@ -276,6 +276,9 @@ MonoBehaviour:
   temporalAccumulationFactor:
     m_OverrideState: 1
     m_Value: 0.95
+  perceptualBlending:
+    m_OverrideState: 1
+    m_Value: 1
   numPrimarySteps:
     m_OverrideState: 1
     m_Value: 32

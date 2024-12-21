@@ -16,7 +16,8 @@ namespace Opus
 
         public void SetParam(AnimationEvent animEvent)
         {
-            if(customParams.Length < animEvent.intParameter + 1)
+            print($"{animEvent.intParameter}");
+            if(customParams.Length > animEvent.intParameter)
             {
                 customParams[animEvent.intParameter] = new CustomParam()
                 {
@@ -24,6 +25,11 @@ namespace Opus
                     floatValue = animEvent.floatParameter,
                     boolValue = animEvent.stringParameter.ToLower() == "true"
                 };
+                    print("setting custom parameter");
+            }
+            else
+            {
+                print("Failed to set custom parameter!");
             }
         }
     }

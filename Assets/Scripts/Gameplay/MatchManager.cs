@@ -20,6 +20,7 @@ namespace Opus
         public EquipmentList weapons;
         public EquipmentList gadgets;
 
+        public bool[] lockedSlots = new bool[5];
 
         [Tooltip("The amount added to the mech readiness every tick. This is synchronised with the players every 10 seconds.")]
         public float mechReadySpeed;
@@ -61,11 +62,11 @@ namespace Opus
                 }
                 (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint();
 
-                p.LivingPlayer.transform.SetPositionAndRotation(pos, rot);
+
                 SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, gadgetThreeIndex, specialIndex);
 
 
-                p.SpawnPlayer_RPC();
+                p.SpawnPlayer_RPC(pos, rot);
             }
         }
         void SpawnWeaponsForPlayer(ulong clientID, PlayerManager p, int primaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int gadgetThreeIndex = -1, int specialIndex = -1)

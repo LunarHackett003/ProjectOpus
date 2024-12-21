@@ -5115,7 +5115,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4198503545
+  GlobalObjectIdHash: 1875319213
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -5148,6 +5148,8 @@ MonoBehaviour:
   cr: {fileID: 434510124358627080}
   netAnimator: {fileID: 1214130254489877562}
   acpp: {fileID: 4896119987806034887}
+  hasAnimations: 0
+  animationSet: {fileID: 11400000, guid: 3c583f5a5ad933f47aceb4787dafc793, type: 2}
   fireParticleSystem: {fileID: 959437202107347610}
   fireVFX: {fileID: 3385435170123581592}
   roundsPerMinute: 720

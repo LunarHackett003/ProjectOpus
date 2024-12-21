@@ -15,6 +15,8 @@ namespace Opus
         public EquipmentList weapons;
         public EquipmentList gadgets;
 
+        public EquipmentList defaultWeapons, defaultGadgets;
+
         public GameObject equipmentItemPrefab;
         List<LoadoutItemDisplay> displayItems = new();
 
@@ -34,6 +36,17 @@ namespace Opus
 
         public void SetUpSlotSelection(Slot slot)
         {
+            if(MatchManager.Instance != null)
+            {
+                weapons = MatchManager.Instance.weapons;
+                gadgets = MatchManager.Instance.gadgets;
+            }
+            else
+            {
+                weapons = defaultWeapons;
+                gadgets = defaultGadgets;
+            }
+
             if (displayItems.Count > 0)
             {
                 for (int i = displayItems.Count - 1; i >= 0; i--)

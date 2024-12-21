@@ -19,5 +19,12 @@ namespace Opus
         public ClientNetworkAnimator netAnimator;
 
         public AnimatorCustomParamProxy acpp;
+
+
+        public bool hasAnimations;
+        public AnimationSetSO animationSet;
+
+
+        protected bool lastFireInput;
     }
 }
