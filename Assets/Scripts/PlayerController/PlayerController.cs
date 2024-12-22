@@ -9,22 +9,18 @@ namespace Opus
     public class PlayerController : HealthyEntity
     {
         #region Definitions
+
+        public bool Alive => CurrentHealth > 0;
+
+
         public AnimatorCustomParamProxy acpp;
 
         public PlayerManager MyPlayerManager;
 
         public Outline outlineComponent;
 
-        public ControlScheme controls;
-
         public Rigidbody rb;
 
-        public Vector2 moveInput, lookInput;
-        public bool jumpInput;
-        public bool crouchInput;
-        public bool sprintInput;
-        public bool fireInput;
-        public bool secondaryInput;
         public Vector2 aimAngle, oldAimAngle;
         public Vector2 aimDelta;
 
@@ -101,6 +97,10 @@ namespace Opus
         public WeaponController wc;
 
         public bool canWallrun;
+
+        
+
+        Vector3 lastGroundedPosition;
         #endregion
         public override void OnNetworkSpawn()
         {
@@ -113,33 +113,6 @@ namespace Opus
             //Subscribe the owner to input callbacks
             if (IsOwner)
             {
-                controls = new();
-                controls.Player.Move.performed += Move_performed;
-                controls.Player.Move.canceled += Move_performed;
-
-                controls.Player.Look.performed += Look_performed;
-                controls.Player.Look.canceled += Look_performed;
-
-                controls.Player.Jump.performed += Jump_performed;
-                controls.Player.Jump.canceled += Jump_performed;
-
-                controls.Player.Crouch.performed += Crouch_performed;
-                controls.Player.Crouch.canceled += Crouch_performed;
-
-                controls.Player.Sprint.performed += Sprint_performed;
-                controls.Player.Sprint.canceled += Sprint_performed;
-
-                controls.Player.Fire.performed += Fire_performed;
-                controls.Player.Fire.canceled += Fire_performed;
-
-                controls.Player.Reload.performed += Reload_performed;
-                controls.Player.Reload.canceled += Reload_performed;
-
-                controls.Player.SecondaryInput.performed += SecondaryInput_performed;
-                controls.Player.SecondaryInput.canceled += SecondaryInput_performed;
-
-                controls.Player.CycleWeapon.performed += CycleWeapon_performed;
-                controls.Enable();
 
                 if(!Camera.main.TryGetComponent(out CinemachineBrain brain))
                 {
@@ -166,8 +139,25 @@ namespace Opus
             swayInitialRotation = weaponOffset.localRotation;
 
             wc = GetComponent<WeaponController>();
+
+            currentHealth.OnValueChanged += HealthUpdated;
+
         }
 
+        void HealthUpdated(float previous, float current)
+        {
+            if(previous > 0 && current <= 0)
+            {
+                //the player just died, we need to make sure they're dead.
+            }
+            else
+            {
+                if(previous <= 0)
+                {
+                    //the player has just come back to life or has been revived.
+                }
+            }
+        }
 
         void SpawnReceived()
         {
@@ -176,55 +166,7 @@ namespace Opus
 
 
         #region Input Callbacks
-        private void CycleWeapon_performed(InputAction.CallbackContext obj)
-        {
-            if (wc != null)
-            {
-                wc.TrySwitchWeapon(obj.ReadValue<int>());
-            }
-        }
-        private void Reload_performed(InputAction.CallbackContext obj)
-        {
-            if(wc != null)
-            {
-                if (obj.ReadValueAsButton() && !wc.networkAnimator.Animator.GetCurrentAnimatorStateInfo(0).IsTag("Reload"))
-                {
-                    wc.TryReload();
-                }
-            }
-        }
-        private void Sprint_performed(InputAction.CallbackContext obj)
-        {
-            sprintInput = obj.ReadValueAsButton();
-        }
-        private void Crouch_performed(InputAction.CallbackContext obj)
-        {
-            crouchInput = obj.ReadValueAsButton();
-        }
 
-        private void Jump_performed(InputAction.CallbackContext obj)
-        {
-            jumpInput = obj.ReadValueAsButton();
-        }
-
-        private void Look_performed(InputAction.CallbackContext obj)
-        {
-            lookInput = obj.ReadValue<Vector2>();
-        }
-
-        private void Move_performed(InputAction.CallbackContext obj)
-        {
-            moveInput = obj.ReadValue<Vector2>();
-        }
-        private void SecondaryInput_performed(InputAction.CallbackContext obj)
-        {
-            secondaryInput = obj.ReadValueAsButton();
-        }
-
-        private void Fire_performed(InputAction.CallbackContext obj)
-        {
-            fireInput = obj.ReadValueAsButton();
-        }
         #endregion
         /// <summary>
         /// Grabs the player's team colours and updates it based on the teams.
@@ -240,7 +182,13 @@ namespace Opus
         }
         private void FixedUpdate()
         {
-            if (IsOwner)
+
+            if (IsServer)
+            {
+                rb.isKinematic = !Alive;
+            }
+            
+            if (IsOwner && Alive)
             {
                 CheckGround();
                 if (ticksSinceJump < minJumpTicks)
@@ -259,13 +207,15 @@ namespace Opus
                 {
                     rb.linearDamping = airDrag;
                 }
-                if (jumpInput && jumps > 0)
+                if (MyPlayerManager.jumpInput && jumps > 0)
                 {
                     Jump();
                 }
                 MovePlayer();
                 rb.useGravity = !wallriding;
             }
+
+            headTransform.position = worldCineCam.transform.position;
         }
         RaycastHit groundHit;
         void CheckGround()
@@ -279,7 +229,7 @@ namespace Opus
                     if (groundHit.distance > (groundCheckDistance + groundCheckRadius))
                         SnapToGround();
                     jumps = jumpsAllowed;
-
+                    lastGroundedPosition = transform.position;
                     return;
                 }
             }
@@ -340,7 +290,7 @@ namespace Opus
             {
                 Vector3 right = Vector3.Cross(-transform.forward, groundNormal);
                 Vector3 forward = Vector3.Cross(right, groundNormal);
-                moveVec = groundMoveForce * (sprintInput ? sprintMultiplier : 1) * ((right * moveInput.x) + (forward * moveInput.y));
+                moveVec = groundMoveForce * (MyPlayerManager.sprintInput ? sprintMultiplier : 1) * ((right * MyPlayerManager.moveInput.x) + (forward * MyPlayerManager.moveInput.y));
                 rb.AddForce(Vector3.ProjectOnPlane(-Physics.gravity, groundNormal));
             }
             else
@@ -351,7 +301,7 @@ namespace Opus
                 }
                 else
                 {
-                    moveVec = airMoveForce * ((transform.forward * moveInput.y) + (transform.right * moveInput.x));
+                    moveVec = airMoveForce * ((transform.forward * MyPlayerManager.moveInput.y) + (transform.right * MyPlayerManager.moveInput.x));
                 }
             }
             rb.AddForce(moveVec, ForceMode.Acceleration);
@@ -416,23 +366,24 @@ namespace Opus
                 {
                     forwardVec = -wallrideNormal;
                     transform.forward = Vector3.Lerp(transform.forward, forwardVec, wallrideTurnSpeed * Time.fixedDeltaTime);
-                    if (moveInput.y < -0.02f)
+                    if (MyPlayerManager.moveInput.y < -0.02f)
                     {
                         CancelWallride();
+                        
                         return;
                     }
-                    moveVec = (moveInput.y * wallClimbForce * transform.up) + (moveInput.x * (wallClimbForce * 0.5f) * Vector3.Cross(-wallrideNormal, transform.up));
+                    moveVec = (MyPlayerManager.moveInput.y * wallClimbForce * transform.up) + (MyPlayerManager.moveInput.x * (wallClimbForce * 0.5f) * Vector3.Cross(-wallrideNormal, transform.up));
                 }
                 else
                 {
                     forwardVec = Vector3.Cross(-wallrideNormal, wallrideOnRight ? transform.up : -transform.up);
                     transform.forward = Vector3.Lerp(transform.forward, forwardVec, wallrideTurnSpeed * Time.fixedDeltaTime);
-                    if ((wallrideOnRight && moveInput.x < -0.1f) || (moveInput.x > 0.1f))
+                    if ((wallrideOnRight && MyPlayerManager.moveInput.x < -0.1f) || (MyPlayerManager.moveInput.x > 0.1f))
                     {
                         CancelWallride();
                         return;
                     }
-                    moveVec = moveInput.y * wallrideMoveForce * Vector3.Cross(transform.right, transform.up);
+                    moveVec = MyPlayerManager.moveInput.y * wallrideMoveForce * Vector3.Cross(transform.right, transform.up);
                 }
 
             }
@@ -455,14 +406,14 @@ namespace Opus
             wallClimbing = false;
             currwallridetime = 0;
             wallrideNormal = Vector3.zero;
-            lookInput = new(0.00001f, 0.00001f);
+            MyPlayerManager.lookInput = new(0.00001f, 0.00001f);
             aimAngle.x = transform.eulerAngles.y + wallrideCurrentDeviation;
             wallrideCurrentDeviation = 0;
             ticksSinceJump = 0;
         }
         void Jump()
         {
-            jumpInput = false;
+            MyPlayerManager.jumpInput = false;
             jumps--;
             if (wallriding)
             {
@@ -474,31 +425,32 @@ namespace Opus
             else
             {
                 rb.AddForce((transform.up * jumpForce) + (Vector3.up * -rb.linearVelocity.y) +
-                    (isGrounded ? Vector3.zero : ((moveInput.y * jumpForce * 0.5f * transform.forward)
-                    + (moveInput.x * jumpForce * 0.5f * transform.right))), ForceMode.VelocityChange);
+                    (isGrounded ? Vector3.zero : ((MyPlayerManager.moveInput.y * jumpForce * 0.5f * transform.forward)
+                    + (MyPlayerManager.moveInput.x * jumpForce * 0.5f * transform.right))), ForceMode.VelocityChange);
             }
             ticksSinceJump = 0;
         }
         private void Update()
         {
-            UpdateLook();
+            if(Alive)
+                UpdateLook();
         }
         void UpdateLook()
         {
             oldAimAngle = aimAngle;
-            if(lookInput != Vector2.zero)
+            if(MyPlayerManager.lookInput != Vector2.zero)
             {
 
                 if (wallriding && wallrideCurrentDeviation < wallrideMaxDeviation)
                 {
-                    wallrideCurrentDeviation += lookInput.x * PlayerSettings.Instance.settingsContainer.mouseLookSpeedX * Time.deltaTime;
-                    aimAngle.y += lookInput.y * PlayerSettings.Instance.settingsContainer.mouseLookSpeedY * Time.deltaTime;
+                    wallrideCurrentDeviation += MyPlayerManager.lookInput.x * PlayerSettings.Instance.settingsContainer.mouseLookSpeedX * Time.deltaTime;
+                    aimAngle.y += MyPlayerManager.lookInput.y * PlayerSettings.Instance.settingsContainer.mouseLookSpeedY * Time.deltaTime;
                 }
                 else
                 {
                     //Consume the current deviation and add it to the local rotation
                     transform.localRotation = Quaternion.Euler(0, aimAngle.x + wallrideCurrentDeviation, 0);
-                    aimAngle += lookInput * new Vector2(PlayerSettings.Instance.settingsContainer.mouseLookSpeedX, PlayerSettings.Instance.settingsContainer.mouseLookSpeedY) * Time.deltaTime;
+                    aimAngle += MyPlayerManager.lookInput * new Vector2(PlayerSettings.Instance.settingsContainer.mouseLookSpeedX, PlayerSettings.Instance.settingsContainer.mouseLookSpeedY) * Time.deltaTime;
                     aimAngle.y = Mathf.Clamp(aimAngle.y, -85f, 85f);
                     wallrideCurrentDeviation = 0;
                 }
@@ -530,10 +482,10 @@ namespace Opus
                 ref v_lookswayeuler, lookSwayEulerDampTime);
 
             moveSwayPos = Vector3.SmoothDamp(moveSwayPos, 
-                new Vector3(moveInput.x * moveSwayPosScale.x, 0, moveInput.y * moveSwayPosScale.y).ClampMagnitude(maxMoveSwayPos), 
+                new Vector3(MyPlayerManager.moveInput.x * moveSwayPosScale.x, 0, MyPlayerManager.moveInput.y * moveSwayPosScale.y).ClampMagnitude(maxMoveSwayPos), 
                 ref v_moveswaypos, moveSwayPosDampTime);
             moveSwayEuler = Vector3.SmoothDamp(moveSwayEuler, 
-                new Vector3(0, moveInput.x * moveSwayEulerScale.y, moveInput.x * moveSwayEuler.z).ClampMagnitude(maxMoveSwayEuler), 
+                new Vector3(0, MyPlayerManager.moveInput.x * moveSwayEulerScale.y, MyPlayerManager.moveInput.x * moveSwayEuler.z).ClampMagnitude(maxMoveSwayEuler), 
                 ref v_moveswayeuler, moveSwayEulerDampTime);
 
 

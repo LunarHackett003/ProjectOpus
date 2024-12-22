@@ -7,6 +7,7 @@ namespace Opus
     {
 
         [SerializeField] float maxHealth;
+        public float MaxHealth => maxHealth;
         /// <summary>
         /// Current Health is only modifiable by the server.
         /// </summary>
@@ -19,8 +20,7 @@ namespace Opus
                 {
                     localCurrentHealth = value;
                     currentHealth.Value = value;
-                    if(localCurrentHealth != value)
-                        SetHealth_RPC(localCurrentHealth);
+                    SetHealth_RPC(localCurrentHealth);
                 }
                 else
                 {
@@ -44,16 +44,16 @@ namespace Opus
         [Rpc(SendTo.ClientsAndHost)]
         void SetHealth_RPC(float health)
         {
-            CurrentHealth = health;
+            localCurrentHealth = health;
         }
 
-        public override void ReceiveDamage(float damageIn)
+        public override void ReceiveDamage(float damageIn, float incomingCritMultiply)
         {
-            base.ReceiveDamage(damageIn);
+            base.ReceiveDamage(damageIn, incomingCritMultiply);
         }
-        public override void ReceiveDamage(float damageIn, ulong sourceClientID)
+        public override void ReceiveDamage(float damageIn, ulong sourceClientID, float incomingCritMultiply)
         {
-            base.ReceiveDamage(damageIn, sourceClientID);
+            base.ReceiveDamage(damageIn, sourceClientID, incomingCritMultiply);
             currentHealth.Value -= damageIn;
 
             if (scoreBehaviour != 0)

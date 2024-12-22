@@ -154,6 +154,15 @@ namespace Opus
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Special"",
+                    ""type"": ""Button"",
+                    ""id"": ""d2202967-ea62-4a86-b4e7-88f7c7a5ea3f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -649,6 +658,28 @@ namespace Opus
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
                     ""action"": ""Crouch"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""cb5d7902-a27e-4ea7-abab-d0eb20b6919c"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""Special"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dc72a683-404d-48bd-b467-c6ef5257a2aa"",
+                    ""path"": ""<Gamepad>/dpad/down"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""Special"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1250,6 +1281,7 @@ namespace Opus
             m_Player_Reload = m_Player.FindAction("Reload", throwIfNotFound: true);
             m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
             m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
+            m_Player_Special = m_Player.FindAction("Special", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1343,6 +1375,7 @@ namespace Opus
         private readonly InputAction m_Player_Reload;
         private readonly InputAction m_Player_Sprint;
         private readonly InputAction m_Player_Crouch;
+        private readonly InputAction m_Player_Special;
         public struct PlayerActions
         {
             private @ControlScheme m_Wrapper;
@@ -1361,6 +1394,7 @@ namespace Opus
             public InputAction @Reload => m_Wrapper.m_Player_Reload;
             public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
             public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
+            public InputAction @Special => m_Wrapper.m_Player_Special;
             public InputActionMap Get() { return m_Wrapper.m_Player; }
             public void Enable() { Get().Enable(); }
             public void Disable() { Get().Disable(); }
@@ -1412,6 +1446,9 @@ namespace Opus
                 @Crouch.started += instance.OnCrouch;
                 @Crouch.performed += instance.OnCrouch;
                 @Crouch.canceled += instance.OnCrouch;
+                @Special.started += instance.OnSpecial;
+                @Special.performed += instance.OnSpecial;
+                @Special.canceled += instance.OnSpecial;
             }
 
             private void UnregisterCallbacks(IPlayerActions instance)
@@ -1458,6 +1495,9 @@ namespace Opus
                 @Crouch.started -= instance.OnCrouch;
                 @Crouch.performed -= instance.OnCrouch;
                 @Crouch.canceled -= instance.OnCrouch;
+                @Special.started -= instance.OnSpecial;
+                @Special.performed -= instance.OnSpecial;
+                @Special.canceled -= instance.OnSpecial;
             }
 
             public void RemoveCallbacks(IPlayerActions instance)
@@ -1654,6 +1694,7 @@ namespace Opus
             void OnReload(InputAction.CallbackContext context);
             void OnSprint(InputAction.CallbackContext context);
             void OnCrouch(InputAction.CallbackContext context);
+            void OnSpecial(InputAction.CallbackContext context);
         }
         public interface IUIActions
         {

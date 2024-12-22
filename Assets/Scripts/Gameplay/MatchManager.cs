@@ -61,6 +61,7 @@ namespace Opus
                     p.LivingPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(p.playerPrefab, clientID).GetComponent<PlayerController>();
                 }
                 (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint();
+                p.LivingPlayer.CurrentHealth = p.LivingPlayer.MaxHealth;
 
 
                 SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, gadgetThreeIndex, specialIndex);
@@ -73,7 +74,6 @@ namespace Opus
         {
             if (primaryWeaponIndex > -1 && primaryWeaponIndex < weapons.equipment.Length)
             {
-                print($"Valid primary weapon (Index {primaryWeaponIndex}) - spawning one for player {clientID}");
                 if(p.LivingPlayer != null)
                 {
                     p.LivingPlayer.wc.weaponRef.Value = SpawnWeapon(clientID, weapons.equipment[primaryWeaponIndex].equipmentPrefab, Slot.primary);
@@ -81,11 +81,9 @@ namespace Opus
             }
             else
             {
-                print($"No primary weapon selected for player {clientID}");
             }
             if (gadgetThreeIndex > -1 && gadgetThreeIndex < gadgets.equipment.Length)
             {
-                print($"Valid tertiary gadget (Index {gadgetThreeIndex}) - spawning one for player {clientID}");
                 if (p.LivingPlayer != null)
                 {
                     p.LivingPlayer.wc.gadget3Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetThreeIndex].equipmentPrefab, Slot.gadget3);
@@ -93,11 +91,9 @@ namespace Opus
             }
             else
             {
-                print($"No secondary weapon selected for player {clientID}");
             }
             if (gadgetOneIndex > -1 && gadgetOneIndex < gadgets.equipment.Length)
             {
-                print($"Valid primary gadget (Index {gadgetOneIndex}) - spawning one for player {clientID}");
                 if (p.LivingPlayer != null)
                 {
                     p.LivingPlayer.wc.gadget1Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetOneIndex].equipmentPrefab, Slot.gadget1);
@@ -105,11 +101,9 @@ namespace Opus
             }
             else
             {
-                print($"No primary gadget selected for player {clientID}");
             }
             if (gadgetTwoIndex > -1 && gadgetTwoIndex < gadgets.equipment.Length)
             {
-                print($"Valid secondary gadget (Index {gadgetTwoIndex}) - spawning one for player {clientID}");
                 if (p.LivingPlayer != null)
                 {
                     p.LivingPlayer.wc.gadget2Ref.Value = SpawnWeapon(clientID, weapons.equipment[gadgetTwoIndex].equipmentPrefab, Slot.gadget2);
@@ -117,11 +111,9 @@ namespace Opus
             }
             else
             {
-                print($"No secondary gadget for player {clientID}");
             }
             if (specialIndex > -1 && specialIndex < gadgets.equipment.Length)
             {
-                print($"Valid specialisation (Index {specialIndex}) - spawning one for player {clientID}");
                 if (p.LivingPlayer != null)
                 {
                     p.LivingPlayer.wc.specialRef.Value = SpawnWeapon(clientID, gadgets.equipment[specialIndex].equipmentPrefab, Slot.special);
@@ -129,7 +121,6 @@ namespace Opus
             }
             else
             {
-                print($"No specialisation selected for player {clientID}");
             }
         }
         BaseEquipment SpawnWeapon(ulong clientID, NetworkObject netPrefab, Slot weaponSlot)

@@ -1,4 +1,6 @@
 using Netcode.Extensions;
+using System.Collections;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -16,7 +18,7 @@ namespace Opus
 
     public class WeaponController : NetworkBehaviour
     {
-        PlayerController pc;
+        public PlayerController Controller { get; private set; }
         public Slot currentSlot;
         public BaseEquipment weapon;
         public BaseEquipment gadget1, gadget2, gadget3, special;
@@ -35,6 +37,19 @@ namespace Opus
 
         protected AnimationClipOverrides clipOverrides;
         protected AnimatorOverrideController aoc;
+
+        bool playingGesture;
+        public float gestureLerpTime;
+        float gestureWeight;
+
+        public void SetPlayingGesture(bool value)
+        {
+            playingGesture = value;
+            if (IsOwner)
+            {
+                LerpGestureWeight_RPC(value);
+            }
+        }
 
         public bool QuerySlot(Slot slot)
         {
@@ -57,7 +72,10 @@ namespace Opus
             {
                 case Slot.primary:
                     weapon = be;
-                    SwitchWeapon_RPC(0);
+                    if (IsOwner)
+                    {
+                        SwitchWeapon_RPC(0);
+                    }
                     break;
                 case Slot.gadget1:
                     gadget1 = be;
@@ -75,14 +93,14 @@ namespace Opus
                     break;
             }
             be.myController = this;
-            be.cr.InitialiseViewable(pc);
+            be.cr.InitialiseViewable(Controller);
         }
 
         public void TrySwitchWeapon(int input)
         {
             if (IsOwner)
             {
-                int target = ((int)currentSlot + input) % 4;
+                int target = input;
                 BaseEquipment be = GetEquipment((Slot)target);
                 if(be != null)
                 {
@@ -95,6 +113,7 @@ namespace Opus
                         else
                         {
                             print($"Slot {target} has no animations, triggering this equipment's effect...");
+                            be.TrySelect();
                         }
                     }
                     else
@@ -114,9 +133,9 @@ namespace Opus
         {
             base.OnNetworkSpawn();
 
-            if(pc == null)
+            if(Controller == null)
             {
-                pc = GetComponent<PlayerController>();
+                Controller = GetComponent<PlayerController>();
             }
             weaponRef.OnValueChanged += WeaponUpdated;
             gadget1Ref.OnValueChanged += Gadget1Updated;
@@ -177,19 +196,21 @@ namespace Opus
         }
         public void TryReload()
         {
-            if (GetCurrentEquipment() is RangedWeapon w)
+            if (Controller.Alive && GetCurrentEquipment() is RangedWeapon w)
             {
                 if (w.CurrentAmmo == w.maxAmmo)
                     return;
                 if(w.CurrentAmmo > 0)
                 {
                     networkAnimator.SetTrigger("TacReload");
-                    w.netAnimator.SetTrigger("TacReload");
+                    if(w.netAnimator != null)
+                        w.netAnimator.SetTrigger("TacReload");
                 }
                 else
                 {
                     networkAnimator.SetTrigger("EmptyReload");
-                    w.netAnimator.SetTrigger("EmptyReload");
+                    if (w.netAnimator != null)
+                        w.netAnimator.SetTrigger("EmptyReload");
                 }
             }
         }
@@ -299,6 +320,8 @@ namespace Opus
 
         private void FixedUpdate()
         {
+            if (!Controller.Alive)
+                return;
             if(weapon != null)
             {
                 UpdateActiveEquipment(weapon, Slot.primary);
@@ -322,6 +345,8 @@ namespace Opus
         }
         private void LateUpdate()
         {
+
+
             if (weapon != null)
             {
                 UpdateEquipmentPosition(weapon, Slot.primary);
@@ -345,34 +370,20 @@ namespace Opus
         }
         void UpdateEquipmentPosition(BaseEquipment be, Slot slot)
         {
-            if (slot == currentSlot)
-            {
-                if (be.transform.localScale == Vector3.zero)
-                {
-                    be.transform.localScale = Vector3.one;
-                }
-            }
-            else
-            {
-                if (be.transform.localScale == Vector3.one)
-                {
-                    be.transform.localScale = Vector3.zero;
-                }
-            }
-            be.transform.SetPositionAndRotation(pc.weaponOffset.position, pc.weaponOffset.rotation);
+            be.transform.SetPositionAndRotation(Controller.weaponOffset.position, Controller.weaponOffset.rotation);
 
         }
         void UpdateActiveEquipment(BaseEquipment be, Slot slot)
         {
             if (be != null && IsOwner)
             {
-                be.fireInput = pc.fireInput && currentSlot == slot && !be.acpp.customParams[0].boolValue;
-                be.secondaryInput = pc.secondaryInput && currentSlot == slot && !be.acpp.customParams[0].boolValue;
-                if (slot == currentSlot)
+                be.fireInput = Controller.MyPlayerManager.fireInput && currentSlot == slot && !be.acpp.customParams[0].boolValue && !playingGesture && Controller.Alive;
+                be.secondaryInput = Controller.MyPlayerManager.secondaryInput && currentSlot == slot && !be.acpp.customParams[0].boolValue && !playingGesture && Controller.Alive;
+                if (Controller.Alive && slot == currentSlot)
                 {
-                    dampedMove = Mathf.SmoothDamp(dampedMove, pc.moveInput.sqrMagnitude * (pc.isGrounded ? 1 : 0)
-                        * (pc.sprintInput ? be.swayContainer.sprintMultiplier : 1)
-                        * (pc.crouchInput ? .5f : 1), ref vdampedmove, pc.moveSwayPosDampTime);
+                    dampedMove = Mathf.SmoothDamp(dampedMove, Controller.MyPlayerManager.moveInput.sqrMagnitude * (Controller.isGrounded ? 1 : 0)
+                        * (Controller.MyPlayerManager.sprintInput ? be.swayContainer.sprintMultiplier : 1)
+                        * (Controller.MyPlayerManager.crouchInput ? .5f : 1), ref vdampedmove, Controller.moveSwayPosDampTime);
                     swaytime += (dampedMove * Time.fixedDeltaTime * be.swayContainer.speed);
                     moveBobTime = (swaytime % 1f) ;
                     linearMoveBob = be.swayContainer.linearMoveBob.Evaluate(moveBobTime).ScaleReturn(be.swayContainer.linearMoveScale) * dampedMove;
@@ -385,6 +396,50 @@ namespace Opus
             if(networkAnimator != null)
             {
                 networkAnimator.SetTrigger("Fire");
+            }
+        }
+
+        public void PlayGesture(string triggerName)
+        {
+            if(!playingGesture)
+                PlayGesture_RPC(triggerName);
+        }
+
+        [Rpc(SendTo.Everyone)]
+        void PlayGesture_RPC(FixedString32Bytes value)
+        {
+            networkAnimator.SetTrigger(value.ToString());
+            StartCoroutine(LerpLayerWeight());
+        }
+        [Rpc(SendTo.Everyone)]
+        void LerpGestureWeight_RPC(bool gesturing = true)
+        {
+            StartCoroutine(LerpLayerWeight(gesturing));
+        }
+        public void LerpGestureWeight(bool gesturing = true)
+        {
+            StartCoroutine(LerpLayerWeight(gesturing));
+        }
+        IEnumerator LerpLayerWeight(bool gesturing = true)
+        {
+            if (gesturing)
+            {
+                while (gestureWeight < 1)
+                {
+                    gestureWeight = Mathf.Clamp01(gestureWeight + (Time.fixedDeltaTime / gestureLerpTime));
+                    networkAnimator.Animator.SetLayerWeight(1, gestureWeight);
+                    yield return new WaitForFixedUpdate();
+                }
+            }
+            else
+            {
+                while (gestureWeight > 0)
+                {
+                    gestureWeight = Mathf.Clamp01(gestureWeight - (Time.fixedDeltaTime / gestureLerpTime));
+                    networkAnimator.Animator.SetLayerWeight(1, gestureWeight);
+                    yield return new WaitForFixedUpdate();
+                    playingGesture = false;
+                }
             }
         }
     }

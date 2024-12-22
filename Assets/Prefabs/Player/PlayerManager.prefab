@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1638164249
+  GlobalObjectIdHash: 3541034774
   InScenePlacedSourceGlobalObjectIdHash: 3541034774
   DeferredDespawnTick: 0
   Ownership: 1
@@ -99,11 +99,18 @@ MonoBehaviour:
   myUI: {fileID: 7338655238034070880}
   readyButton: {fileID: 6723797280413877173}
   hud: {fileID: 7440212327959297398}
+  moveInput: {x: 0, y: 0}
+  lookInput: {x: 0, y: 0}
+  jumpInput: 0
+  crouchInput: 0
+  sprintInput: 0
+  fireInput: 0
+  secondaryInput: 0
   primaryWeaponIndex: 0
   gadget1Index: -1
   gadget2Index: -1
   gadget3Index: -1
-  specialIndex: -1
+  specialIndex: 0
 --- !u!1 &1282170567618094970
 GameObject:
   m_ObjectHideFlags: 0

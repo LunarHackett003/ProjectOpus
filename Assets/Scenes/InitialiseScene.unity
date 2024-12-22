@@ -93,8 +93,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingDataAsset: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 081e3fe918b216241a4b0be6a830fa8d, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -226,15 +226,15 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.08
-  far clip plane: 1000
+  near clip plane: 0.18
+  far clip plane: 500
   field of view: 80
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4194231
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -254,8 +254,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 854916404}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.000000089308976, y: 0.000000270207, z: -2.4131911e-14, w: 1}
-  m_LocalPosition: {x: 0.0000000041171546, y: 0.83926487, z: -0.04709518}
+  m_LocalRotation: {x: 0.0000010132862, y: 0.00000047683534, z: -4.831707e-13, w: 1}
+  m_LocalPosition: {x: 9.864637, y: 0.83926463, z: 13.527355}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

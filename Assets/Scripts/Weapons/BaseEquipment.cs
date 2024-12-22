@@ -26,5 +26,10 @@ namespace Opus
 
 
         protected bool lastFireInput;
+
+        public virtual void TrySelect()
+        {
+            print($"Tried to select {gameObject.name}");
+        }
     }
 }

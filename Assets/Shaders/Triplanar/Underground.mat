@@ -108,8 +108,8 @@ Material:
     m_Colors:
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
-    - _SideColour: {r: 0.48780704, g: 0.49389982, b: 0.5471698, a: 1}
-    - _TopColour: {r: 0.5980331, g: 0.8396226, b: 0.82451636, a: 1}
+    - _SideColour: {r: 0.2830189, g: 0.2830189, b: 0.2830189, a: 1}
+    - _TopColour: {r: 0.6415094, g: 0.5727965, b: 0.55375576, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &5911464190726329641
