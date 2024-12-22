@@ -34,7 +34,7 @@ AvatarMask:
   - m_Path: metarig.001/IKRoot/AimRoot/Camera/Camera_end
     m_Weight: 0
   - m_Path: metarig.001/IKRoot/AimRoot/Elbow.IK.L
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: metarig.001/IKRoot/AimRoot/Elbow.IK.L/Elbow.IK.L_end
     m_Weight: 0
   - m_Path: metarig.001/IKRoot/AimRoot/Elbow.IK.R
@@ -54,7 +54,7 @@ AvatarMask:
   - m_Path: metarig.001/IKRoot/AimRoot/WeaponBone/WeaponBone.001
     m_Weight: 0
   - m_Path: metarig.001/IKRoot/AimRoot/WeaponBone/WeaponBone.001/WeaponBone_L
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: metarig.001/IKRoot/AimRoot/WeaponBone/WeaponBone.001/WeaponBone_L/WeaponBone_L_end
     m_Weight: 0
   - m_Path: metarig.001/IKRoot/AimRoot/WeaponBone/WeaponBone.001/WeaponBone_R
@@ -62,11 +62,11 @@ AvatarMask:
   - m_Path: metarig.001/IKRoot/AimRoot/WeaponBone/WeaponBone.001/WeaponBone_R/WeaponBone_R_end
     m_Weight: 0
   - m_Path: metarig.001/IKRoot/Hand.IK.L
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: metarig.001/IKRoot/Hand.IK.L/Hand.IK.L_end
     m_Weight: 0
   - m_Path: metarig.001/IKRoot/Hand.IK.R
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: metarig.001/IKRoot/Hand.IK.R/Hand.IK.R_end
     m_Weight: 0
   - m_Path: metarig.001/IKRoot/Hips.IK

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Cinemachine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -51,7 +52,20 @@ namespace Opus
 
         public ControlScheme controls;
 
+        public NetworkObject reviveItemPrefab;
+        NetworkObject reviveItemInstance;
 
+        public int currentSpectateIndex;
+        bool spectating;
+        Transform originalTrackingTarget;
+        public CinemachineCamera spectatorCamera;
+        public Transform spectatorCamParent;
+        bool firstPersonSpectating;
+
+        Vector2 spectatorLookAngle;
+
+        public NetworkVariable<int> timeUntilSpawn = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        bool canRespawn = true;
         public int primaryWeaponIndex = -1, gadget1Index = -1, gadget2Index = -1, gadget3Index = -1, specialIndex = -1;
         public override void OnNetworkSpawn()
         {
@@ -69,8 +83,7 @@ namespace Opus
                     LoadoutUI.Instance.pm = this;
                 }
 
-
-
+                #region Input Subscription
                 controls = new();
                 controls.Player.Move.performed += Move_performed;
                 controls.Player.Move.canceled += Move_performed;
@@ -100,7 +113,9 @@ namespace Opus
 
                 controls.Player.Special.performed += Special_performed;
                 controls.Enable();
+                #endregion
 
+                timeUntilSpawn.OnValueChanged += RespawnTimeChanged;
             }
             else
             {
@@ -108,18 +123,28 @@ namespace Opus
             }
             UpdateAllPlayerColours();
         }
-
+        void RespawnTimeChanged(int previous, int current)
+        {
+            canRespawn = current <= 0;
+        }
         private void Special_performed(InputAction.CallbackContext obj)
         {
-            if(LivingPlayer != null && LivingPlayer.wc != null && LivingPlayer.wc.special != null)
+            if (LivingPlayer != null)
             {
-                LivingPlayer.wc.TrySwitchWeapon((int)Slot.special);
+                if(LivingPlayer.wc != null && LivingPlayer.Alive && LivingPlayer.wc.special != null)
+                {
+                    LivingPlayer.wc.TrySwitchWeapon((int)Slot.special);
+                }
+                if (spectating)
+                {
+                    firstPersonSpectating = !firstPersonSpectating;
+                }
             }
         }
 
         private void CycleWeapon_performed(InputAction.CallbackContext obj)
         {
-            if (LivingPlayer != null && LivingPlayer.wc != null)
+            if (LivingPlayer != null && LivingPlayer.Alive && LivingPlayer.wc != null)
             {
                 LivingPlayer.wc.TrySwitchWeapon(Mathf.FloorToInt(obj.ReadValue<float>()));
             }
@@ -137,16 +162,24 @@ namespace Opus
         private void Sprint_performed(InputAction.CallbackContext obj)
         {
             sprintInput = obj.ReadValueAsButton();
+            if(!IsServer)
+                Sprint_RPC(sprintInput);
         }
         private void Crouch_performed(InputAction.CallbackContext obj)
         {
             crouchInput = obj.ReadValueAsButton();
+            if (!IsServer)
+                Crouch_RPC(crouchInput);
         }
 
         private void Jump_performed(InputAction.CallbackContext obj)
         {
             jumpInput = obj.ReadValueAsButton();
+            if (!IsServer)
+                Jump_RPC(jumpInput);
         }
+
+
 
         private void Look_performed(InputAction.CallbackContext obj)
         {
@@ -156,20 +189,132 @@ namespace Opus
         private void Move_performed(InputAction.CallbackContext obj)
         {
             moveInput = obj.ReadValue<Vector2>();
+            if (!IsServer)
+                Move_RPC(moveInput);
         }
         private void SecondaryInput_performed(InputAction.CallbackContext obj)
         {
             secondaryInput = obj.ReadValueAsButton();
+
+            if (LivingPlayer != null && spectating)
+            {
+                Spectate_RPC(true, -1, reviveItemInstance);
+            }
         }
 
         private void Fire_performed(InputAction.CallbackContext obj)
         {
             fireInput = obj.ReadValueAsButton();
+            if (LivingPlayer != null && spectating)
+            {
+                Spectate_RPC(true, 1, reviveItemInstance);
+            }
         }
 
+        [Rpc(SendTo.Server)]
+        void Move_RPC(Vector2 move)
+        {
+            moveInput = move;
+        }
+        [Rpc(SendTo.Server)]
+        void Sprint_RPC(bool sprint)
+        {
+            sprintInput = sprint;
+        }
+        [Rpc(SendTo.Server)]
+        void Jump_RPC(bool jump)
+        {
+            jumpInput = jump;
+        }
+        [Rpc(SendTo.Server)]
+        void Crouch_RPC(bool crouch)
+        {
+            crouchInput = crouch;
+        }
+
+        public void SpawnReviveItem(Vector3 lastPos = default)
+        {
+            if(reviveItemInstance == null)
+            {
+                reviveItemInstance = NetworkManager.SpawnManager.InstantiateAndSpawn(reviveItemPrefab, OwnerClientId, position: lastPos);
+            }
+            Spectate_RPC(true, 0, reviveItemInstance);
+
+            StartCoroutine(SpawnCountdown());
+        }
+
+        [Rpc(SendTo.Owner)]
+        public void Spectate_RPC(bool spectating, int indexChange, NetworkObjectReference nor)
+        {
+            if (!this.spectating)
+            {
+                currentSpectateIndex = (int)OwnerClientId;
+            }
+            this.spectating = spectating;
+            spectatorCamera.enabled = spectating && !firstPersonSpectating;
+            if (!spectating && LivingPlayer != null)
+            {
+                LivingPlayer.viewmodelCamera.enabled = true;
+                LivingPlayer.viewCineCam.enabled = true;
+
+                LivingPlayer.worldCineCam.enabled = true;
+                LivingPlayer.worldCineCam.Target.TrackingTarget = originalTrackingTarget;
+                spectatorCamera.enabled = false;
+                return;
+            }
 
 
 
+
+            currentSpectateIndex += indexChange;
+            currentSpectateIndex %= MatchManager.Instance.playersOnTeam[(int)teamIndex.Value];
+            PlayerManager target = playersByID[(uint)currentSpectateIndex];
+            if(target.LivingPlayer == null)
+            {
+                return;
+            }
+
+            if (target.LivingPlayer.Alive)
+            {
+                if (firstPersonSpectating && LivingPlayer != null)
+                {
+                    spectatorCamera.enabled = false;
+                    LivingPlayer.worldCineCam.Target.TrackingTarget = target.LivingPlayer.worldCineCam.Target.TrackingTarget;
+                    return;
+                }
+                else
+                {
+                    spectatorCamera.Target.TrackingTarget = target.LivingPlayer.transform;
+                }
+            }
+            else
+            {
+                if (nor.TryGet(out reviveItemInstance))
+                {
+                    spectatorCamera.Target.TrackingTarget = target.reviveItemInstance.transform;
+                }
+            }
+            LivingPlayer.viewmodelCamera.enabled = false;
+            LivingPlayer.viewCineCam.enabled = false;
+            LivingPlayer.worldCineCam.enabled = false;
+        }
+
+        public void RespawnPlayer(bool revived, Vector3 lastPos = default)
+        {
+            if (revived)
+            {
+                MatchManager.Instance.RequestSpawn_RPC(OwnerClientId, revived: true, position: lastPos);
+            }
+            else
+            {
+                MatchManager.Instance.RequestSpawn_RPC(OwnerClientId, primaryWeaponIndex, gadget1Index, gadget2Index, gadget3Index, specialIndex);
+            }
+            Spectate_RPC(false, 0, reviveItemInstance);
+            if (reviveItemInstance)
+            {
+                reviveItemInstance.Despawn();
+            }
+        }
 
 
 
@@ -206,14 +351,12 @@ namespace Opus
             }
         }
         [Rpc(SendTo.Owner)]
-        public void SpawnPlayer_RPC(Vector3 pos, Quaternion rot)
+        public void SpawnPlayer_RPC()
         {
             print("received spawn message, attempting to find us somewhere to spawn!");
             requestingSpawn = false;
 
             onSpawnReceived?.Invoke();
-
-            LivingPlayer.GetComponent<NetworkTransform>().Teleport(pos, rot, Vector3.one);
 
             if (hud != null)
             {
@@ -222,12 +365,13 @@ namespace Opus
         }
         public void ReadyUpPressed()
         {
-            MatchManager.Instance.RequestSpawn_RPC(OwnerClientId, primaryWeaponIndex, gadget1Index, gadget2Index, gadget3Index, specialIndex);
+            RespawnPlayer(false);
         }
         public void SetPlayerOnSpawn(PlayerController spawnedPlayer)
         {
             LivingPlayer = spawnedPlayer;
-            LivingPlayer.transform.SetPositionAndRotation(spawnPos, spawnRot);
+
+            originalTrackingTarget = LivingPlayer.worldCineCam.Target.TrackingTarget;
         }
         private void FixedUpdate()
         {
@@ -247,15 +391,34 @@ namespace Opus
                 {
                     if(LivingPlayer.transform.position.y < -40 && LivingPlayer.CurrentHealth > 0)
                     {
-                        LivingPlayer.CurrentHealth = 0;
+                        LivingPlayer.currentHealth.Value = 0;
                     }
                 }
             }
 
             if (IsOwner)
             {
-                readyButton.interactable = LivingPlayer == null || LivingPlayer.CurrentHealth <= 0;
+                readyButton.interactable = canRespawn;
+            }
+        }
 
+        IEnumerator SpawnCountdown()
+        {
+            while (timeUntilSpawn.Value > 0)
+            {
+                yield return new WaitForSeconds(1);
+                timeUntilSpawn.Value--;
+            }
+        }
+        private void Update()
+        {
+            if (spectating)
+            {
+                spectatorLookAngle += new Vector2(PlayerSettings.Instance.settingsContainer.mouseLookSpeedY * -lookInput.y, PlayerSettings.Instance.settingsContainer.mouseLookSpeedX * lookInput.x) * Time.smoothDeltaTime;
+                spectatorLookAngle.x = Mathf.Clamp(spectatorLookAngle.x, -85, 85);
+                spectatorLookAngle.y %= 360;
+
+                spectatorCamParent.SetPositionAndRotation(spectatorCamera.Target.TrackingTarget.position, Quaternion.Euler(spectatorLookAngle.x, spectatorLookAngle.y, 0));
             }
         }
     }

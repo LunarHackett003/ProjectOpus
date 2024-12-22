@@ -10,7 +10,7 @@ namespace Opus
     {
         #region Definitions
 
-        public bool Alive => CurrentHealth > 0;
+        public bool Alive;
 
 
         public AnimatorCustomParamProxy acpp;
@@ -26,6 +26,8 @@ namespace Opus
 
         public Transform headTransform;
         public Transform weaponOffset;
+
+        public Transform clientRotationRoot;
 
         Vector3 lookSwayPos, lookSwayEuler, v_lookswaypos, v_lookswayeuler;
         //Sway and rotation based on movement
@@ -98,7 +100,7 @@ namespace Opus
 
         public bool canWallrun;
 
-        
+        public NetworkVariable<bool> SpawnedFromRevive = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         Vector3 lastGroundedPosition;
         #endregion
@@ -130,7 +132,13 @@ namespace Opus
                 worldCineCam.enabled = false;
                 viewCineCam.enabled = false;
                 viewmodelCamera.enabled = false;
+
+                ticksSinceJump = minJumpTicks;
+
+                rb.isKinematic = true;
+
             }
+            
 
             if(TryGetComponent(out characterRender))
             {
@@ -149,19 +157,27 @@ namespace Opus
             if(previous > 0 && current <= 0)
             {
                 //the player just died, we need to make sure they're dead.
+                if (IsServer)
+                {
+                    MyPlayerManager.SpawnReviveItem(lastGroundedPosition);
+                }
             }
             else
             {
                 if(previous <= 0)
                 {
                     //the player has just come back to life or has been revived.
+                    if (IsServer)
+                    {
+                        MyPlayerManager.RespawnPlayer(SpawnedFromRevive.Value, lastGroundedPosition);
+                    }
                 }
             }
         }
 
         void SpawnReceived()
         {
-            aimAngle.x = transform.eulerAngles.y;
+            aimAngle.x = clientRotationRoot.eulerAngles.y;
         }
 
 
@@ -183,36 +199,37 @@ namespace Opus
         private void FixedUpdate()
         {
 
+            Alive = CurrentHealth > 0;
+
             if (IsServer)
             {
-                rb.isKinematic = !Alive;
-            }
-            
-            if (IsOwner && Alive)
-            {
                 CheckGround();
-                if (ticksSinceJump < minJumpTicks)
-                    ticksSinceJump++;
-                if(ticksSinceWallride < minWallrideTicks)
-                    ticksSinceWallride++;
-                if (isGrounded || SnapToGround())
+                rb.isKinematic = !Alive;
+                if (Alive)
                 {
-                    rb.linearDamping = groundDrag;
-                    if (wallriding)
+                    if (ticksSinceJump < minJumpTicks)
+                        ticksSinceJump++;
+                    if (ticksSinceWallride < minWallrideTicks)
+                        ticksSinceWallride++;
+                    if (isGrounded || SnapToGround())
                     {
-                        CancelWallride();
+                        rb.linearDamping = groundDrag;
+                        if (wallriding)
+                        {
+                            CancelWallride();
+                        }
                     }
+                    else
+                    {
+                        rb.linearDamping = airDrag;
+                    }
+                    if (MyPlayerManager.jumpInput && jumps > 0)
+                    {
+                        Jump();
+                    }
+                    MovePlayer();
+                    rb.useGravity = !wallriding;
                 }
-                else
-                {
-                    rb.linearDamping = airDrag;
-                }
-                if (MyPlayerManager.jumpInput && jumps > 0)
-                {
-                    Jump();
-                }
-                MovePlayer();
-                rb.useGravity = !wallriding;
             }
 
             headTransform.position = worldCineCam.transform.position;
@@ -220,7 +237,7 @@ namespace Opus
         RaycastHit groundHit;
         void CheckGround()
         {
-            if (ticksSinceJump == minJumpTicks && Physics.SphereCast(transform.TransformPoint(groundCheckOrigin), groundCheckRadius, -transform.up, out groundHit, groundCheckDistance, groundLayermask, QueryTriggerInteraction.Ignore))
+            if (ticksSinceJump == minJumpTicks && Physics.SphereCast(clientRotationRoot.TransformPoint(groundCheckOrigin), groundCheckRadius, -clientRotationRoot.up, out groundHit, groundCheckDistance, groundLayermask, QueryTriggerInteraction.Ignore))
             {
                 if(groundHit.normal.y >= walkableGroundThreshold)
                 {
@@ -241,22 +258,8 @@ namespace Opus
         {
             if (IsOwner)
             {
-                GUI.contentColor = wallriding ? Color.green : Color.red;
+                GUI.contentColor = Alive ? Color.green : Color.red;
                 GUI.Box(new Rect(0, 0, 32, 32), content);
-                GUI.contentColor = wallClimbing ? Color.green : Color.red;
-                GUI.Box(new Rect(32, 0, 32, 32), content);
-                GUI.contentColor = wallrideOnRight ? Color.green : Color.red;
-                GUI.Box(new Rect(64, 0, 32, 32), content);
-                GUI.contentColor = ticksSinceJump >= minJumpTicks ? Color.green : Color.red;
-                GUI.Box(new Rect(96, 0, 32, 32), $"{ticksSinceJump}/{minJumpTicks}");
-                GUI.contentColor = ticksSinceWallride >= minWallrideTicks ? Color.green : Color.red;
-                GUI.Box(new Rect(128, 0, 32, 32), $"{ticksSinceWallride}/{minWallrideTicks}");
-                speed = rb.linearVelocity.magnitude;
-                GUI.contentColor = Color.Lerp(Color.red, Color.green, speed / 100);
-                GUI.Box(new(0, 32, 64, 32), $"speed: {speed:0.0}");
-                GUI.Box(new(64, 32, 128, 32), $"{rb.linearVelocity:0.0}");
-                GUI.contentColor = Color.Lerp(Color.green, Color.red, Mathf.InverseLerp(0, wallrideMaxDeviation, Mathf.Abs(wallrideCurrentDeviation)));
-                GUI.Box(new(0, 64, 32, 32), $"{wallrideCurrentDeviation:0.0}");
             }
         }
 
@@ -288,7 +291,7 @@ namespace Opus
         {
             if (isGrounded)
             {
-                Vector3 right = Vector3.Cross(-transform.forward, groundNormal);
+                Vector3 right = Vector3.Cross(-clientRotationRoot.forward, groundNormal);
                 Vector3 forward = Vector3.Cross(right, groundNormal);
                 moveVec = groundMoveForce * (MyPlayerManager.sprintInput ? sprintMultiplier : 1) * ((right * MyPlayerManager.moveInput.x) + (forward * MyPlayerManager.moveInput.y));
                 rb.AddForce(Vector3.ProjectOnPlane(-Physics.gravity, groundNormal));
@@ -301,7 +304,7 @@ namespace Opus
                 }
                 else
                 {
-                    moveVec = airMoveForce * ((transform.forward * MyPlayerManager.moveInput.y) + (transform.right * MyPlayerManager.moveInput.x));
+                    moveVec = airMoveForce * ((clientRotationRoot.forward * MyPlayerManager.moveInput.y) + (clientRotationRoot.right * MyPlayerManager.moveInput.x));
                 }
             }
             rb.AddForce(moveVec, ForceMode.Acceleration);
@@ -361,29 +364,29 @@ namespace Opus
                 jumps = jumpsAllowed;
                 wallrideLerp = Mathf.Clamp01(Mathf.InverseLerp(0, wallrideMaxTime, currwallridetime));
                 currwallridetime += Time.fixedDeltaTime;
-                rb.AddForce((wallrideFallForce * wallrideLerp * -transform.up) + (-wallrideNormal * wallrideStickForce), ForceMode.Acceleration);
+                rb.AddForce((wallrideFallForce * wallrideLerp * -clientRotationRoot.up) + (-wallrideNormal * wallrideStickForce), ForceMode.Acceleration);
                 if (wallClimbing)
                 {
                     forwardVec = -wallrideNormal;
-                    transform.forward = Vector3.Lerp(transform.forward, forwardVec, wallrideTurnSpeed * Time.fixedDeltaTime);
+                    clientRotationRoot.forward = Vector3.Lerp(clientRotationRoot.forward, forwardVec, wallrideTurnSpeed * Time.fixedDeltaTime);
                     if (MyPlayerManager.moveInput.y < -0.02f)
                     {
                         CancelWallride();
                         
                         return;
                     }
-                    moveVec = (MyPlayerManager.moveInput.y * wallClimbForce * transform.up) + (MyPlayerManager.moveInput.x * (wallClimbForce * 0.5f) * Vector3.Cross(-wallrideNormal, transform.up));
+                    moveVec = (MyPlayerManager.moveInput.y * wallClimbForce * clientRotationRoot.up) + (MyPlayerManager.moveInput.x * (wallClimbForce * 0.5f) * Vector3.Cross(-wallrideNormal, clientRotationRoot.up));
                 }
                 else
                 {
-                    forwardVec = Vector3.Cross(-wallrideNormal, wallrideOnRight ? transform.up : -transform.up);
-                    transform.forward = Vector3.Lerp(transform.forward, forwardVec, wallrideTurnSpeed * Time.fixedDeltaTime);
+                    forwardVec = Vector3.Cross(-wallrideNormal, wallrideOnRight ? clientRotationRoot.up : -clientRotationRoot.up);
+                    clientRotationRoot.forward = Vector3.Lerp(clientRotationRoot.forward, forwardVec, wallrideTurnSpeed * Time.fixedDeltaTime);
                     if ((wallrideOnRight && MyPlayerManager.moveInput.x < -0.1f) || (MyPlayerManager.moveInput.x > 0.1f))
                     {
                         CancelWallride();
                         return;
                     }
-                    moveVec = MyPlayerManager.moveInput.y * wallrideMoveForce * Vector3.Cross(transform.right, transform.up);
+                    moveVec = MyPlayerManager.moveInput.y * wallrideMoveForce * Vector3.Cross(clientRotationRoot.right, clientRotationRoot.up);
                 }
 
             }
@@ -395,9 +398,9 @@ namespace Opus
         }
         bool WallrideBoxCast(out RaycastHit hit, bool leftSide = false)
         {
-            Debug.DrawRay(transform.position, leftSide ? - transform.right : transform.right, Color.green, 0.1f);
-            return Physics.BoxCast(transform.TransformPoint(wallrideOffset), wallrideBounds / 2, leftSide ? -transform.right : transform.right, 
-                out hit, transform.rotation, wallrideCheckDistance, groundLayermask);
+            Debug.DrawRay(clientRotationRoot.position, leftSide ? - clientRotationRoot.right : clientRotationRoot.right, Color.green, 0.1f);
+            return Physics.BoxCast(clientRotationRoot.TransformPoint(wallrideOffset), wallrideBounds / 2, leftSide ? -clientRotationRoot.right : clientRotationRoot.right, 
+                out hit, clientRotationRoot.rotation, wallrideCheckDistance, groundLayermask);
         }
         void CancelWallride()
         {
@@ -407,7 +410,7 @@ namespace Opus
             currwallridetime = 0;
             wallrideNormal = Vector3.zero;
             MyPlayerManager.lookInput = new(0.00001f, 0.00001f);
-            aimAngle.x = transform.eulerAngles.y + wallrideCurrentDeviation;
+            aimAngle.x = clientRotationRoot.eulerAngles.y + wallrideCurrentDeviation;
             wallrideCurrentDeviation = 0;
             ticksSinceJump = 0;
         }
@@ -418,15 +421,15 @@ namespace Opus
             if (wallriding)
             {
                 wallriding = false;
-                rb.AddForce((transform.up + wallrideNormal) * jumpForce, ForceMode.VelocityChange);
+                rb.AddForce((clientRotationRoot.up + wallrideNormal) * jumpForce, ForceMode.VelocityChange);
                 ticksSinceWallride = minWallrideTicks;
                 CancelWallride();
             }
             else
             {
-                rb.AddForce((transform.up * jumpForce) + (Vector3.up * -rb.linearVelocity.y) +
-                    (isGrounded ? Vector3.zero : ((MyPlayerManager.moveInput.y * jumpForce * 0.5f * transform.forward)
-                    + (MyPlayerManager.moveInput.x * jumpForce * 0.5f * transform.right))), ForceMode.VelocityChange);
+                rb.AddForce((clientRotationRoot.up * jumpForce) + (Vector3.up * -rb.linearVelocity.y) +
+                    (isGrounded ? Vector3.zero : ((MyPlayerManager.moveInput.y * jumpForce * 0.5f * clientRotationRoot.forward)
+                    + (MyPlayerManager.moveInput.x * jumpForce * 0.5f * clientRotationRoot.right))), ForceMode.VelocityChange);
             }
             ticksSinceJump = 0;
         }
@@ -449,7 +452,7 @@ namespace Opus
                 else
                 {
                     //Consume the current deviation and add it to the local rotation
-                    transform.localRotation = Quaternion.Euler(0, aimAngle.x + wallrideCurrentDeviation, 0);
+                    clientRotationRoot.localRotation = Quaternion.Euler(0, aimAngle.x + wallrideCurrentDeviation, 0);
                     aimAngle += MyPlayerManager.lookInput * new Vector2(PlayerSettings.Instance.settingsContainer.mouseLookSpeedX, PlayerSettings.Instance.settingsContainer.mouseLookSpeedY) * Time.deltaTime;
                     aimAngle.y = Mathf.Clamp(aimAngle.y, -85f, 85f);
                     wallrideCurrentDeviation = 0;
@@ -495,7 +498,7 @@ namespace Opus
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.matrix = clientRotationRoot.localToWorldMatrix;
             Gizmos.color = Color.green;
             Gizmos.DrawRay(groundCheckOrigin, Vector3.down * groundCheckDistance);
             Gizmos.DrawWireSphere(groundCheckOrigin, groundCheckRadius);

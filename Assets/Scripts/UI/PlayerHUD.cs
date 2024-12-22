@@ -11,6 +11,7 @@ namespace Opus
         public PlayerController controller;
         public WeaponController wc;
 
+        public Button readyButton;
 
         public int hudUpdateInterval;
         int updateTicks;
@@ -26,6 +27,7 @@ namespace Opus
         public CanvasGroup deadUI;
         public CanvasGroup aliveUI;
 
+        public TMP_Text respawnCounterText;
 
         public override void OnNetworkSpawn()
         {
@@ -44,7 +46,24 @@ namespace Opus
             {
                 manager = GetComponent<PlayerManager>();
             }
+                manager.timeUntilSpawn.OnValueChanged += UpdateRespawnTimer;
+                UpdateRespawnTimer(0, manager.timeUntilSpawn.Value);
         }
+
+        public void UpdateRespawnTimer(int previous, int current)
+        {
+            if(current > 0)
+            {
+                respawnCounterText.text = $"Respawn in {current}";
+            }
+            else
+            {
+                respawnCounterText.text = $"Respawn Ready!";
+            }
+            readyButton.gameObject.SetActive(current <= 0);
+        }
+
+
         public void InitialiseHUD()
         {
             if(manager != null)

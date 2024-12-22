@@ -12,39 +12,18 @@ namespace Opus
         /// Current Health is only modifiable by the server.
         /// </summary>
         public NetworkVariable<float> currentHealth = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        protected float localCurrentHealth;
-        public float CurrentHealth { get { return localCurrentHealth; } 
-            set 
-            {
-                if (IsServer)
-                {
-                    localCurrentHealth = value;
-                    currentHealth.Value = value;
-                    SetHealth_RPC(localCurrentHealth);
-                }
-                else
-                {
-                    localCurrentHealth = value;
-                }
-            }
-        }
+        public float CurrentHealth => currentHealth.Value;
         public bool healable;
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
 
-            if(currentHealth.Value == 0)
+            if (IsServer)
             {
-                localCurrentHealth = currentHealth.Value;
+                currentHealth.Value = maxHealth;
             }
-            CurrentHealth = maxHealth;
             
-        }
-        [Rpc(SendTo.ClientsAndHost)]
-        void SetHealth_RPC(float health)
-        {
-            localCurrentHealth = health;
         }
 
         public override void ReceiveDamage(float damageIn, float incomingCritMultiply)

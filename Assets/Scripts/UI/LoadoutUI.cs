@@ -20,7 +20,7 @@ namespace Opus
         public GameObject equipmentItemPrefab;
         List<LoadoutItemDisplay> displayItems = new();
 
-        private void Awake()
+        private void Start()
         {
             if(Instance == null)
             {
@@ -28,7 +28,6 @@ namespace Opus
             }
             else
             {
-                Destroy(gameObject);
                 return;
             }
         }

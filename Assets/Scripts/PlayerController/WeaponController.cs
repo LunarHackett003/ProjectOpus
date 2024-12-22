@@ -20,6 +20,7 @@ namespace Opus
     {
         public PlayerController Controller { get; private set; }
         public Slot currentSlot;
+        public NetworkVariable<Slot> syncedSlot = new(Slot.primary, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public BaseEquipment weapon;
         public BaseEquipment gadget1, gadget2, gadget3, special;
         public NetworkVariable<NetworkBehaviourReference> weaponRef = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -138,36 +139,17 @@ namespace Opus
                 Controller = GetComponent<PlayerController>();
             }
             weaponRef.OnValueChanged += WeaponUpdated;
+            WeaponUpdated(null, weaponRef.Value);
             gadget1Ref.OnValueChanged += Gadget1Updated;
+            Gadget1Updated(null, gadget1Ref.Value);
             gadget2Ref.OnValueChanged += Gadget2Updated;
+            Gadget2Updated(null, gadget2Ref.Value);
             gadget3Ref.OnValueChanged += Gadget3Updated;
+            Gadget3Updated(null, gadget3Ref.Value);
             specialRef.OnValueChanged += SpecialUpdated;
+            SpecialUpdated(null, specialRef.Value);
 
-            if (weapon)
-            {
-                SetUpWeaponSlot(Slot.primary, weapon);
-            }
-
-            if(weaponRef.Value.TryGet(out BaseEquipment e))
-            {
-                SetUpWeaponSlot(Slot.primary, e);
-            }
-            if(gadget1Ref.Value.TryGet(out e))
-            {
-                SetUpWeaponSlot(Slot.gadget1, e);
-            }
-            if (gadget2Ref.Value.TryGet(out e))
-            {
-                SetUpWeaponSlot(Slot.gadget2, e);
-            }
-            if (gadget3Ref.Value.TryGet(out e))
-            {
-                SetUpWeaponSlot(Slot.gadget3, e);
-            }
-            if (specialRef.Value.TryGet(out e))
-            {
-                SetUpWeaponSlot(Slot.special, e);
-            }
+            currentSlot = syncedSlot.Value;
         }
         public BaseEquipment GetCurrentEquipment()
         {
@@ -180,6 +162,27 @@ namespace Opus
                 Slot.special => special,
                 _ => null,
             };
+        }
+
+        public BaseEquipment GetCurrentEquipmentByReference()
+        {
+            NetworkBehaviourReference nbr = currentSlot switch
+            {
+                Slot.primary => weaponRef.Value,
+                Slot.gadget1 => gadget1Ref.Value,
+                Slot.gadget2 => gadget2Ref.Value,
+                Slot.gadget3 => gadget3Ref.Value,
+                Slot.special => specialRef.Value,
+                _ => null,
+            };
+            if(nbr.TryGet(out BaseEquipment be))
+            {
+                return be;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public BaseEquipment GetEquipment(Slot slot)
@@ -219,6 +222,10 @@ namespace Opus
         void SwitchWeapon_RPC(int targetSlot)
         {
             currentSlot = (Slot)targetSlot;
+            if (IsOwner)
+            {
+                syncedSlot.Value = currentSlot;
+            }
             BaseEquipment w = GetCurrentEquipment();
             switch (w)
             {
@@ -232,11 +239,14 @@ namespace Opus
                     networkAnimator.Animator.SetInteger("Type", 2);
                     break;
             }
-            SetUpAnimations();
+            if (IsOwner)
+            {
+                SetUpAnimations_RPC(w);
+            }
         }
 
-
-        public void SetUpAnimations()
+        [Rpc(SendTo.Everyone)]
+        public void SetUpAnimations_RPC(NetworkBehaviourReference nbr)
         {
             print($"overriding animations for {OwnerClientId}'s {currentSlot} slot.");
             if(aoc == null)
@@ -249,7 +259,34 @@ namespace Opus
             aoc.GetOverrides(clipOverrides);
 
             BaseEquipment be = GetCurrentEquipment();
-
+            if(be == null)
+            {
+                if(!nbr.TryGet(out be))
+                {
+                    Debug.LogWarning($"Failed to get weapon or weapon reference in slot {currentSlot} for client {OwnerClientId}!");
+                    return;
+                }
+                switch (currentSlot)
+                {
+                    case Slot.primary:
+                        weapon = be;
+                        break;
+                    case Slot.gadget1:
+                        gadget1 = be;
+                        break;
+                    case Slot.gadget2:
+                        gadget2 = be;
+                        break;
+                    case Slot.gadget3:
+                        gadget3 = be;
+                        break;
+                    case Slot.special:
+                        special = be;
+                        break;
+                    default:
+                        break;
+                }
+            }
             for (int i = 0; i < be.animationSet.animations.Length; i++)
             {
                 AnimationClipPair acp = be.animationSet.animations[i];
@@ -260,6 +297,7 @@ namespace Opus
             }
             aoc.ApplyOverrides(clipOverrides);
             networkAnimator.Animator.Rebind();
+
         }
 
         public void WeaponUpdated(NetworkBehaviourReference old, NetworkBehaviourReference next)
@@ -272,6 +310,10 @@ namespace Opus
                 }
                 SetUpWeaponSlot(Slot.primary, e);
             }
+            else
+            {
+                print("failed to update primary");
+            }
         }
         public void Gadget1Updated(NetworkBehaviourReference old, NetworkBehaviourReference next)
         {
@@ -283,6 +325,11 @@ namespace Opus
                 }
                 SetUpWeaponSlot(Slot.gadget1, e);
             }
+            else
+            {
+                print("failed to update gadget 1");
+            }
+
         }
         public void Gadget2Updated(NetworkBehaviourReference old, NetworkBehaviourReference next)
         {
@@ -293,6 +340,10 @@ namespace Opus
                     w.NetworkObject.Despawn(true);
                 }
                 SetUpWeaponSlot(Slot.gadget2, e);
+            }
+            else
+            {
+                print("failed to update gadget 2");
             }
         }
         public void Gadget3Updated(NetworkBehaviourReference old, NetworkBehaviourReference next)
@@ -305,6 +356,10 @@ namespace Opus
                 }
                 SetUpWeaponSlot(Slot.gadget3, e);
             }
+            else
+            {
+                print("failed to update gadget 3");
+            }
         }
         public void SpecialUpdated(NetworkBehaviourReference old, NetworkBehaviourReference next)
         {
@@ -315,6 +370,10 @@ namespace Opus
                     w.NetworkObject.Despawn(true);
                 }
                 SetUpWeaponSlot(Slot.special, e);
+            }
+            else
+            {
+                print("failed to update special");
             }
         }
 

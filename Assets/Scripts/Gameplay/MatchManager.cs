@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Components;
@@ -15,10 +16,14 @@ namespace Opus
         public int numberOfTeamsAllowed;
         public NetworkVariable<Dictionary<int, int>> teamScores = new(new(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+        public NetworkList<int> playersOnTeam = new(new int[20], NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
         public SpawnpointHolder spawnpointHolder;
 
         public EquipmentList weapons;
         public EquipmentList gadgets;
+
+        public int maxRespawnTime = 10;
 
         public bool[] lockedSlots = new bool[5];
 
@@ -32,14 +37,38 @@ namespace Opus
             base.OnNetworkSpawn();
             NetworkManager.OnConnectionEvent += ConnectionEvent;
             NetworkManager.SceneManager.OnSceneEvent += SceneManager_OnSceneEvent;
+
+            TeamsChanged(new(), clientsOnTeams.Value);
         }
         public override void OnNetworkDespawn()
         {
             NetworkManager.OnConnectionEvent -= ConnectionEvent;
             NetworkManager.SceneManager.OnSceneEvent -= SceneManager_OnSceneEvent;
+
             Instance = null;
             base.OnNetworkDespawn();
         }
+
+        public void TeamsChanged(Dictionary<ulong, uint> previous, Dictionary<ulong, uint> current)
+        {
+            playersOnTeam.Clear();
+            for (int i = 0; i < numberOfTeamsAllowed; i++)
+            {
+                playersOnTeam.Add(0);
+            };
+            print("Updating teams!");
+            foreach (var item in current)
+            {
+                print($"found a player on team {item.Value}");
+                playersOnTeam[(int)item.Value]++;
+            }
+            for (int i = 0; i < numberOfTeamsAllowed; i++)
+            {
+
+            }
+        }
+
+
         private void SceneManager_OnSceneEvent(SceneEvent sceneEvent)
         {
             if(sceneEvent.SceneEventType == SceneEventType.LoadComplete)
@@ -52,7 +81,7 @@ namespace Opus
             }
         }
         [Rpc(SendTo.Server)]
-        public void RequestSpawn_RPC(ulong clientID, int primaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int gadgetThreeIndex = -1, int specialIndex = -1)
+        public void RequestSpawn_RPC(ulong clientID, int primaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int gadgetThreeIndex = -1, int specialIndex = -1, bool revived = false, Vector3 position = default)
         {
             if (PlayerManager.playersByID.TryGetValue(clientID, out PlayerManager p))
             {
@@ -60,14 +89,22 @@ namespace Opus
                 {
                     p.LivingPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(p.playerPrefab, clientID).GetComponent<PlayerController>();
                 }
-                (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint();
-                p.LivingPlayer.CurrentHealth = p.LivingPlayer.MaxHealth;
+                p.LivingPlayer.currentHealth.Value = p.LivingPlayer.MaxHealth;
+                p.timeUntilSpawn.Value = maxRespawnTime;
+                if (!revived)
+                {
+                    (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint(p.teamIndex.Value);
 
+                    SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, gadgetThreeIndex, specialIndex);
+                    p.LivingPlayer.GetComponent<NetworkTransform>().Teleport(pos, Quaternion.identity, Vector3.one);
 
-                SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, gadgetThreeIndex, specialIndex);
-
-
-                p.SpawnPlayer_RPC(pos, rot);
+                    p.SpawnPlayer_RPC();
+                }
+                else
+                {
+                    p.LivingPlayer.GetComponent<NetworkTransform>().Teleport(position, Quaternion.identity, Vector3.one);
+                    p.SpawnPlayer_RPC();
+                }
             }
         }
         void SpawnWeaponsForPlayer(ulong clientID, PlayerManager p, int primaryWeaponIndex = -1, int gadgetOneIndex = -1, int gadgetTwoIndex = -1, int gadgetThreeIndex = -1, int specialIndex = -1)
@@ -138,8 +175,14 @@ namespace Opus
         void SetPlayerTeam(ulong clientID)
         {
             uint team = FindSmallestTeam();
-            clientsOnTeams.Value.TryAdd(clientID, team);
-            print($"added client {clientID} to {team}");
+            if (clientsOnTeams.Value.TryAdd(clientID, team))
+            {
+                print($"added client {clientID} to {team}");
+            }
+            else
+            {
+                print($"failed to add client {clientID} to team {team}");
+            }
 
             NetworkObject n = NetworkManager.ConnectedClients[clientID].PlayerObject;
             PlayerManager p = n.GetComponent<PlayerManager>();
@@ -147,6 +190,8 @@ namespace Opus
                 p.UpdateTeamIndex(0, 0);
             else
                 p.teamIndex.Value = team;
+            TeamsChanged(new(), clientsOnTeams.Value);
+
         }
         private void ConnectionEvent(NetworkManager manager, ConnectionEventData eventData)
         {
