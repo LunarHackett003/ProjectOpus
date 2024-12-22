@@ -33,7 +33,7 @@ Material:
     m_Ints: []
     m_Floats: []
     m_Colors:
-    - _SideColour: {r: 0.49056602, g: 0.3727797, b: 0.3494126, a: 1}
+    - _SideColour: {r: 0.58348167, g: 0.8301887, b: 0.8149288, a: 1}
     - _TopColour: {r: 0.6792453, g: 0.6792453, b: 0.6792453, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
