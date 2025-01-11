@@ -14,9 +14,9 @@ namespace Opus
 
         PlayerManager owningPlayer;
 
-        public void InitialiseViewable(PlayerController fromThis)
+        public void InitialiseViewable(PlayerEntity fromThis)
         {
-            owningPlayer = fromThis.MyPlayerManager;
+            owningPlayer = fromThis.playerManager;
             if (IsOwner)
             {
 

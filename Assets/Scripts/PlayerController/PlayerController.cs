@@ -142,7 +142,7 @@ namespace Opus
 
             if(TryGetComponent(out characterRender))
             {
-                characterRender.InitialiseViewable(this);
+                //characterRender.InitialiseViewable(this);
             }
             swayInitialRotation = weaponOffset.localRotation;
 
@@ -193,7 +193,6 @@ namespace Opus
             if (MyPlayerManager)
             {
                 
-                MyPlayerManager.SetPlayerOnSpawn(this);
             }
         }
         private void FixedUpdate()

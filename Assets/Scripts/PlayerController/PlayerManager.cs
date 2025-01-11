@@ -19,7 +19,7 @@ namespace Opus
         public static uint MyTeam;
 
         public NetworkObject playerPrefab;
-        public PlayerController LivingPlayer;
+        public PlayerEntity LivingPlayer;
         public NetworkVariable<uint> teamIndex = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> kills = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> deaths = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -131,52 +131,39 @@ namespace Opus
         {
             if (LivingPlayer != null)
             {
-                if(LivingPlayer.wc != null && LivingPlayer.Alive && LivingPlayer.wc.special != null)
-                {
-                    LivingPlayer.wc.TrySwitchWeapon((int)Slot.special);
-                }
-                if (spectating)
-                {
-                    firstPersonSpectating = !firstPersonSpectating;
-                }
+
             }
         }
 
         private void CycleWeapon_performed(InputAction.CallbackContext obj)
         {
-            if (LivingPlayer != null && LivingPlayer.Alive && LivingPlayer.wc != null)
+            if (LivingPlayer != null)
             {
-                LivingPlayer.wc.TrySwitchWeapon(Mathf.FloorToInt(obj.ReadValue<float>()));
+                
             }
         }
         private void Reload_performed(InputAction.CallbackContext obj)
         {
-            if (LivingPlayer.wc != null)
+            if (LivingPlayer)
             {
-                if (obj.ReadValueAsButton() && !LivingPlayer.wc.networkAnimator.Animator.GetCurrentAnimatorStateInfo(0).IsTag("Reload"))
-                {
-                    LivingPlayer.wc.TryReload();
-                }
+
             }
         }
         private void Sprint_performed(InputAction.CallbackContext obj)
         {
             sprintInput = obj.ReadValueAsButton();
-            if(!IsServer)
-                Sprint_RPC(sprintInput);
+
         }
         private void Crouch_performed(InputAction.CallbackContext obj)
         {
             crouchInput = obj.ReadValueAsButton();
-            if (!IsServer)
-                Crouch_RPC(crouchInput);
+
         }
 
         private void Jump_performed(InputAction.CallbackContext obj)
         {
             jumpInput = obj.ReadValueAsButton();
-            if (!IsServer)
-                Jump_RPC(jumpInput);
+
         }
 
 
@@ -189,8 +176,7 @@ namespace Opus
         private void Move_performed(InputAction.CallbackContext obj)
         {
             moveInput = obj.ReadValue<Vector2>();
-            if (!IsServer)
-                Move_RPC(moveInput);
+
         }
         private void SecondaryInput_performed(InputAction.CallbackContext obj)
         {
@@ -209,27 +195,6 @@ namespace Opus
             {
                 Spectate_RPC(true, 1, reviveItemInstance);
             }
-        }
-
-        [Rpc(SendTo.Server)]
-        void Move_RPC(Vector2 move)
-        {
-            moveInput = move;
-        }
-        [Rpc(SendTo.Server)]
-        void Sprint_RPC(bool sprint)
-        {
-            sprintInput = sprint;
-        }
-        [Rpc(SendTo.Server)]
-        void Jump_RPC(bool jump)
-        {
-            jumpInput = jump;
-        }
-        [Rpc(SendTo.Server)]
-        void Crouch_RPC(bool crouch)
-        {
-            crouchInput = crouch;
         }
 
         public void SpawnReviveItem(Vector3 lastPos = default)
@@ -346,7 +311,7 @@ namespace Opus
             {
                 if (item.Value.LivingPlayer != null)
                 {
-                    item.Value.LivingPlayer.UpdatePlayerColours();
+
                 }
             }
         }
@@ -367,7 +332,7 @@ namespace Opus
         {
             RespawnPlayer(false);
         }
-        public void SetPlayerOnSpawn(PlayerController spawnedPlayer)
+        public void SetPlayerOnSpawn(PlayerEntity spawnedPlayer)
         {
             LivingPlayer = spawnedPlayer;
 

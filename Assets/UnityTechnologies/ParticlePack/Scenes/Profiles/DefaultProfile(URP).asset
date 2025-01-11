@@ -201,10 +201,10 @@ MonoBehaviour:
     m_Value: 0
   ambientLightProbeDimmer:
     m_OverrideState: 0
-    m_Value: 0.75
+    m_Value: 0
   sunLightDimmer:
     m_OverrideState: 1
-    m_Value: 0.67
+    m_Value: 2
   erosionOcclusion:
     m_OverrideState: 0
     m_Value: 0.1
@@ -213,13 +213,13 @@ MonoBehaviour:
     m_Value: {r: 0.16037738, g: 0.16037738, b: 0.16037738, a: 1}
   powderEffectIntensity:
     m_OverrideState: 0
-    m_Value: 0.25
+    m_Value: 0
   multiScattering:
     m_OverrideState: 0
     m_Value: 0.5
   shadows:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 1
   shadowResolution:
     m_OverrideState: 0
     m_Value: 64
@@ -234,7 +234,7 @@ MonoBehaviour:
     m_Value: 0.782
   temporalAccumulationFactor:
     m_OverrideState: 0
-    m_Value: 0.95
+    m_Value: 1
   perceptualBlending:
     m_OverrideState: 0
     m_Value: 1

@@ -8,7 +8,7 @@ namespace Opus
     public class PlayerHUD : NetworkBehaviour
     {
         public PlayerManager manager;
-        public PlayerController controller;
+        public PlayerEntity entity;
         public WeaponController wc;
 
         public Button readyButton;
@@ -68,8 +68,8 @@ namespace Opus
         {
             if(manager != null)
             {
-                controller = manager.LivingPlayer;
-                wc = manager.LivingPlayer.wc;
+                entity = manager.LivingPlayer;
+                //wc = manager.LivingPlayer.wc;
             }
         }
 

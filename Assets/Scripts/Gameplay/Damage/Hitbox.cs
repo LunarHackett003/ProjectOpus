@@ -6,7 +6,6 @@ namespace Opus
     {
         [SerializeField] Entity parentEntity;
         [SerializeField] bool criticalBox = false;
-        [SerializeField] float criticalMultiplier = 1;
         [SerializeField] bool transmitDamage = true;
         [SerializeField] float transmitDamageMultiplier = 1;
         public override void ReceiveDamage(float damageIn, float incomingCritMultiply)

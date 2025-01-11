@@ -90,4 +90,27 @@ namespace Opus
         /// </summary>
         chargeAttack = 3
     }
+    /// <summary>
+    /// The player's current move state - how are they moving?
+    /// </summary>
+    public enum MovementState
+    {
+        /// <summary>
+        /// The player has no move state. Not sure how we should ever be in this position.
+        /// </summary>
+        none = 0,
+        /// <summary>
+        /// The player is on the ground & standing still or moving normally.
+        /// </summary>
+        walking = 1,
+        /// <summary>
+        /// The player is sliding along the ground.
+        /// </summary>
+        sliding = 2,
+        /// <summary>
+        /// The player is not on the ground.
+        /// </summary>
+        airborne = 3
+    }
+
 }

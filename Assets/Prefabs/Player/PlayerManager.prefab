@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1638164249
+  GlobalObjectIdHash: 3541034774
   InScenePlacedSourceGlobalObjectIdHash: 3541034774
   DeferredDespawnTick: 0
   Ownership: 1
@@ -209,7 +209,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
-  playerPrefab: {fileID: 569778727507139370, guid: fcb04674e7be87a40827c68c8d773d72, type: 3}
+  playerPrefab: {fileID: 5721487457739386501, guid: f9960a977e1e1c042b0b8664e3edba50, type: 3}
   LivingPlayer: {fileID: 0}
   teamIndex:
     m_InternalValue: 0
@@ -2037,7 +2037,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowTopMostFoldoutHeaderGroup: 1
   manager: {fileID: 3498182768300382486}
-  controller: {fileID: 0}
+  entity: {fileID: 0}
   wc: {fileID: 0}
   readyButton: {fileID: 6723797280413877173}
   hudUpdateInterval: 5

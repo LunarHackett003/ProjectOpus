@@ -87,7 +87,7 @@ namespace Opus
             {
                 if (p.LivingPlayer == null)
                 {
-                    p.LivingPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(p.playerPrefab, clientID).GetComponent<PlayerController>();
+                    p.LivingPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(p.playerPrefab, clientID).GetComponent<PlayerEntity>();
                 }
                 p.LivingPlayer.currentHealth.Value = p.LivingPlayer.MaxHealth;
                 p.timeUntilSpawn.Value = maxRespawnTime;
@@ -96,13 +96,13 @@ namespace Opus
                     (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint(p.teamIndex.Value);
 
                     SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, gadgetThreeIndex, specialIndex);
-                    p.LivingPlayer.GetComponent<NetworkTransform>().Teleport(pos, Quaternion.identity, Vector3.one);
+                    p.LivingPlayer.Teleport_RPC(pos, Quaternion.identity);
 
                     p.SpawnPlayer_RPC();
                 }
                 else
                 {
-                    p.LivingPlayer.GetComponent<NetworkTransform>().Teleport(position, Quaternion.identity, Vector3.one);
+                    p.LivingPlayer.Teleport_RPC(position, Quaternion.identity);
                     p.SpawnPlayer_RPC();
                 }
             }
@@ -113,7 +113,7 @@ namespace Opus
             {
                 if(p.LivingPlayer != null)
                 {
-                    p.LivingPlayer.wc.weaponRef.Value = SpawnWeapon(clientID, weapons.equipment[primaryWeaponIndex].equipmentPrefab, Slot.primary);
+                    //p.LivingPlayer.wc.weaponRef.Value = SpawnWeapon(clientID, weapons.equipment[primaryWeaponIndex].equipmentPrefab, Slot.primary);
                 }
             }
             else
@@ -123,7 +123,7 @@ namespace Opus
             {
                 if (p.LivingPlayer != null)
                 {
-                    p.LivingPlayer.wc.gadget3Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetThreeIndex].equipmentPrefab, Slot.gadget3);
+                    //p.LivingPlayer.wc.gadget3Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetThreeIndex].equipmentPrefab, Slot.gadget3);
                 }
             }
             else
@@ -133,7 +133,7 @@ namespace Opus
             {
                 if (p.LivingPlayer != null)
                 {
-                    p.LivingPlayer.wc.gadget1Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetOneIndex].equipmentPrefab, Slot.gadget1);
+                    //p.LivingPlayer.wc.gadget1Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetOneIndex].equipmentPrefab, Slot.gadget1);
                 }
             }
             else
@@ -143,7 +143,7 @@ namespace Opus
             {
                 if (p.LivingPlayer != null)
                 {
-                    p.LivingPlayer.wc.gadget2Ref.Value = SpawnWeapon(clientID, weapons.equipment[gadgetTwoIndex].equipmentPrefab, Slot.gadget2);
+                    //p.LivingPlayer.wc.gadget2Ref.Value = SpawnWeapon(clientID, weapons.equipment[gadgetTwoIndex].equipmentPrefab, Slot.gadget2);
                 }
             }
             else
@@ -153,7 +153,7 @@ namespace Opus
             {
                 if (p.LivingPlayer != null)
                 {
-                    p.LivingPlayer.wc.specialRef.Value = SpawnWeapon(clientID, gadgets.equipment[specialIndex].equipmentPrefab, Slot.special);
+                    //p.LivingPlayer.wc.specialRef.Value = SpawnWeapon(clientID, gadgets.equipment[specialIndex].equipmentPrefab, Slot.special);
                 }
             }
             else

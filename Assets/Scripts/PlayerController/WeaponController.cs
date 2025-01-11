@@ -94,7 +94,7 @@ namespace Opus
                     break;
             }
             be.myController = this;
-            be.cr.InitialiseViewable(Controller);
+            //be.cr.InitialiseViewable(Controller);
         }
 
         public void TrySwitchWeapon(int input)
