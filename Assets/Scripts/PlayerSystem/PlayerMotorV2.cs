@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,16 +15,16 @@ namespace Opus
         //Sway and rotation based on movement
         Vector3 moveSwayPos, moveSwayEuler, v_moveswaypos, v_moveswayeuler;
         Quaternion swayInitialRotation;
-        public Vector3 lookSwayPosScale, lookSwayEulerScale;
-        public float lookSwayPosDampTime, lookSwayEulerDampTime, maxLookSwayPos, maxLookSwayEuler;
-
-        public Vector3 moveSwayPosScale, moveSwayEulerScale;
-        public float moveSwayPosDampTime, moveSwayEulerDampTime, maxMoveSwayPos, maxMoveSwayEuler;
-
-        //Sway and rotation based on vertical velocity
-        public float verticalVelocitySwayScale, verticalVelocityEulerScale, verticalVelocitySwayPosTime, verticalVelocitySwayEulerTime, verticalVelocityPosClamp, verticalVelocityEulerClamp;
         float v_verticalvelocityswaypos, v_verticalvelocityswayeuler;
         float verticalVelocitySwayPos, verticalVelocitySwayEuler;
+
+        public SwayParameters swayParams;
+        public JumpAnimParameters jumpAnimParams, landAnimParams;
+        float jumpAnimTargetTime, trueJumpAnimTime;
+        public bool playingJumpAnim;
+        Vector3 jumpAnimPos, jumpAnimRot;
+        public float jumpAnimCameraInfluence, animTimeLerpSpeed;
+
 
         public float groundMoveForce, airMoveForce, jumpForce, sprintMultiplier;
         public float groundDrag, airDrag;
@@ -40,9 +41,7 @@ namespace Opus
         [Tooltip("ground normal y values less than this value will be unwalkable.")]
         public float walkableGroundThreshold;
         int ticksSinceJump;
-        int ticksSinceWallride;
         public int minJumpTicks;
-        public int minWallrideTicks;
         int ticksSinceGrounded;
         public float groundStickDistance;
         public Vector3 groundStickOffset;
@@ -51,11 +50,16 @@ namespace Opus
         int jumps;
 
         RaycastHit groundHit;
-        Vector3 lastGroundedPosition;
         #endregion Ground Checking
         public Transform weaponOffset;
         public MovementState moveState;
         Vector3 moveVec;
+
+        public LedgeClimbParameters vaultParams;
+        float vaultTime, vaultDistance, vaultSpeed;
+        Vector3 vaultStart, vaultEnd;
+        public bool vaulting;
+        float currentVaultEnableTime;
 
         public override void OnNetworkSpawn()
         {
@@ -64,22 +68,26 @@ namespace Opus
             {
                 rb = GetComponent<Rigidbody>();
             }
-            
+            swayInitialRotation = Quaternion.identity;
 
         }
 
         private void Update()
         {
-            if (IsOwner && entity.Alive)
+            if (entity.Alive)
             {
-                UpdateAim();
-            }   
+                if (IsOwner)
+                {
+                    UpdateAim();
+                }
+                UpdateSway();
+            }
+
         }
         private void FixedUpdate()
         {
             if(IsOwner)
             {
-                rb.isKinematic = !entity.Alive;
                 if (entity.Alive)
                 {
                     CheckGround();
@@ -90,7 +98,30 @@ namespace Opus
                     {
                         Jump();
                     }
+                    if (isGrounded)
+                    {
+                        entity.LastGroundedPosition = transform.position;
+                        currentVaultEnableTime = 0;
+                    }
+                    else if(!vaulting)
+                    {
+                        currentVaultEnableTime += Time.fixedDeltaTime;
+                        if(currentVaultEnableTime > vaultParams.vaultEnableTime)
+                        {
+                            CheckVault();
+                        }
+                    }
+
+                    if (vaulting)
+                    {
+                        currentVaultEnableTime = 0;
+                        if (entity.playerManager.crouchInput || entity.playerManager.moveInput.y < -0.1f)
+                        {
+                            vaulting = false;
+                        }
+                    }
                 }
+                rb.isKinematic = !entity.Alive || vaulting;
             }
         }
 
@@ -99,7 +130,9 @@ namespace Opus
             oldAimAngle = aimAngle;
             if (entity.playerManager.lookInput != Vector2.zero)
             {
-                aimAngle += entity.playerManager.lookInput * new Vector2(PlayerSettings.Instance.settingsContainer.mouseLookSpeedX, PlayerSettings.Instance.settingsContainer.mouseLookSpeedY) * Time.deltaTime;
+                aimAngle += (entity.stunned.Value ? MatchManager.Instance.stunLookSpeedMultiplier : 1) * 
+                    Time.deltaTime * entity.playerManager.lookInput * 
+                    new Vector2(PlayerSettings.Instance.settingsContainer.mouseLookSpeedX, PlayerSettings.Instance.settingsContainer.mouseLookSpeedY);
                 aimAngle.y = Mathf.Clamp(aimAngle.y, -85f, 85f);
                 
                 if (headTransform)
@@ -112,34 +145,45 @@ namespace Opus
             aimDelta.x %= 360;
             aimAngle.x %= 360;
 
-            UpdateSway();
         }
         void UpdateSway()                                                                                                                                                                                                                                    //Fish was here 8----D
         {
-            verticalVelocitySwayPos = Mathf.SmoothDamp(verticalVelocitySwayPos, rb.linearVelocity.y * verticalVelocitySwayScale,
-                ref v_verticalvelocityswaypos, verticalVelocitySwayPosTime).Clamp(-verticalVelocityPosClamp, verticalVelocityPosClamp);
-            verticalVelocitySwayEuler = Mathf.SmoothDampAngle(verticalVelocitySwayEuler, (rb.linearVelocity.y * verticalVelocityEulerScale).Clamp(-verticalVelocityEulerClamp, verticalVelocityEulerClamp),
-                ref v_verticalvelocityswayeuler, verticalVelocitySwayEulerTime);
+            if (IsOwner)
+            {
+                verticalVelocitySwayPos = Mathf.SmoothDamp(verticalVelocitySwayPos, rb.linearVelocity.y * swayParams.verticalVelocitySwayScale,
+                    ref v_verticalvelocityswaypos, swayParams.verticalVelocitySwayPosTime).Clamp(-swayParams.verticalVelocityPosClamp, swayParams.verticalVelocityPosClamp);
+                verticalVelocitySwayEuler = Mathf.SmoothDampAngle(verticalVelocitySwayEuler,
+                    (rb.linearVelocity.y * swayParams.verticalVelocityEulerScale).Clamp(-swayParams.verticalVelocityEulerClamp, swayParams.verticalVelocityEulerClamp),
+                    ref v_verticalvelocityswayeuler, swayParams.verticalVelocitySwayEulerTime);
 
 
 
-            lookSwayPos = Vector3.SmoothDamp(lookSwayPos,
-                new Vector3(aimDelta.x * lookSwayPosScale.x, aimDelta.y * lookSwayPosScale.y).ClampMagnitude(maxLookSwayPos),
-                ref v_lookswaypos, lookSwayPosDampTime);
-            lookSwayEuler = Vector3.SmoothDamp(lookSwayEuler,
-                new Vector3(aimDelta.y * lookSwayEulerScale.x, aimDelta.x * lookSwayEulerScale.y, aimDelta.x * lookSwayEulerScale.z).ClampMagnitude(maxLookSwayEuler),
-                ref v_lookswayeuler, lookSwayEulerDampTime);
+                lookSwayPos = Vector3.SmoothDamp(lookSwayPos,
+                    new Vector3(aimDelta.x * swayParams.lookSwayPosScale.x, aimDelta.y * swayParams.lookSwayPosScale.y).ClampMagnitude(swayParams.maxLookSwayPos),
+                    ref v_lookswaypos, swayParams.lookSwayPosDampTime);
+                lookSwayEuler = Vector3.SmoothDamp(lookSwayEuler,
+                    new Vector3(aimDelta.y * swayParams.lookSwayEulerScale.x, aimDelta.x * swayParams.lookSwayEulerScale.y, aimDelta.x * swayParams.lookSwayEulerScale.z).ClampMagnitude(swayParams.maxLookSwayEuler),
+                    ref v_lookswayeuler, swayParams.lookSwayEulerDampTime);
 
-            moveSwayPos = Vector3.SmoothDamp(moveSwayPos,
-                new Vector3(entity.playerManager.moveInput.x * moveSwayPosScale.x, 0, entity.playerManager.moveInput.y * moveSwayPosScale.y).ClampMagnitude(maxMoveSwayPos),
-                ref v_moveswaypos, moveSwayPosDampTime);
-            moveSwayEuler = Vector3.SmoothDamp(moveSwayEuler,
-                new Vector3(0, entity.playerManager.moveInput.x * moveSwayEulerScale.y, entity.playerManager.moveInput.x * moveSwayEuler.z).ClampMagnitude(maxMoveSwayEuler),
-                ref v_moveswayeuler, moveSwayEulerDampTime);
+                moveSwayPos = Vector3.SmoothDamp(moveSwayPos,
+                    new Vector3(entity.playerManager.moveInput.x * swayParams.moveSwayPosScale.x, 0, entity.playerManager.moveInput.y * swayParams.moveSwayPosScale.y).ClampMagnitude(swayParams.maxMoveSwayPos),
+                    ref v_moveswaypos, swayParams.moveSwayPosDampTime);
+                moveSwayEuler = Vector3.SmoothDamp(moveSwayEuler,
+                    new Vector3(0, entity.playerManager.moveInput.x * swayParams.moveSwayEulerScale.y, entity.playerManager.moveInput.x * moveSwayEuler.z).ClampMagnitude(swayParams.maxMoveSwayEuler),
+                    ref v_moveswayeuler, swayParams.moveSwayEulerDampTime);
 
-
-            weaponOffset.SetLocalPositionAndRotation(lookSwayPos + moveSwayPos + new Vector3(0, verticalVelocitySwayPos, 0),
-                swayInitialRotation * Quaternion.Euler(lookSwayEuler + moveSwayEuler + new Vector3(verticalVelocitySwayEuler, 0, 0)));
+                if (playingJumpAnim)
+                {
+                    trueJumpAnimTime = Mathf.Lerp(trueJumpAnimTime, jumpAnimTargetTime, Time.fixedDeltaTime * animTimeLerpSpeed);
+                    entity.worldCineCam.transform.SetLocalPositionAndRotation(jumpAnimPos * jumpAnimCameraInfluence, Quaternion.Euler(jumpAnimRot * jumpAnimCameraInfluence));   
+                }
+                else
+                {
+                    entity.worldCineCam.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                }
+            }
+            weaponOffset.SetLocalPositionAndRotation(lookSwayPos + moveSwayPos + new Vector3(0, verticalVelocitySwayPos, 0) + (playingJumpAnim ? jumpAnimPos : Vector3.zero),
+                swayInitialRotation * Quaternion.Euler(lookSwayEuler + moveSwayEuler + new Vector3(verticalVelocitySwayEuler, 0, 0) + (playingJumpAnim ? jumpAnimRot : Vector3.zero)));
         }
         void CheckGround()
         {
@@ -148,11 +192,14 @@ namespace Opus
                 if (groundHit.normal.y >= walkableGroundThreshold)
                 {
                     groundNormal = groundHit.normal;
+                    if (!isGrounded)
+                    {
+                        PlayJumpOrLandAnim_RPC(true, Mathf.InverseLerp(0, landAnimParams.maxYVelocityOnLand, -rb.linearVelocity.y));
+                    }
                     isGrounded = true && ticksSinceJump >= minJumpTicks;
                     if (groundHit.distance > (groundCheckDistance + groundCheckRadius))
                         SnapToGround();
                     jumps = jumpsAllowed;
-                    lastGroundedPosition = transform.position;
                     return;
                 }
             }
@@ -195,7 +242,10 @@ namespace Opus
                     rb.linearDamping = groundDrag;
 
 
-                    moveVec = groundMoveForce * (entity.playerManager.sprintInput ? sprintMultiplier : 1) * ((right * entity.playerManager.moveInput.x) + (forward * entity.playerManager.moveInput.y)).normalized;
+                    moveVec = (entity.playerManager.sprintInput && !entity.stunned.Value ? sprintMultiplier : 1)
+                        * (entity.stunned.Value ? MatchManager.Instance.stunMoveSpeedMultiplier : 1)
+                        * groundMoveForce * ((right * entity.playerManager.moveInput.x)
+                        + (forward * entity.playerManager.moveInput.y)).normalized;
 
                     rb.AddForce(Vector3.ProjectOnPlane(-Physics.gravity, groundNormal));
                     break;
@@ -224,19 +274,136 @@ namespace Opus
 
             Gizmos.color = Color.yellow;
             Gizmos.DrawRay(Vector3.zero, Vector3.down * groundStickDistance);
-
         }
 
         void Jump()
         {
             entity.playerManager.jumpInput = false;
-            jumps--;
+            if(!entity.stunned.Value)
             {
-                rb.AddForce((transform.up * jumpForce) + (Vector3.up * -rb.linearVelocity.y) +
-                    (isGrounded ? Vector3.zero : ((entity.playerManager.moveInput.y * jumpForce * 0.5f * transform.forward)
-                    + (entity.playerManager.moveInput.x * jumpForce * 0.5f * transform.right))), ForceMode.VelocityChange);
+                jumps--;
+                if(vaulting && vaultParams.canEjectFromClimb &&
+                vaultTime > vaultParams.minEjectTime && vaultTime < vaultParams.maxEjectTime)
+                {
+                    rb.AddForce(-transform.forward * vaultParams.ejectRearForce + Vector3.up * vaultParams.ejectUpForce, ForceMode.VelocityChange);
+                }
+                else
+                {
+                    rb.AddForce((transform.up * jumpForce) + (Vector3.up * -rb.linearVelocity.y) +
+                        (isGrounded ? Vector3.zero : ((entity.playerManager.moveInput.y * jumpForce * 0.5f * transform.forward)
+                        + (entity.playerManager.moveInput.x * jumpForce * 0.5f * transform.right))), ForceMode.VelocityChange);
+                    ticksSinceJump = 0;
+                }
+                PlayJumpOrLandAnim_RPC(false);
             }
-            ticksSinceJump = 0;
         }
+        Coroutine jumpCoroutine;
+        [Rpc(SendTo.ClientsAndHost)]
+        void PlayJumpOrLandAnim_RPC(bool landing, float intensity = 1)
+        {
+            if(jumpCoroutine != null)
+            {
+                StopCoroutine(jumpCoroutine);
+            }
+            jumpCoroutine = StartCoroutine(PlayJumpOrLandAnim(landing ? landAnimParams : jumpAnimParams, intensity));
+        }
+
+        IEnumerator PlayJumpOrLandAnim(JumpAnimParameters anim, float intensity)
+        {
+            WaitForFixedUpdate wff = new();
+            playingJumpAnim = true;
+            jumpAnimTargetTime = 0;
+            while (jumpAnimTargetTime < 1)
+            {
+                jumpAnimTargetTime += Time.fixedDeltaTime * anim.animSpeed;
+                jumpAnimPos = new Vector3()
+                {
+                    x = anim.XPositionCurve.Evaluate(trueJumpAnimTime),
+                    y = anim.YPositionCurve.Evaluate(trueJumpAnimTime),
+                    z = anim.ZPositionCurve.Evaluate(trueJumpAnimTime)
+                }.ScaleReturn(anim.MaxPosition) * intensity;
+                jumpAnimRot = new Vector3()
+                {
+                    x = anim.XRotationCurve.Evaluate(trueJumpAnimTime),
+                    y = anim.YRotationCurve.Evaluate(trueJumpAnimTime),
+                    z = anim.ZRotationCurve.Evaluate(trueJumpAnimTime)
+                }.ScaleReturn(anim.maxRotation) * intensity;
+                yield return wff;
+            }
+            yield return new WaitForSeconds(2);
+            playingJumpAnim = false;
+        }
+        void CheckVault()
+        {
+            /*
+            Checking for vaulting is a complex process. It should only happen in certain circumstances.
+            It should not happen on the ground (we cannot enter CheckVault while grounded)
+            We should not check for vaulting if we are:
+                - already vaulting
+                - not moving forwards or pressing the jump button to vault
+            We will 
+                1. cast a box forwards to see if we hit a surface
+                2. cast a ray downwards from the maximum vaultable height to ground level
+                3. cast a slightly offset ray back upwards to see if we have enough space to stand up
+            If 1 & 2 hit and 3 does not, we can vault into this position.
+             */
+
+            if (!(entity.playerManager.moveInput.y > 0 || entity.playerManager.jumpInput))
+                return;
+            if (Physics.BoxCast(transform.position + vaultParams.climbCheckOffset, vaultParams.climbCheckBounds / 2, transform.forward, 
+                out RaycastHit hit, transform.rotation, vaultParams.vaultDistance, groundLayermask, QueryTriggerInteraction.Ignore))
+            {
+                Vector3 nextRayOrigin = new Vector3(hit.point.x, transform.position.y + vaultParams.maxVaultHeight, hit.point.z) + transform.forward * vaultParams.lateralPositionForwardOffset;
+                if (Physics.Raycast(nextRayOrigin, Vector3.down, out hit, vaultParams.maxVaultHeight-0.1f, groundLayermask, QueryTriggerInteraction.Ignore))
+                {
+                    if(!Physics.Raycast(hit.point, Vector3.up, vaultParams.maxVaultHeight + 0.02f, groundLayermask, QueryTriggerInteraction.Ignore))
+                    {
+                        vaultStart = transform.position;
+                        vaultEnd = hit.point;
+                        entity.playerManager.jumpInput = false;
+                        StartCoroutine(VaultWall());
+                    }
+                }
+            }
+        }
+        IEnumerator VaultWall()
+        {
+            vaulting = true;
+            vaultTime = 0;
+            vaultDistance = Vector3.Distance(vaultEnd, vaultStart);
+            vaultSpeed = vaultParams.climbSpeed / vaultDistance;
+            
+            print($"Started vault from {vaultStart} to {vaultEnd}");
+            WaitForFixedUpdate wff = new();
+            Vector2 latPos;
+            while (vaultTime < 1 && vaulting)
+            {
+                vaultTime += Time.fixedDeltaTime * vaultSpeed;
+                latPos = Vector2.Lerp(new(vaultStart.x, vaultStart.z), new(vaultEnd.x, vaultEnd.z), vaultParams.lateralPath.Evaluate(vaultTime));
+                float vertPos = Mathf.Lerp(vaultStart.y, vaultEnd.y, vaultTime);
+                rb.MovePosition(new(latPos.x, vertPos, latPos.y));
+                yield return wff;
+            }
+
+            vaulting = false;
+        }
+        private void OnDrawGizmos()
+        {
+            if(vaultParams != null && vaultParams.debugMode)
+            {
+                Gizmos.color = Color.cyan;
+                Vector3 vec = (transform.forward * vaultParams.vaultDistance);
+                Vector3 vec2 = vec + (transform.forward * vaultParams.lateralPositionForwardOffset);
+                Gizmos.DrawWireCube(transform.position + vaultParams.climbCheckOffset, vaultParams.climbCheckBounds);
+                Gizmos.DrawWireCube(transform.position + vaultParams.climbCheckOffset + vec, vaultParams.climbCheckBounds);
+
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(transform.position + vec2 + (Vector3.up * vaultParams.maxVaultHeight), Vector3.down * vaultParams.maxVaultHeight);
+
+
+                Gizmos.DrawRay(transform.position + (vec2 * 1.02f), Vector3.up * vaultParams.maxVaultHeight);
+            }
+        }
+
     }
 }

@@ -10,11 +10,14 @@ namespace Opus
     {
         public PlayerManager playerManager;
         public NetworkTransform netTransform;
+        public Transform headTransform;
         public CinemachineCamera viewCineCam, worldCineCam;
         public Camera viewmodelCamera;
 
         public Outline outlineComponent;
         public CharacterRenderable cr;
+
+        public Vector3 LastGroundedPosition;
 
         public NetworkVariable<bool> stunned = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<bool> burning = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);

@@ -69,13 +69,14 @@ namespace Opus
         {
 
         }
-
+        protected PlayerManager owningPlayer;
         public ParticleSystem fireParticleSystem;
         public VisualEffect fireVFX;
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            owningPlayer = PlayerManager.playersByID[OwnerClientId];
         }
     }
 }

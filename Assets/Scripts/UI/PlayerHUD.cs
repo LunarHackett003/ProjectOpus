@@ -16,9 +16,6 @@ namespace Opus
         public int hudUpdateInterval;
         int updateTicks;
 
-        public Image mechReadinessImage;
-        public TMP_Text mechReadinessText;
-
         public TMP_Text ammoCountText;
 
         public bool playerAlive;
@@ -29,6 +26,9 @@ namespace Opus
 
         public TMP_Text respawnCounterText;
 
+        public Slider healthBar;
+        public TMP_Text healthValue;
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -38,16 +38,15 @@ namespace Opus
                 gameObject.SetActive(false);
                 return;
             }
-        }
-
-        private void Start()
-        {
-            if (manager == null)
+            else
             {
-                manager = GetComponent<PlayerManager>();
-            }
+                if (manager == null)
+                {
+                    manager = GetComponent<PlayerManager>();
+                }
                 manager.timeUntilSpawn.OnValueChanged += UpdateRespawnTimer;
                 UpdateRespawnTimer(0, manager.timeUntilSpawn.Value);
+            }
         }
 
         public void UpdateRespawnTimer(int previous, int current)
@@ -68,17 +67,32 @@ namespace Opus
         {
             if(manager != null)
             {
-                entity = manager.LivingPlayer;
+                entity = manager.Character;
+                entity.currentHealth.OnValueChanged += HealthUpdated;
+                healthBar.maxValue = entity.MaxHealth;
+                healthBar.value = entity.CurrentHealth;
                 //wc = manager.LivingPlayer.wc;
             }
         }
+        public override void OnNetworkDespawn()
+        {
+            entity.currentHealth.OnValueChanged -= HealthUpdated;
+            base.OnNetworkDespawn();
+        }
+
+        void HealthUpdated(float prev, float curr)
+        {
+            healthBar.value = curr;
+            healthValue.text = $"{curr}/{entity.MaxHealth}";
+        }
+
 
         private void Update()
         {
             if (manager == null || !IsOwner)
                 return;
 
-            playerAlive = manager.LivingPlayer != null && manager.LivingPlayer.currentHealth.Value > 0;
+            playerAlive = manager.Character != null && manager.Character.currentHealth.Value > 0;
 
             updateTicks++;
             if(updateTicks > hudUpdateInterval)
@@ -124,11 +138,7 @@ namespace Opus
             deadUI.blocksRaycasts = deadUI.interactable = !playerAlive;
             aliveUI.alpha = playerAlive ? 1 : 0;
 
-            if (mechReadinessImage != null && mechReadinessText != null && !manager.mechDeployed.Value)
-            {
-                mechReadinessImage.fillAmount = manager.specialPercentage_noSync;
-                mechReadinessText.text = $"{manager.specialPercentage_noSync * 100:0}%";
-            }
+            
         }
     }
 }

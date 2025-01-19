@@ -19,7 +19,7 @@ namespace Opus
         public static uint MyTeam;
 
         public NetworkObject playerPrefab;
-        public PlayerEntity LivingPlayer;
+        public PlayerEntity Character;
         public NetworkVariable<uint> teamIndex = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> kills = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> deaths = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -129,7 +129,7 @@ namespace Opus
         }
         private void Special_performed(InputAction.CallbackContext obj)
         {
-            if (LivingPlayer != null)
+            if (Character != null)
             {
 
             }
@@ -137,14 +137,14 @@ namespace Opus
 
         private void CycleWeapon_performed(InputAction.CallbackContext obj)
         {
-            if (LivingPlayer != null)
+            if (Character != null)
             {
                 
             }
         }
         private void Reload_performed(InputAction.CallbackContext obj)
         {
-            if (LivingPlayer)
+            if (Character)
             {
 
             }
@@ -182,18 +182,18 @@ namespace Opus
         {
             secondaryInput = obj.ReadValueAsButton();
 
-            if (LivingPlayer != null && spectating)
+            if (Character != null && spectating)
             {
-                Spectate_RPC(true, -1, reviveItemInstance);
+                Spectate_RPC(true, -1);
             }
         }
 
         private void Fire_performed(InputAction.CallbackContext obj)
         {
             fireInput = obj.ReadValueAsButton();
-            if (LivingPlayer != null && spectating)
+            if (Character != null && spectating)
             {
-                Spectate_RPC(true, 1, reviveItemInstance);
+                Spectate_RPC(true, 1);
             }
         }
 
@@ -203,13 +203,13 @@ namespace Opus
             {
                 reviveItemInstance = NetworkManager.SpawnManager.InstantiateAndSpawn(reviveItemPrefab, OwnerClientId, position: lastPos);
             }
-            Spectate_RPC(true, 0, reviveItemInstance);
+            Spectate_RPC(true, 0);
 
             StartCoroutine(SpawnCountdown());
         }
 
         [Rpc(SendTo.Owner)]
-        public void Spectate_RPC(bool spectating, int indexChange, NetworkObjectReference nor)
+        public void Spectate_RPC(bool spectating, int indexChange)
         {
             if (!this.spectating)
             {
@@ -217,13 +217,13 @@ namespace Opus
             }
             this.spectating = spectating;
             spectatorCamera.enabled = spectating && !firstPersonSpectating;
-            if (!spectating && LivingPlayer != null)
+            if (!spectating && Character != null)
             {
-                LivingPlayer.viewmodelCamera.enabled = true;
-                LivingPlayer.viewCineCam.enabled = true;
+                Character.viewmodelCamera.enabled = true;
+                Character.viewCineCam.enabled = true;
 
-                LivingPlayer.worldCineCam.enabled = true;
-                LivingPlayer.worldCineCam.Target.TrackingTarget = originalTrackingTarget;
+                Character.worldCineCam.enabled = true;
+                Character.worldCineCam.Target.TrackingTarget = originalTrackingTarget;
                 spectatorCamera.enabled = false;
                 return;
             }
@@ -234,34 +234,31 @@ namespace Opus
             currentSpectateIndex += indexChange;
             currentSpectateIndex %= MatchManager.Instance.playersOnTeam[(int)teamIndex.Value];
             PlayerManager target = playersByID[(uint)currentSpectateIndex];
-            if(target.LivingPlayer == null)
+            if(target.Character == null)
             {
                 return;
             }
 
-            if (target.LivingPlayer.Alive)
+            if (target.Character.Alive)
             {
-                if (firstPersonSpectating && LivingPlayer != null)
+                if (firstPersonSpectating && Character != null)
                 {
                     spectatorCamera.enabled = false;
-                    LivingPlayer.worldCineCam.Target.TrackingTarget = target.LivingPlayer.worldCineCam.Target.TrackingTarget;
+                    Character.worldCineCam.Target.TrackingTarget = target.Character.worldCineCam.Target.TrackingTarget;
                     return;
                 }
                 else
                 {
-                    spectatorCamera.Target.TrackingTarget = target.LivingPlayer.transform;
+                    spectatorCamera.Target.TrackingTarget = target.Character.transform;
                 }
             }
             else
             {
-                if (nor.TryGet(out reviveItemInstance))
-                {
-                    spectatorCamera.Target.TrackingTarget = target.reviveItemInstance.transform;
-                }
+
             }
-            LivingPlayer.viewmodelCamera.enabled = false;
-            LivingPlayer.viewCineCam.enabled = false;
-            LivingPlayer.worldCineCam.enabled = false;
+            Character.viewmodelCamera.enabled = false;
+            Character.viewCineCam.enabled = false;
+            Character.worldCineCam.enabled = false;
         }
 
         public void RespawnPlayer(bool revived, Vector3 lastPos = default)
@@ -274,7 +271,7 @@ namespace Opus
             {
                 MatchManager.Instance.RequestSpawn_RPC(OwnerClientId, primaryWeaponIndex, gadget1Index, gadget2Index, gadget3Index, specialIndex);
             }
-            Spectate_RPC(false, 0, reviveItemInstance);
+            Spectate_RPC(false, 0);
             if (reviveItemInstance)
             {
                 reviveItemInstance.Despawn();
@@ -309,7 +306,7 @@ namespace Opus
         {
             foreach (var item in playersByID)
             {
-                if (item.Value.LivingPlayer != null)
+                if (item.Value.Character != null)
                 {
 
                 }
@@ -334,9 +331,9 @@ namespace Opus
         }
         public void SetPlayerOnSpawn(PlayerEntity spawnedPlayer)
         {
-            LivingPlayer = spawnedPlayer;
+            Character = spawnedPlayer;
 
-            originalTrackingTarget = LivingPlayer.worldCineCam.Target.TrackingTarget;
+            originalTrackingTarget = Character.worldCineCam.Target.TrackingTarget;
         }
         private void FixedUpdate()
         {
@@ -352,11 +349,12 @@ namespace Opus
 
             if (IsServer)
             {
-                if(LivingPlayer != null)
+                if(Character != null)
                 {
-                    if(LivingPlayer.transform.position.y < -40 && LivingPlayer.CurrentHealth > 0)
+                    if(Character.transform.position.y < -40 && Character.CurrentHealth > 0)
                     {
-                        LivingPlayer.currentHealth.Value = 0;
+                        Character.currentHealth.Value = 0;
+                        SpawnReviveItem(Character.LastGroundedPosition);
                     }
                 }
             }

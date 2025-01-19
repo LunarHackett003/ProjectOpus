@@ -2,7 +2,6 @@ using JetBrains.Annotations;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Components;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace Opus
@@ -26,6 +25,8 @@ namespace Opus
         public int maxRespawnTime = 10;
 
         public bool[] lockedSlots = new bool[5];
+
+        public float stunMoveSpeedMultiplier, stunLookSpeedMultiplier;
 
         [Tooltip("The amount added to the mech readiness every tick. This is synchronised with the players every 10 seconds.")]
         public float mechReadySpeed;
@@ -85,24 +86,24 @@ namespace Opus
         {
             if (PlayerManager.playersByID.TryGetValue(clientID, out PlayerManager p))
             {
-                if (p.LivingPlayer == null)
+                if (p.Character == null)
                 {
-                    p.LivingPlayer = NetworkManager.SpawnManager.InstantiateAndSpawn(p.playerPrefab, clientID).GetComponent<PlayerEntity>();
+                    p.Character = NetworkManager.SpawnManager.InstantiateAndSpawn(p.playerPrefab, clientID).GetComponent<PlayerEntity>();
                 }
-                p.LivingPlayer.currentHealth.Value = p.LivingPlayer.MaxHealth;
+                p.Character.currentHealth.Value = p.Character.MaxHealth;
                 p.timeUntilSpawn.Value = maxRespawnTime;
                 if (!revived)
                 {
                     (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint(p.teamIndex.Value);
 
                     SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, gadgetThreeIndex, specialIndex);
-                    p.LivingPlayer.Teleport_RPC(pos, Quaternion.identity);
+                    p.Character.Teleport_RPC(pos, Quaternion.identity);
 
                     p.SpawnPlayer_RPC();
                 }
                 else
                 {
-                    p.LivingPlayer.Teleport_RPC(position, Quaternion.identity);
+                    p.Character.Teleport_RPC(position, Quaternion.identity);
                     p.SpawnPlayer_RPC();
                 }
             }
@@ -111,7 +112,7 @@ namespace Opus
         {
             if (primaryWeaponIndex > -1 && primaryWeaponIndex < weapons.equipment.Length)
             {
-                if(p.LivingPlayer != null)
+                if(p.Character != null)
                 {
                     //p.LivingPlayer.wc.weaponRef.Value = SpawnWeapon(clientID, weapons.equipment[primaryWeaponIndex].equipmentPrefab, Slot.primary);
                 }
@@ -121,7 +122,7 @@ namespace Opus
             }
             if (gadgetThreeIndex > -1 && gadgetThreeIndex < gadgets.equipment.Length)
             {
-                if (p.LivingPlayer != null)
+                if (p.Character != null)
                 {
                     //p.LivingPlayer.wc.gadget3Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetThreeIndex].equipmentPrefab, Slot.gadget3);
                 }
@@ -131,7 +132,7 @@ namespace Opus
             }
             if (gadgetOneIndex > -1 && gadgetOneIndex < gadgets.equipment.Length)
             {
-                if (p.LivingPlayer != null)
+                if (p.Character != null)
                 {
                     //p.LivingPlayer.wc.gadget1Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetOneIndex].equipmentPrefab, Slot.gadget1);
                 }
@@ -141,7 +142,7 @@ namespace Opus
             }
             if (gadgetTwoIndex > -1 && gadgetTwoIndex < gadgets.equipment.Length)
             {
-                if (p.LivingPlayer != null)
+                if (p.Character != null)
                 {
                     //p.LivingPlayer.wc.gadget2Ref.Value = SpawnWeapon(clientID, weapons.equipment[gadgetTwoIndex].equipmentPrefab, Slot.gadget2);
                 }
@@ -151,7 +152,7 @@ namespace Opus
             }
             if (specialIndex > -1 && specialIndex < gadgets.equipment.Length)
             {
-                if (p.LivingPlayer != null)
+                if (p.Character != null)
                 {
                     //p.LivingPlayer.wc.specialRef.Value = SpawnWeapon(clientID, gadgets.equipment[specialIndex].equipmentPrefab, Slot.special);
                 }
