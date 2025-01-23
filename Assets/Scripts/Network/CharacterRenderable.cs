@@ -41,25 +41,6 @@ namespace Opus
                     item.gameObject.layer = localRender;
                 }
             }
-
-            if (fromThis.outlineComponent)
-            {
-                if (!IsOwner)
-                {
-                    if (owningPlayer.teamIndex.Value != PlayerManager.MyTeam)
-                    {
-                        fromThis.outlineComponent.enabled = true;
-                        fromThis.outlineComponent.OutlineMode = Outline.Mode.OutlineVisible;
-                        fromThis.outlineComponent.OutlineColor = PlayerSettings.Instance.teamColours[owningPlayer.teamIndex.Value];
-                    }
-                    else
-                    {
-                        fromThis.outlineComponent.enabled = true;
-                        fromThis.outlineComponent.OutlineMode = Outline.Mode.OutlineAll;
-                        fromThis.outlineComponent.OutlineColor = owningPlayer.myTeamColour;
-                    }
-                }
-            }
         }
     }
 }

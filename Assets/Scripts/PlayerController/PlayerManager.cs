@@ -11,8 +11,6 @@ namespace Opus
 {
     public class PlayerManager : NetworkBehaviour
     {
-        public delegate void OnSpawnReceived();
-        public OnSpawnReceived onSpawnReceived;
 
         public static Dictionary<ulong, PlayerManager> playersByID = new();
 
@@ -312,18 +310,16 @@ namespace Opus
                 }
             }
         }
-        [Rpc(SendTo.Owner)]
+        [Rpc(SendTo.Owner, DeferLocal = true)]
         public void SpawnPlayer_RPC()
         {
-            print("received spawn message, attempting to find us somewhere to spawn!");
-            requestingSpawn = false;
-
-            onSpawnReceived?.Invoke();
-
+            print("spawn received");
             if (hud != null)
             {
+                print("initialising hud");
                 hud.InitialiseHUD();
             }
+            print("spawn complete");
         }
         public void ReadyUpPressed()
         {

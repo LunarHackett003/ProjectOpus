@@ -114,7 +114,7 @@ namespace Opus
             {
                 if(p.Character != null)
                 {
-                    //p.LivingPlayer.wc.weaponRef.Value = SpawnWeapon(clientID, weapons.equipment[primaryWeaponIndex].equipmentPrefab, Slot.primary);
+                    p.Character.wc.slots[0] = SpawnWeapon(clientID, weapons.equipment[primaryWeaponIndex].equipmentPrefab, Slot.primary);
                 }
             }
             else
@@ -166,6 +166,7 @@ namespace Opus
             netPrefab = NetworkManager.SpawnManager.InstantiateAndSpawn(netPrefab, clientID, false, false, false, Vector3.zero, Quaternion.identity);
             if (netPrefab.TryGetComponent(out BaseEquipment be))
             {
+                PlayerManager.playersByID[clientID].Character.wc.SetEquipmentSlot_RPC(be, (int)weaponSlot);
                 return be;
             }
             else

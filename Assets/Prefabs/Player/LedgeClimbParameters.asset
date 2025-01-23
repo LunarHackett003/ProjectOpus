@@ -74,11 +74,11 @@ MonoBehaviour:
   climbCheckBounds: {x: 0.4, y: 2, z: 0.1}
   climbCheckOffset: {x: 0, y: 1.1, z: 0.15}
   maxVaultHeight: 2.2
-  lateralPositionForwardOffset: 0.15
+  lateralPositionForwardOffset: 0.4
   canEjectFromClimb: 1
-  minEjectTime: 0
-  maxEjectTime: 0
-  ejectRearForce: 0
-  ejectUpForce: 0
+  minEjectTime: 0.1
+  maxEjectTime: 0.8
+  ejectRearForce: 15
+  ejectUpForce: 15
   vaultEnableTime: 0.5
   debugMode: 0

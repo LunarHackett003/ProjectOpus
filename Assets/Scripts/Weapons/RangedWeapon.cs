@@ -47,6 +47,12 @@ namespace Opus
         public float critMultiplier = 1;
         public int fireIterations = 1;
 
+        public bool useSingleReload;
+        public float firstReloadDelay = 1.2f;
+        public float reloadTime = 2f;
+
+        public float reloadCancelTime = 0.5f;
+
         void UpdateAmmo()
         {
             SendAmmo_RPC(CurrentAmmo);
@@ -100,7 +106,10 @@ namespace Opus
             //{
             //    fireInputPressed = false;
             //}
-            reloading = acpp.customParams[0].boolValue;
+            if(acpp != null)
+            {
+                reloading = acpp.customParams[0].boolValue;
+            }
 
             if (IsOwner)
             {

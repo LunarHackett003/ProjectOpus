@@ -1,5 +1,9 @@
+using Opus;
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 namespace Opus
 {
@@ -15,6 +19,14 @@ namespace Opus
         public float CurrentHealth => currentHealth.Value;
         public bool healable;
 
+        public bool useWorldHealthBar;
+        public bool hideBarOnOwner;
+        public Slider worldHealthBar;
+        public float worldHealthBarFade;
+        public float worldHealthBarDisplayTime;
+        [SerializeField] protected bool displayingBar;
+        public CanvasGroup worldHealthBarCG;
+        float currentBarFadeTime;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -23,8 +35,64 @@ namespace Opus
             {
                 currentHealth.Value = maxHealth;
             }
-            
+
+            if (useWorldHealthBar )
+            {
+                if(hideBarOnOwner && IsOwner)
+                {
+                    worldHealthBarCG.alpha = 0;
+                }
+                else
+                {
+                    worldHealthBar.maxValue = MaxHealth;
+                }
+
+            }
+            currentHealth.OnValueChanged += HealthUpdated;
+            HealthUpdated(0, currentHealth.Value);
         }
+
+        protected virtual void HealthUpdated(float prev, float curr)
+        {
+            if (useWorldHealthBar)
+            {
+                displayingBar = true;
+                currentBarFadeTime = 0;
+                worldHealthBar.value = curr;
+            }
+        }
+
+        protected void DisplayHealthBar()
+        {
+            if (displayingBar)
+            {
+                currentBarFadeTime += Time.deltaTime;
+                if (currentBarFadeTime < worldHealthBarFade)
+                {
+                    worldHealthBarCG.alpha = Mathf.InverseLerp(0, worldHealthBarFade, currentBarFadeTime);
+                }
+                else if (currentBarFadeTime >= worldHealthBarDisplayTime - worldHealthBarFade)
+                {
+                    worldHealthBarCG.alpha = Mathf.InverseLerp(worldHealthBarDisplayTime - worldHealthBarFade, worldHealthBarDisplayTime, currentBarFadeTime);
+                }
+                else
+                {
+                    worldHealthBarCG.alpha = 1;
+                }
+
+                if (currentBarFadeTime >= worldHealthBarDisplayTime)
+                    displayingBar = false;
+            }
+        }
+
+        private void Update()
+        {
+            if (useWorldHealthBar && (!hideBarOnOwner || !IsOwner))
+            {
+                DisplayHealthBar();
+            }
+        }
+
 
         public override void ReceiveDamage(float damageIn, float incomingCritMultiply)
         {

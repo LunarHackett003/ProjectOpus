@@ -16,6 +16,7 @@ namespace Opus
 
         public Outline outlineComponent;
         public CharacterRenderable cr;
+        public WeaponControllerV2 wc;
 
         public Vector3 LastGroundedPosition;
 

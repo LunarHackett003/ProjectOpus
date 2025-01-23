@@ -13,36 +13,45 @@ MonoBehaviour:
   m_Name: JumpAnimCurves
   m_EditorClassIdentifier: 
   animSpeed: 1
-  maxRotation: {x: 45, y: 90, z: 45}
+  maxRotation: {x: 15, y: 90, z: 5}
   XRotationCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0.94568646
-      outSlope: 0.94568646
+      inSlope: -51.72213
+      outSlope: -51.72213
       tangentMode: 0
-      weightedMode: 3
-      inWeight: 0
-      outWeight: 0.4479863
+      weightedMode: 2
+      inWeight: 0.33333334
+      outWeight: 0.034323893
     - serializedVersion: 3
-      time: 0.3896848
-      value: 0.008890495
-      inSlope: -1.3424827
-      outSlope: -1.3424827
+      time: 0.07175875
+      value: -0.50647384
+      inSlope: -3.3032687
+      outSlope: -3.3032687
       tangentMode: 0
       weightedMode: 3
-      inWeight: 0.39541128
-      outWeight: 0.39262453
+      inWeight: 0.33333334
+      outWeight: 0.2211782
+    - serializedVersion: 3
+      time: 0.43270576
+      value: 0.3595676
+      inSlope: 2.3133862
+      outSlope: 2.3133862
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.37295386
+      outWeight: 0.41898763
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: -0.13756293
-      outSlope: -0.13756293
+      inSlope: -0.4940095
+      outSlope: -0.4940095
       tangentMode: 0
       weightedMode: 3
-      inWeight: 0.49996045
+      inWeight: 0.44659927
       outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -104,7 +113,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  MaxPosition: {x: 1, y: 0.05, z: 0.17}
+  MaxPosition: {x: 1, y: 0.1, z: 0.17}
   XPositionCurve:
     serializedVersion: 2
     m_Curve:
@@ -135,30 +144,30 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0.0012741089
       value: 0
-      inSlope: 2.1464658
-      outSlope: 2.1464658
+      inSlope: -7.182692
+      outSlope: -7.182692
       tangentMode: 0
-      weightedMode: 0
+      weightedMode: 2
       inWeight: 0
-      outWeight: 0.08145477
+      outWeight: 0.40788844
     - serializedVersion: 3
-      time: 0.611697
-      value: -0.004156992
-      inSlope: -1.1416086
-      outSlope: -1.1416086
+      time: 0.10353039
+      value: -0.6169967
+      inSlope: -0.050961323
+      outSlope: -0.050961323
       tangentMode: 0
       weightedMode: 3
-      inWeight: 0.33333334
-      outWeight: 0.5729092
+      inWeight: 0.71805364
+      outWeight: 0.44455168
     - serializedVersion: 3
-      time: 0.8853027
-      value: -0.055700842
-      inSlope: 0.9988641
-      outSlope: 0.9988641
-      tangentMode: 1
+      time: 0.4656555
+      value: 0.750894
+      inSlope: 0.14227988
+      outSlope: 0.14227988
+      tangentMode: 0
       weightedMode: 3
-      inWeight: 0.30341238
-      outWeight: 0.3159372
+      inWeight: 0.6921402
+      outWeight: 0.5190425
     - serializedVersion: 3
       time: 1
       value: 0
@@ -195,4 +204,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  maxYVelocityOnLand: 8
+  maxYVelocityOnLand: 1
+  endWaitTime: 0.5

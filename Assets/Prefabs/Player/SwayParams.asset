@@ -18,12 +18,12 @@ MonoBehaviour:
   lookSwayEulerDampTime: 0.13
   maxLookSwayPos: 0.034
   maxLookSwayEuler: 5
-  moveSwayPosScale: {x: 0.01, y: 0.01, z: 0}
-  moveSwayEulerScale: {x: 5, y: 5, z: 5}
+  moveSwayPosScale: {x: -0.01, y: -0.02, z: 0}
+  moveSwayEulerScale: {x: 90, y: 2, z: 90}
   moveSwayPosDampTime: 0.2
   moveSwayEulerDampTime: 0.1
   maxMoveSwayPos: 0.05
-  maxMoveSwayEuler: 25
+  maxMoveSwayEuler: 90
   verticalVelocitySwayScale: -0.005
   verticalVelocityEulerScale: 0.5
   verticalVelocitySwayPosTime: 0.05

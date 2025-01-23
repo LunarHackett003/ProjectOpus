@@ -12,7 +12,7 @@ namespace Opus
 
         public SwayContainerSO swayContainer;
 
-        public WeaponController myController;
+        public WeaponControllerV2 myController;
 
         public CharacterRenderable cr;
 
@@ -27,6 +27,11 @@ namespace Opus
 
         protected bool lastFireInput;
 
+        protected override void OnNetworkPostSpawn()
+        {
+            base.OnNetworkPostSpawn();
+            myController = PlayerManager.playersByID[OwnerClientId].Character.wc;
+        }
         public virtual void TrySelect()
         {
             print($"Tried to select {gameObject.name}");

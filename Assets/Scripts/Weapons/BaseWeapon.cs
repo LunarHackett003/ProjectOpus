@@ -73,9 +73,9 @@ namespace Opus
         public ParticleSystem fireParticleSystem;
         public VisualEffect fireVFX;
 
-        public override void OnNetworkSpawn()
+        protected override void OnNetworkPostSpawn()
         {
-            base.OnNetworkSpawn();
+            base.OnNetworkPostSpawn();
             owningPlayer = PlayerManager.playersByID[OwnerClientId];
         }
     }

@@ -20,11 +20,11 @@ namespace Opus
 
         public SwayParameters swayParams;
         public JumpAnimParameters jumpAnimParams, landAnimParams;
-        float jumpAnimTargetTime, trueJumpAnimTime;
+        float jumpAnimTime;
         public bool playingJumpAnim;
         Vector3 jumpAnimPos, jumpAnimRot;
         public float jumpAnimCameraInfluence, animTimeLerpSpeed;
-
+        float velocityLastAirTick;
 
         public float groundMoveForce, airMoveForce, jumpForce, sprintMultiplier;
         public float groundDrag, airDrag;
@@ -103,13 +103,17 @@ namespace Opus
                         entity.LastGroundedPosition = transform.position;
                         currentVaultEnableTime = 0;
                     }
-                    else if(!vaulting)
+                    else 
                     {
-                        currentVaultEnableTime += Time.fixedDeltaTime;
-                        if(currentVaultEnableTime > vaultParams.vaultEnableTime)
+                        if (!vaulting)
                         {
-                            CheckVault();
+                            currentVaultEnableTime += Time.fixedDeltaTime;
+                            if (currentVaultEnableTime > vaultParams.vaultEnableTime)
+                            {
+                                CheckVault();
+                            }
                         }
+                        velocityLastAirTick = rb.linearVelocity.y;
                     }
 
                     if (vaulting)
@@ -174,7 +178,6 @@ namespace Opus
 
                 if (playingJumpAnim)
                 {
-                    trueJumpAnimTime = Mathf.Lerp(trueJumpAnimTime, jumpAnimTargetTime, Time.fixedDeltaTime * animTimeLerpSpeed);
                     entity.worldCineCam.transform.SetLocalPositionAndRotation(jumpAnimPos * jumpAnimCameraInfluence, Quaternion.Euler(jumpAnimRot * jumpAnimCameraInfluence));   
                 }
                 else
@@ -194,7 +197,7 @@ namespace Opus
                     groundNormal = groundHit.normal;
                     if (!isGrounded)
                     {
-                        PlayJumpOrLandAnim_RPC(true, Mathf.InverseLerp(0, landAnimParams.maxYVelocityOnLand, -rb.linearVelocity.y));
+                        PlayJumpOrLandAnim_RPC(true, Mathf.InverseLerp(0, landAnimParams.maxYVelocityOnLand, -velocityLastAirTick));
                     }
                     isGrounded = true && ticksSinceJump >= minJumpTicks;
                     if (groundHit.distance > (groundCheckDistance + groundCheckRadius))
@@ -275,7 +278,7 @@ namespace Opus
             Gizmos.color = Color.yellow;
             Gizmos.DrawRay(Vector3.zero, Vector3.down * groundStickDistance);
         }
-
+        
         void Jump()
         {
             entity.playerManager.jumpInput = false;
@@ -312,25 +315,25 @@ namespace Opus
         {
             WaitForFixedUpdate wff = new();
             playingJumpAnim = true;
-            jumpAnimTargetTime = 0;
-            while (jumpAnimTargetTime < 1)
+            jumpAnimTime = 0;
+            while (jumpAnimTime < 1)
             {
-                jumpAnimTargetTime += Time.fixedDeltaTime * anim.animSpeed;
+                jumpAnimTime += Time.fixedDeltaTime * anim.animSpeed;
                 jumpAnimPos = new Vector3()
                 {
-                    x = anim.XPositionCurve.Evaluate(trueJumpAnimTime),
-                    y = anim.YPositionCurve.Evaluate(trueJumpAnimTime),
-                    z = anim.ZPositionCurve.Evaluate(trueJumpAnimTime)
+                    x = anim.XPositionCurve.Evaluate(jumpAnimTime),
+                    y = anim.YPositionCurve.Evaluate(jumpAnimTime),
+                    z = anim.ZPositionCurve.Evaluate(jumpAnimTime)
                 }.ScaleReturn(anim.MaxPosition) * intensity;
                 jumpAnimRot = new Vector3()
                 {
-                    x = anim.XRotationCurve.Evaluate(trueJumpAnimTime),
-                    y = anim.YRotationCurve.Evaluate(trueJumpAnimTime),
-                    z = anim.ZRotationCurve.Evaluate(trueJumpAnimTime)
+                    x = anim.XRotationCurve.Evaluate(jumpAnimTime),
+                    y = anim.YRotationCurve.Evaluate(jumpAnimTime),
+                    z = anim.ZRotationCurve.Evaluate(jumpAnimTime)
                 }.ScaleReturn(anim.maxRotation) * intensity;
                 yield return wff;
             }
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(anim.endWaitTime);
             playingJumpAnim = false;
         }
         void CheckVault()

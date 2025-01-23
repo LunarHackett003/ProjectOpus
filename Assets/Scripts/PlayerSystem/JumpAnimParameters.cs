@@ -14,5 +14,6 @@ namespace Opus
         public Vector3 MaxPosition;
         public AnimationCurve XPositionCurve, YPositionCurve, ZPositionCurve;
         public float maxYVelocityOnLand;
+        public float endWaitTime = 0.5f;
     }
 }

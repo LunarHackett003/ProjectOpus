@@ -12,43 +12,188 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4693d63582949194fb93b39021f7bfae, type: 3}
   m_Name: LandAnimCurves
   m_EditorClassIdentifier: 
-  animSpeed: 0
-  maxRotation: {x: 0, y: 0, z: 0}
+  animSpeed: 2
+  maxRotation: {x: 25, y: 90, z: 5}
   XRotationCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 8.725607
+      outSlope: 8.725607
+      tangentMode: 0
+      weightedMode: 2
+      inWeight: 0.33333334
+      outWeight: 0.29196733
+    - serializedVersion: 3
+      time: 0.12653017
+      value: 0.14596146
+      inSlope: -3.3032687
+      outSlope: -3.3032687
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.33333334
+      outWeight: 0.2211782
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0.09626899
+      outSlope: 0.09626899
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.4510562
+      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   YRotationCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   ZRotationCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: -0.0069412133
+      outSlope: -0.0069412133
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.17070332
+      value: -0.0011848882
+      inSlope: 0.11738153
+      outSlope: 0.11738153
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.08448245
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0.0014287868
+      outSlope: 0.0014287868
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  MaxPosition: {x: 0, y: 0, z: 0}
+  MaxPosition: {x: 1, y: 0.15, z: 0.17}
   XPositionCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   YPositionCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.1
+      inSlope: -1.2560586
+      outSlope: -1.2560586
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.22332388
+    - serializedVersion: 3
+      time: 0.22779113
+      value: -0.44151035
+      inSlope: 0.0100913495
+      outSlope: 0.0100913495
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.33333334
+      outWeight: 0.4961528
+    - serializedVersion: 3
+      time: 0.6994507
+      value: 0.008035123
+      inSlope: -0.15060778
+      outSlope: -0.15060778
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.33333334
+      outWeight: 0.46409053
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0.069111824
+      outSlope: 0.069111824
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.46587878
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   ZPositionCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  maxYVelocityOnLand: 0
+  maxYVelocityOnLand: 1
+  endWaitTime: 0.5

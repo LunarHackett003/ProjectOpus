@@ -9,7 +9,7 @@ namespace Opus
     {
         public PlayerManager manager;
         public PlayerEntity entity;
-        public WeaponController wc;
+        public WeaponControllerV2 wc;
 
         public Button readyButton;
 
@@ -103,7 +103,7 @@ namespace Opus
 
             if(wc != null)
             {
-                if(wc.GetCurrentEquipment() is RangedWeapon w)
+                if(wc.slots[wc.weaponIndex.Value] is RangedWeapon w)
                 {
                     if(w.CurrentAmmo != cachedAmmoCount)
                         UpdateAmmoCount(w);

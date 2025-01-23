@@ -123,7 +123,7 @@ namespace Opus
                 }
                 content = new(new Texture2D(32, 32));
 
-                MyPlayerManager.onSpawnReceived += SpawnReceived;
+                //MyPlayerManager.onSpawnReceived += SpawnReceived;
                 Camera.main.GetUniversalAdditionalCameraData().cameraStack.Add(viewmodelCamera);
                 Camera.main.GetUniversalAdditionalCameraData().renderPostProcessing = false;
             }

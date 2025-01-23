@@ -65,7 +65,7 @@ namespace Opus
             }
             grappleTargetPos = (grappleThrowSpeed * grappleThrowTime * myController.Controller.headTransform.forward) + myController.Controller.headTransform.position;
             yield return null;
-            myController.PlayGesture("Grapple");
+            //myController.PlayGesture("Grapple");
             //Do everything between here...
             while (grappleTime < grappleThrowTime && !grappleHit)
             {
@@ -85,7 +85,7 @@ namespace Opus
             }
             if (grappleHit)
             {
-                while (Vector3.Distance(grappleTargetPos, myController.transform.position) > grappleReleaseDistance && !myController.Controller.MyPlayerManager.jumpInput && Grappling.Value)
+                while (Vector3.Distance(grappleTargetPos, myController.transform.position) > grappleReleaseDistance && !myController.pm.jumpInput && Grappling.Value)
                 {
                     myController.Controller.rb.AddForce(((grappleTargetPos- myController.transform.position).normalized * grappleReelDirectForce) 
                         + (myController.Controller.headTransform.forward * grappleReelAimDirForce), ForceMode.Acceleration);

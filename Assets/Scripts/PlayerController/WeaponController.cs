@@ -93,7 +93,7 @@ namespace Opus
                 default:
                     break;
             }
-            be.myController = this;
+            //be.myController = this;
             //be.cr.InitialiseViewable(Controller);
         }
 
