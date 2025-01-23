@@ -162,8 +162,8 @@ namespace Opus
                         RaycastHit hit = workingRaycastHits[closestHitIndex];
                         if (hit.collider.TryGetComponent(out Hitbox box))
                         {
-                            float damage = damageFalloff.Evaluate(Mathf.Clamp01(Mathf.InverseLerp(minRange, maxRange, hit.distance)));
-                            box.ReceiveDamage(damage, OwnerClientId, critMultiplier);
+                            float damage = Mathf.Lerp(maxRangeDamage, minRangeDamage, damageFalloff.Evaluate(Mathf.Clamp01(Mathf.InverseLerp(minRange, maxRange, hit.distance))));
+                            box.ReceiveDamage(damage, OwnerClientId, critMultiplier, DamageType.Regular);
                         }
                         hitEndPoints[f] = hit.point;
                     }

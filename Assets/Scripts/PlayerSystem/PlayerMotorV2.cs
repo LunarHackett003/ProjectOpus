@@ -170,7 +170,8 @@ namespace Opus
                     ref v_lookswayeuler, swayParams.lookSwayEulerDampTime);
 
                 moveSwayPos = Vector3.SmoothDamp(moveSwayPos,
-                    new Vector3(entity.playerManager.moveInput.x * swayParams.moveSwayPosScale.x, 0, entity.playerManager.moveInput.y * swayParams.moveSwayPosScale.y).ClampMagnitude(swayParams.maxMoveSwayPos),
+                    new Vector3(entity.playerManager.moveInput.x * swayParams.moveSwayPosScale.x, 0, entity.playerManager.moveInput.y * swayParams.moveSwayPosScale.y).ClampMagnitude(swayParams.maxMoveSwayPos) 
+                    + (entity.wc.Reloading ? Vector3.down * 0.1f : Vector3.zero),
                     ref v_moveswaypos, swayParams.moveSwayPosDampTime);
                 moveSwayEuler = Vector3.SmoothDamp(moveSwayEuler,
                     new Vector3(0, entity.playerManager.moveInput.x * swayParams.moveSwayEulerScale.y, entity.playerManager.moveInput.x * moveSwayEuler.z).ClampMagnitude(swayParams.maxMoveSwayEuler),

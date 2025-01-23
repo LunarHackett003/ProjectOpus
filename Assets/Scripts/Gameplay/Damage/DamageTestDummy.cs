@@ -21,7 +21,7 @@ namespace Opus
         protected override void HealthUpdated(float prev, float curr)
         {
             base.HealthUpdated(prev, curr);
-            if(curr >= 0 && prev < 0)
+            if(curr >= 0 && prev <= 0)
             {
                 if(restoreParticle != null)
                     restoreParticle.Play();
@@ -52,9 +52,9 @@ namespace Opus
             yield break;
         }
 
-        public override void ReceiveDamage(float damageIn, ulong sourceClientID, float incomingCritMultiply)
+        public override void ReceiveDamage(float damageIn, ulong sourceClientID, float incomingCritMultiply, DamageType damageType = DamageType.Regular)
         {
-            base.ReceiveDamage(damageIn, sourceClientID, incomingCritMultiply);
+            base.ReceiveDamage(damageIn, sourceClientID, incomingCritMultiply, damageType);
         }
 
         public override void RestoreHealth(float healthIn, ulong sourceClientID)

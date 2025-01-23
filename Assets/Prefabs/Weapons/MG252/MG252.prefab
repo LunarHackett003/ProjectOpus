@@ -182,12 +182,13 @@ MonoBehaviour:
   fireVFX: {fileID: 7535112267649372479}
   roundsPerMinute: 600
   timeBetweenBursts: 0
-  chargeSpeed: 2
+  chargeSpeed: 20
   chargeDecay: 15
+  clearChargeOnShot: 0
   burstFireRounds: 0
   recoilPos: {x: 0, y: 0, z: 0}
   recoilEuler: {x: 0, y: 0, z: 0}
-  weaponFireType: 0
+  weaponFireType: 8
   fireBehaviour: 1
   maxAmmo: 80
   syncedAmmo:
@@ -198,41 +199,50 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 663553
   useDamageRanging: 1
-  maxRange: 200
+  maxRange: 150
   minRange: 10
   maxRangeDamage: 5
-  minRangeDamage: 20
+  minRangeDamage: 15
   damageFalloff:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: -1
-      outSlope: -1
-      tangentMode: 34
+      inSlope: -3.0363204
+      outSlope: -3.0363204
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.04841338
+    - serializedVersion: 3
+      time: 0.65781677
+      value: 0
+      inSlope: -0.43812755
+      outSlope: 0
+      tangentMode: 65
+      weightedMode: 0
+      inWeight: 0.122749545
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: -1
-      outSlope: -1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  critMultiplier: 1
+  critMultiplier: 1.7
   fireIterations: 1
   useSingleReload: 0
   firstReloadDelay: 1.2
   reloadTime: 2
   reloadCancelTime: 0.5
-  tracerSpeed: 500
+  tracerSpeed: 200
   tracerRemovalTime: 5
   tracerPrefab: {fileID: 4404160881862405530, guid: f3055026e90419c4484cc62aea92cd10, type: 3}
 --- !u!114 &-7144776333239896497
@@ -287,6 +297,7 @@ MonoBehaviour:
   - {fileID: 3900736578394533293}
   - {fileID: 4976787494356421021}
   - {fileID: 5686397936765547388}
+  - {fileID: 5096592246378798894}
   hideOnHostRenderers: []
   localRender: 6
 --- !u!114 &7313256858211175898
@@ -417,6 +428,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1ed17b753ef4dce4b8d6a9d134ea08a3, type: 3}
+--- !u!73398921 &5096592246378798894 stripped
+VFXRenderer:
+  m_CorrespondingSourceObject: {fileID: 4178616598570030080, guid: 1ed17b753ef4dce4b8d6a9d134ea08a3, type: 3}
+  m_PrefabInstance: {fileID: 9171534517758479150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!2083052967 &7535112267649372479 stripped
 VisualEffect:
   m_CorrespondingSourceObject: {fileID: 1717506029565483537, guid: 1ed17b753ef4dce4b8d6a9d134ea08a3, type: 3}

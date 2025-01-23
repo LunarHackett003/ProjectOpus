@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -29,6 +30,14 @@ namespace Opus
         public Slider healthBar;
         public TMP_Text healthValue;
 
+        public CanvasGroup chargeSliderCG;
+        public Slider chargeSlider;
+
+        bool[] playingDamageType = new bool[4];
+        Coroutine[] damageTypeCoroutines = new Coroutine[4];
+
+        public CanvasGroup[] hitmarkerCGs;
+        public float hitmarkerFadeSpeed = 3;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -71,9 +80,11 @@ namespace Opus
                 entity.currentHealth.OnValueChanged += HealthUpdated;
                 healthBar.maxValue = entity.MaxHealth;
                 healthBar.value = entity.CurrentHealth;
-                //wc = manager.LivingPlayer.wc;
+                wc = entity.wc;
             }
         }
+        
+
         public override void OnNetworkDespawn()
         {
             entity.currentHealth.OnValueChanged -= HealthUpdated;
@@ -105,8 +116,7 @@ namespace Opus
             {
                 if(wc.slots[wc.weaponIndex.Value] is RangedWeapon w)
                 {
-                    if(w.CurrentAmmo != cachedAmmoCount)
-                        UpdateAmmoCount(w);
+                    UpdateWeaponHud(w);
                 }
                 else
                 {
@@ -117,7 +127,7 @@ namespace Opus
                 }
             }
         }
-        void UpdateAmmoCount(RangedWeapon w)
+        void UpdateWeaponHud(RangedWeapon w)
         {
             if (ammoCountText)
             {
@@ -126,6 +136,11 @@ namespace Opus
                     ammoCountText.gameObject.SetActive(true);
                 }
                 ammoCountText.text = $"{w.CurrentAmmo}/{w.maxAmmo}";
+            }
+            if (chargeSliderCG)
+            {
+                chargeSliderCG.alpha = w.chargeSpeed > 0 ? 1 : 0;
+                chargeSlider.value = w.CurrentCharge;
             }
             cachedAmmoCount = w.CurrentAmmo;
         }
@@ -136,9 +151,27 @@ namespace Opus
 
             deadUI.alpha = playerAlive ? 0 : 1;
             deadUI.blocksRaycasts = deadUI.interactable = !playerAlive;
-            aliveUI.alpha = playerAlive ? 1 : 0;
-
-            
+            aliveUI.alpha = playerAlive ? 1 : 0;   
+        }
+        
+        public void PlayHitmarker(DamageType damageType)
+        {
+            int dt = (int)damageType;
+            if (playingDamageType[dt] && damageTypeCoroutines[dt] != null)
+            {
+                StopCoroutine(damageTypeCoroutines[dt]);
+            }
+            damageTypeCoroutines[dt] = StartCoroutine(Hitmarker(dt));
+        }
+        IEnumerator Hitmarker(int damageType)
+        {
+            float t = 1;
+            while (t > 0)
+            {
+                t -= Time.fixedDeltaTime * hitmarkerFadeSpeed;
+                hitmarkerCGs[damageType].alpha = t;
+                yield return new WaitForFixedUpdate();
+            }
         }
     }
 }

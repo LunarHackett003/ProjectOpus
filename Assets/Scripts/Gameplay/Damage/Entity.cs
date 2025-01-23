@@ -12,7 +12,7 @@ namespace Opus
             print($"Received {damageIn} damage from empty source");
         }
 
-        public virtual void ReceiveDamage(float damageIn, ulong sourceClientID, float incomingCritMultiply)
+        public virtual void ReceiveDamage(float damageIn, ulong sourceClientID, float incomingCritMultiply, DamageType damageType = DamageType.Regular)
         {
             print($"Received {damageIn} damage from client {sourceClientID}");
         }

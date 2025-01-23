@@ -188,6 +188,8 @@ namespace Opus
 
             NetworkObject n = NetworkManager.ConnectedClients[clientID].PlayerObject;
             PlayerManager p = n.GetComponent<PlayerManager>();
+
+            p.teamIndex.Value = team;
             if (team == 0)
                 p.UpdateTeamIndex(0, 0);
             else

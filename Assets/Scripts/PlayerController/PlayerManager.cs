@@ -47,6 +47,8 @@ namespace Opus
         public bool sprintInput;
         public bool fireInput;
         public bool secondaryInput;
+        public bool reloadInput;
+
 
         public ControlScheme controls;
 
@@ -142,10 +144,7 @@ namespace Opus
         }
         private void Reload_performed(InputAction.CallbackContext obj)
         {
-            if (Character)
-            {
-
-            }
+            reloadInput = obj.ReadValueAsButton();
         }
         private void Sprint_performed(InputAction.CallbackContext obj)
         {
@@ -276,7 +275,11 @@ namespace Opus
             }
         }
 
-
+        [Rpc(SendTo.Owner)]
+        public void SendHitmarker_RPC(DamageType dt)
+        {
+            hud.PlayHitmarker(dt);
+        }
 
 
         void SpecialPercentageChanged(float previous, float current)
@@ -333,16 +336,6 @@ namespace Opus
         }
         private void FixedUpdate()
         {
-            //We don't want to execute this if we are the host, as we already do this maths on the game manager.
-            if (MatchManager.Instance != null && !IsHost)
-            {
-                if (specialPercentage_noSync < 1)
-                {
-                    specialPercentage_noSync += Time.fixedDeltaTime * (mechDeployed.Value ? MatchManager.Instance.mechSpecialSpeed : MatchManager.Instance.mechReadySpeed);
-                    specialPercentage_noSync = Mathf.Clamp01(specialPercentage_noSync);
-                } 
-            }
-
             if (IsServer)
             {
                 if(Character != null)

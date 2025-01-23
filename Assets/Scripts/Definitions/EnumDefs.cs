@@ -13,19 +13,10 @@ namespace Opus
         /// <summary>
         /// Typically the body of a humanoid character
         /// </summary>
-        HumanRegular = 0,
-        /// <summary>
-        /// Typically the head of a humanoid character
-        /// </summary>
-        HumanCritical = 1,
-        /// <summary>
-        /// Typically the body of a mech or robot
-        /// </summary>
-        MechRegular = 2,
-        /// <summary>
-        /// Typically the cockpit or the power cell on a mech or robot.
-        /// </summary>
-        MechCritical = 4
+        Regular = 0,
+        OverTime = 1,
+        Utility = 2,
+        Critical = 3
     }
     /// <summary>
     /// The state the player is currently in.

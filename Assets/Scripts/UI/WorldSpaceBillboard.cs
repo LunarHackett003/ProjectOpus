@@ -27,7 +27,7 @@ namespace Opus
                 if (debug)
                     transform.forward = (transform.position - Camera.current.transform.position) * (invertDirection ? -1 : 1);
                 else
-                    transform.forward = Vector3.forward;
+                    transform.localRotation = Quaternion.identity;
             }
         }
 

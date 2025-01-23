@@ -18,7 +18,9 @@ namespace Opus
         public NetworkAnimator networkAnimator;
         public PlayerMotorV2 Controller;
         public bool cancellingReload;
-        
+
+        public bool Reloading => slots[weaponIndex.Value] is RangedWeapon rw && rw.reloading;
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -62,7 +64,12 @@ namespace Opus
                     {
                         if(e is RangedWeapon rw)
                         {
-                            if(!rw.reloading || (accumulatedReloadTime >= rw.reloadCancelTime))
+                            if (pm.reloadInput && !rw.reloading && rw.CurrentAmmo < rw.maxAmmo)
+                            {
+                                pm.reloadInput = false;
+                                TryReload(rw);
+                            }
+                            if ((pm.fireInput || pm.secondaryInput) && rw.reloading && (accumulatedReloadTime >= rw.reloadCancelTime))
                             {
                                 cancellingReload = true;
                             }
@@ -114,7 +121,8 @@ namespace Opus
                 t += Time.fixedDeltaTime;
                 yield return wff;
             }
-            weapon.RefillAmmo();
+            if(!cancellingReload)
+                weapon.RefillAmmo();
             weapon.reloading = false;
             cancellingReload = false;
 

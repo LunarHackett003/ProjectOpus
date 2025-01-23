@@ -29,9 +29,9 @@ namespace Opus
         {
             base.ReceiveDamage(damageIn, incomingCritMultiply);
         }
-        public override void ReceiveDamage(float damageIn, ulong sourceClientID, float incomingCritMultiply)
+        public override void ReceiveDamage(float damageIn, ulong sourceClientID, float incomingCritMultiply, DamageType damageType = DamageType.Regular)
         {
-            base.ReceiveDamage(damageIn, sourceClientID, incomingCritMultiply);
+            base.ReceiveDamage(damageIn, sourceClientID, incomingCritMultiply, damageType);
         }
         public override void RestoreHealth(float healthIn, ulong sourceClientID)
         {

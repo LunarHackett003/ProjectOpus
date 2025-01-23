@@ -104,7 +104,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  MaxPosition: {x: 1, y: 0.15, z: 0.17}
+  MaxPosition: {x: 1, y: 0.2, z: 0.17}
   XPositionCurve:
     serializedVersion: 2
     m_Curve:
@@ -133,8 +133,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 0.1
+      time: 0.0012741089
+      value: 0.20601806
       inSlope: -1.2560586
       outSlope: -1.2560586
       tangentMode: 0

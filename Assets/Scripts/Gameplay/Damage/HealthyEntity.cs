@@ -19,6 +19,7 @@ namespace Opus
         public float CurrentHealth => currentHealth.Value;
         public bool healable;
 
+
         public bool useWorldHealthBar;
         public bool hideBarOnOwner;
         public Slider worldHealthBar;
@@ -27,6 +28,10 @@ namespace Opus
         [SerializeField] protected bool displayingBar;
         public CanvasGroup worldHealthBarCG;
         float currentBarFadeTime;
+
+        public bool useDamageTypeOverride;
+        public DamageType damageTypeOverride;
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -57,7 +62,7 @@ namespace Opus
             if (useWorldHealthBar)
             {
                 displayingBar = true;
-                currentBarFadeTime = 0;
+                currentBarFadeTime = worldHealthBarFade * 1.1f;
                 worldHealthBar.value = curr;
             }
         }
@@ -73,7 +78,7 @@ namespace Opus
                 }
                 else if (currentBarFadeTime >= worldHealthBarDisplayTime - worldHealthBarFade)
                 {
-                    worldHealthBarCG.alpha = Mathf.InverseLerp(worldHealthBarDisplayTime - worldHealthBarFade, worldHealthBarDisplayTime, currentBarFadeTime);
+                    worldHealthBarCG.alpha = Mathf.InverseLerp(worldHealthBarDisplayTime, worldHealthBarDisplayTime - worldHealthBarFade, currentBarFadeTime);
                 }
                 else
                 {
@@ -98,10 +103,14 @@ namespace Opus
         {
             base.ReceiveDamage(damageIn, incomingCritMultiply);
         }
-        public override void ReceiveDamage(float damageIn, ulong sourceClientID, float incomingCritMultiply)
+        public override void ReceiveDamage(float damageIn, ulong sourceClientID, float incomingCritMultiply, DamageType damageType = DamageType.Regular)
         {
             base.ReceiveDamage(damageIn, sourceClientID, incomingCritMultiply);
             currentHealth.Value -= damageIn;
+
+            PlayerManager.playersByID[sourceClientID].SendHitmarker_RPC(useDamageTypeOverride ? damageTypeOverride : damageType);          
+
+
 
             if (scoreBehaviour != 0)
             {
