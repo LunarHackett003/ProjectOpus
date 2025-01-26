@@ -286,6 +286,7 @@ MonoBehaviour:
   menuScene:
     asset: {fileID: 102900000, guid: 953f6bd53db84054eb4ffabec60c61a5, type: 3}
     guid: 953f6bd53db84054eb4ffabec60c61a5
+  selectedGameModePrefab: {fileID: 4447775633492038755, guid: 60a3a62eef0d80d4f8fdd10dd621b96c, type: 3}
   sessionUI: {fileID: 601061980964563192}
 --- !u!1 &6753637434798450716
 GameObject:

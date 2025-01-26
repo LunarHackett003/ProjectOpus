@@ -279,14 +279,15 @@ namespace Opus
                     {
                         if (CurrentCharge <= 0)
                             StartCoroutine(ChargeToFull());
-                        if (CurrentCharge >= 1)
-                        {
-                            TryFire();
-                        }
                     }
                     else if (!charging)
                     {
                         CurrentCharge = 0;
+                    }
+                    
+                    if (CurrentCharge >= 1)
+                    {
+                        TryFire();
                     }
                     break;
                 case WeaponFireType.binaryFire:

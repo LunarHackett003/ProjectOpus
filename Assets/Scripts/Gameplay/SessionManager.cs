@@ -13,6 +13,8 @@ namespace Opus
         public SceneReference[] scenes;
         public SceneReference menuScene;
 
+        public NetworkObject selectedGameModePrefab;
+
         public Canvas sessionUI;
         private void Awake()
         {
@@ -79,7 +81,8 @@ namespace Opus
             if(scenes.Length > 0)
             {
                 int random = Random.Range(0, scenes.Length);
-                NetworkManager.Singleton.SceneManager.LoadScene(scenes[random].Name, UnityEngine.SceneManagement.LoadSceneMode.Single);
+                NetworkManager.Singleton.SceneManager.LoadScene(scenes[random].Name, LoadSceneMode.Single);
+                
             }
         }
         public void CloseConnection()

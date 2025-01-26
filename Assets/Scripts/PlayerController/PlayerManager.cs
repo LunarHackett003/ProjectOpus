@@ -25,8 +25,7 @@ namespace Opus
         public NetworkVariable<uint> revives = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> supportPoints = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<uint> combatPoints = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public NetworkVariable<float> specialPercentage = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public NetworkVariable<bool> mechDeployed = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        public NetworkVariable<uint> objectivePoints = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         public float specialPercentage_noSync;
 
@@ -77,7 +76,6 @@ namespace Opus
             {
                 MyTeam = teamIndex.Value;
 
-                specialPercentage.OnValueChanged += SpecialPercentageChanged;
                 if (LoadoutUI.Instance != null)
                 {
                     LoadoutUI.Instance.pm = this;

@@ -10,28 +10,16 @@ namespace Opus
     {
 
         public static MatchManager Instance;
-
         public NetworkVariable<Dictionary<ulong, uint>> clientsOnTeams = new(new(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public int numberOfTeamsAllowed;
-        public NetworkVariable<Dictionary<int, int>> teamScores = new(new(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-
+        public NetworkVariable<Dictionary<uint, uint>> teamScores = new(new(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkList<int> playersOnTeam = new(new int[20], NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-
         public SpawnpointHolder spawnpointHolder;
-
         public EquipmentList weapons;
         public EquipmentList gadgets;
-
         public int maxRespawnTime = 10;
-
         public bool[] lockedSlots = new bool[5];
-
         public float stunMoveSpeedMultiplier, stunLookSpeedMultiplier;
-
-        [Tooltip("The amount added to the mech readiness every tick. This is synchronised with the players every 10 seconds.")]
-        public float mechReadySpeed;
-        [Tooltip("The amount added to the mech's special readiness every tick. This is synchronised with the players every 10 seconds.")]
-        public float mechSpecialSpeed;
         public override void OnNetworkSpawn()
         {
             Instance = this;
@@ -40,6 +28,20 @@ namespace Opus
             NetworkManager.SceneManager.OnSceneEvent += SceneManager_OnSceneEvent;
 
             TeamsChanged(new(), clientsOnTeams.Value);
+
+
+            if (IsServer)
+            {
+
+                var n = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(SessionManager.Instance.selectedGameModePrefab, 0, false, false, false, default, default);
+
+
+                teamScores.Value = new();
+                for (uint i = 0; i < numberOfTeamsAllowed; i++)
+                {
+                    teamScores.Value.Add(i, 0);
+                }
+            }
         }
         public override void OnNetworkDespawn()
         {
@@ -68,7 +70,6 @@ namespace Opus
 
             }
         }
-
 
         private void SceneManager_OnSceneEvent(SceneEvent sceneEvent)
         {
@@ -245,38 +246,37 @@ namespace Opus
                 return smallestTeamIndex;
             }
         }
-        float specialSyncTime;
-        bool syncingSpecialTime;
         private void FixedUpdate()
         {
             if (!IsHost && !IsServer)
                 return;
+        }
 
-            specialSyncTime += Time.fixedDeltaTime;
-            if (specialSyncTime > 10)
+        public void SetScoreForTeam(uint teamIndex = 0, uint teamScore = 10, bool additive = false, uint clientID = 0, uint extraPlayerScore = 0)
+        {
+            if (teamScores.Value.ContainsKey(teamIndex))
             {
-                specialSyncTime = 0;
-                syncingSpecialTime = true;
-            }
-            else
-                syncingSpecialTime = false;
-            if(PlayerManager.playersByID.Count > 0)
-            {
-                foreach (KeyValuePair<ulong, PlayerManager> item in PlayerManager.playersByID)
+                Debug.Log($"Awarding {(additive ? "+" : "")} {teamScore} points to team {teamIndex}! {(extraPlayerScore > 0 ? $"Awarding points to {clientID}" : "")}");
+                if (additive)
                 {
-                    if (item.Value.specialPercentage_noSync < 1)
+                    teamScores.Value[teamIndex] += teamScore;
+                    
+                }
+                else
+                {
+                    teamScores.Value[teamIndex] = teamScore;
+                }
+                foreach (var item in PlayerManager.playersByID)
+                {
+                    if (item.Value.teamIndex.Value == teamIndex)
                     {
-                        item.Value.specialPercentage_noSync += (item.Value.mechDeployed.Value ? mechSpecialSpeed : mechReadySpeed) * Time.fixedDeltaTime;
-                    }
-                    if (item.Value.specialPercentage_noSync > 1)
-                    {
-                        item.Value.specialPercentage_noSync = 1;
-                    }
-                    if (syncingSpecialTime)
-                    {
-                        item.Value.specialPercentage.Value = item.Value.specialPercentage_noSync;
+                        item.Value.objectivePoints.Value += extraPlayerScore;
                     }
                 }
+            }
+            else
+            {
+                Debug.LogWarning($"Invalid team index given!\nTeam Index {teamIndex} does not exist!");
             }
         }
     }
