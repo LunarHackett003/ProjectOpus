@@ -208,7 +208,6 @@ namespace Opus
                 CurrentCharge += chargeSpeed * Time.fixedDeltaTime;
                 yield return wff;
             }
-            TryFire();
             charging = false;
             yield break;
         }
@@ -311,7 +310,7 @@ namespace Opus
 
         }
 
-
+        [Rpc(SendTo.Server)]
         public void SendFireToServer_RPC(Vector3 direction, Vector3 origin)
         {
             FireOnServer(direction, origin);

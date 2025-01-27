@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Opus
 {
-    public class BaseInteractable : NetworkBehaviour
+    public class BaseInteractable : BaseHoverable
     {
         public bool holdInteract;
         public string interactText;
@@ -13,12 +13,23 @@ namespace Opus
 
 
         [Rpc(SendTo.Everyone)]
-        public virtual void InteractStart_RPC(uint clientID = 0)
+        public void InteractStart_RPC(uint clientID = 0)
+        {
+            InteractStart(clientID);
+        }
+
+        protected virtual void InteractStart(uint clientID = 0)
         {
 
         }
+
         [Rpc(SendTo.Everyone)]
-        public virtual void InteractEnd_RPC(uint clientID = 0)
+        public void InteractEnd_RPC(uint clientID = 0)
+        {
+            InteractEnd(clientID);
+        }
+
+        protected virtual void InteractEnd(uint clientID = 0)
         {
 
         }

@@ -1,4 +1,5 @@
 using Netcode.Extensions;
+using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -30,6 +31,11 @@ namespace Opus
         protected override void OnNetworkPostSpawn()
         {
             base.OnNetworkPostSpawn();
+            StartCoroutine(DelayInitialise());
+        }
+        protected virtual IEnumerator DelayInitialise()
+        {
+            yield return new WaitForFixedUpdate();
             myController = PlayerManager.playersByID[OwnerClientId].Character.wc;
         }
         public virtual void TrySelect()

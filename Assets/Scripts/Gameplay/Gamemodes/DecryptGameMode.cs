@@ -18,7 +18,7 @@ namespace Opus
         public float timeToSpawnNewStation = 15;
 
 
-        DecryptSpawnPoint[] decryptSpawns;
+        DecryptSpawnPoint[] decryptSpawns = new DecryptSpawnPoint[0];
 
         public NetworkObject decryptStationPrefab;
 
@@ -45,10 +45,21 @@ namespace Opus
         public IEnumerator SpawnNewDecryptStation()
         { 
             yield return new WaitForSeconds(timeToSpawnNewStation);
-
-            int rand = Random.Range(0, decryptSpawns.Length);
-            Transform t = decryptSpawns[rand].transform;
-            NetworkObject newStation = NetworkManager.SpawnManager.InstantiateAndSpawn(decryptStationPrefab, 0, false, false, false, t.position, t.rotation);
+            Vector3 pos, rot;
+            if(decryptSpawns.Length > 0)
+            {
+                int rand = Random.Range(0, decryptSpawns.Length);
+                Transform t = decryptSpawns[rand].transform;
+                pos = t.position;
+                rot = t.eulerAngles;
+            }
+            else
+            {
+                print("Failed to find spawn for decrypt station!");
+                pos = new(0, 50, 0);
+                rot = Vector3.zero;
+            }
+            NetworkObject newStation = NetworkManager.SpawnManager.InstantiateAndSpawn(decryptStationPrefab, 0, false, false, false, pos, Quaternion.Euler(rot));
             objectives.Add(newStation.gameObject);
         }
     }

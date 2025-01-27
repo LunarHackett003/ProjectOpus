@@ -20,7 +20,7 @@ namespace Opus
         {
             if (be != null && IsServer)
             {
-                be.RefillAmmo();
+                be.RefillAmmo_RPC();
             }
         }
         public void GiveWeaponAmmo(int ammo)

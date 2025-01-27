@@ -1,7 +1,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using Unity.Collections;
+using Unity.Jobs;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Jobs;
 using UnityEngine.Pool;
 
 namespace Opus
@@ -16,6 +20,21 @@ namespace Opus
             public float time, speed;
         }
 
+        #region TracerJob
+        public struct TracerJob : IJobParallelForTransform
+        {
+            public NativeArray<Vector3> start, end;
+            public NativeArray<float> time;
+
+            public void Execute(int index, TransformAccess transform)
+            {
+                var pos = Vector3.Lerp(start[index], end[index], time[index]);
+                transform.position = pos;
+            }
+        }
+
+
+        #endregion
         #region Pooling
         IObjectPool<TrailRenderer> _tracerPool;
         public IObjectPool<TrailRenderer> TracerPool
@@ -62,6 +81,9 @@ namespace Opus
         public GameObject tracerPrefab;
 
 
+        TransformAccessArray accessArray;
+        NativeArray<Vector3> startArr, endArr;
+        NativeArray<float> timeArr;
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
@@ -69,31 +91,65 @@ namespace Opus
         }
         protected override void FixedUpdate()
         {
-            if (tracers.Count > 0)
-            {
-                if (tracers.Count > 0)
-                {
-                    for (int i = 0; i < tracers.Count; i++)
-                    {
-                        Tracer x = tracers[i];
-                        if (x.t != null)
-                        {
-                            x.t.emitting = true;
-                            x.t.transform.position = Vector3.Lerp(x.start, x.end, x.time);
-                        }
-                        x.time += x.speed * Time.fixedDeltaTime;
-                        if (x.time >= tracerRemovalTime)
-                        {
-                            TracerPool.Release(x.t);
-                            x.t = null;
-                        }
-                        tracers[i] = x;
-                    }
-                    tracers.RemoveAll(x => x.t == null);
-                }
-            }
+            UpdateTracers();
 
             base.FixedUpdate();
+        }
+
+
+
+        void UpdateTracers()
+        {
+            if (tracers.Count > 0)
+            {
+                for (int i = 0; i < tracers.Count; i++)
+                {
+                    Tracer x = tracers[i];
+                    x.time += x.speed * Time.fixedDeltaTime;
+                    x.t.emitting = x.time < tracerRemovalTime;
+                    if (x.time >= tracerRemovalTime)
+                    {
+                        TracerPool.Release(x.t);
+                        x.t.emitting = true;
+                    }
+                    tracers[i] = x;
+                }
+                tracers.RemoveAll(x => x.time >= tracerRemovalTime);
+                accessArray = new(tracers.Select(x => x.t.transform).ToArray());
+                startArr = new(tracers.Select(x => x.start).ToArray(), Allocator.TempJob);
+                endArr = new(tracers.Select(x => x.end).ToArray(), Allocator.TempJob);
+                timeArr = new(tracers.Select(x => x.time).ToArray(), Allocator.TempJob);
+
+                var traceJob = new TracerJob()
+                {
+                    start = startArr,
+                    end = endArr,
+                    time = timeArr
+                };
+
+                JobHandle traceJobHandle = traceJob.Schedule(accessArray);
+
+                traceJobHandle.Complete();
+
+
+                accessArray.Dispose();
+                startArr.Dispose();
+                endArr.Dispose();
+                timeArr.Dispose();
+            }   
+        }
+
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            if(accessArray.isCreated)
+                accessArray.Dispose();
+            if(startArr.IsCreated)
+                startArr.Dispose();
+            if (endArr.IsCreated)
+                endArr.Dispose();
+            if (timeArr.IsCreated)
+                timeArr.Dispose();
         }
 
         Tracer[] tracerWorkingArray;

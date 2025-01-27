@@ -13,6 +13,10 @@ namespace Opus
         public SceneReference[] scenes;
         public SceneReference menuScene;
 
+        public bool IsInGame => Client;
+        public bool Server { get; private set; }
+        public bool Client { get; private set; }
+
         public NetworkObject selectedGameModePrefab;
 
         public Canvas sessionUI;
@@ -39,6 +43,7 @@ namespace Opus
             {
                 NetworkManager.Singleton.OnConnectionEvent += Singleton_OnConnectionEvent;
                 sessionUI.gameObject.SetActive(true);
+                Client = true;
             }
         }
 
@@ -65,14 +70,17 @@ namespace Opus
 
         public void StartServer()
         {
-            if(NetworkManager.Singleton.StartServer())
+            if (NetworkManager.Singleton.StartServer())
+            {
                 ServerPostConnection();
+            }
         }
         public void StartHost()
         {
             if (NetworkManager.Singleton.StartHost())
             {
                 sessionUI.gameObject.SetActive(true);
+                Client = true;
                 ServerPostConnection();
             }
         }
@@ -80,9 +88,9 @@ namespace Opus
         {
             if(scenes.Length > 0)
             {
+                Server = true;
                 int random = Random.Range(0, scenes.Length);
                 NetworkManager.Singleton.SceneManager.LoadScene(scenes[random].Name, LoadSceneMode.Single);
-                
             }
         }
         public void CloseConnection()
@@ -92,6 +100,7 @@ namespace Opus
 
             if(LoadScreenManager.Instance != null)
                 LoadScreenManager.Instance.LoadWithScreen(menuScene);
+            Server = Client = false;
         }
 
         public void QuitGame()

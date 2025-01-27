@@ -1,8 +1,10 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Cinemachine;
 using Unity.Netcode;
-using Unity.Netcode.Components;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -41,13 +43,7 @@ namespace Opus
         public PlayerHUD hud;
 
         public Vector2 moveInput, lookInput;
-        public bool jumpInput;
-        public bool crouchInput;
-        public bool sprintInput;
-        public bool fireInput;
-        public bool secondaryInput;
-        public bool reloadInput;
-
+        public bool jumpInput, crouchInput, sprintInput, fireInput, secondaryInput, reloadInput, interactInput, pickupInput;
 
         public ControlScheme controls;
 
@@ -66,6 +62,7 @@ namespace Opus
         public NetworkVariable<int> timeUntilSpawn = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         bool canRespawn = true;
         public int primaryWeaponIndex = -1, gadget1Index = -1, gadget2Index = -1, gadget3Index = -1, specialIndex = -1;
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -83,6 +80,9 @@ namespace Opus
 
                 #region Input Subscription
                 controls = new();
+
+                controls.Player.Pause.performed += Pause_performed;
+
                 controls.Player.Move.performed += Move_performed;
                 controls.Player.Move.canceled += Move_performed;
 
@@ -110,10 +110,21 @@ namespace Opus
                 controls.Player.CycleWeapon.performed += CycleWeapon_performed;
 
                 controls.Player.Special.performed += Special_performed;
+
+                controls.Player.PickUp.performed += PickUp_performed;
+                controls.Player.PickUp.canceled += PickUp_performed;
+
+                controls.Player.Interact.performed += Interact_performed;
+                controls.Player.Interact.canceled += Interact_performed;
+
                 controls.Enable();
                 #endregion
 
                 timeUntilSpawn.OnValueChanged += RespawnTimeChanged;
+
+                PauseMenu.Instance.PauseGame(false);
+                PauseMenu.Instance.FreeCursor(true);
+
             }
             else
             {
@@ -121,6 +132,28 @@ namespace Opus
             }
             UpdateAllPlayerColours();
         }
+
+        private void Pause_performed(InputAction.CallbackContext obj)
+        {
+            PauseMenu.Instance.gamePaused = !PauseMenu.Instance.gamePaused;
+
+            if (PauseMenu.Instance.gamePaused)
+            {
+                moveInput = lookInput = Vector2.zero;
+                jumpInput = crouchInput = sprintInput = fireInput = secondaryInput = interactInput = reloadInput = pickupInput = false;
+            }
+        }
+
+        private void Interact_performed(InputAction.CallbackContext obj)
+        {
+            interactInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+        }
+
+        private void PickUp_performed(InputAction.CallbackContext obj)
+        {
+            pickupInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+        }
+
         void RespawnTimeChanged(int previous, int current)
         {
             canRespawn = current <= 0;
@@ -137,27 +170,27 @@ namespace Opus
         {
             if (Character != null)
             {
-                
+
             }
         }
         private void Reload_performed(InputAction.CallbackContext obj)
         {
-            reloadInput = obj.ReadValueAsButton();
+            reloadInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
         }
         private void Sprint_performed(InputAction.CallbackContext obj)
         {
-            sprintInput = obj.ReadValueAsButton();
+            sprintInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
 
         }
         private void Crouch_performed(InputAction.CallbackContext obj)
         {
-            crouchInput = obj.ReadValueAsButton();
+            crouchInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
 
         }
 
         private void Jump_performed(InputAction.CallbackContext obj)
         {
-            jumpInput = obj.ReadValueAsButton();
+            jumpInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
 
         }
 
@@ -165,17 +198,17 @@ namespace Opus
 
         private void Look_performed(InputAction.CallbackContext obj)
         {
-            lookInput = obj.ReadValue<Vector2>();
+            lookInput = PauseMenu.Instance.IsPaused ? Vector2.zero : obj.ReadValue<Vector2>();
         }
 
         private void Move_performed(InputAction.CallbackContext obj)
         {
-            moveInput = obj.ReadValue<Vector2>();
+            moveInput = PauseMenu.Instance.IsPaused ? Vector2.zero : obj.ReadValue<Vector2>();
 
         }
         private void SecondaryInput_performed(InputAction.CallbackContext obj)
         {
-            secondaryInput = obj.ReadValueAsButton();
+            secondaryInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
 
             if (Character != null && spectating)
             {
@@ -185,7 +218,7 @@ namespace Opus
 
         private void Fire_performed(InputAction.CallbackContext obj)
         {
-            fireInput = obj.ReadValueAsButton();
+            fireInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
             if (Character != null && spectating)
             {
                 Spectate_RPC(true, 1);
@@ -194,7 +227,7 @@ namespace Opus
 
         public void SpawnReviveItem(Vector3 lastPos = default)
         {
-            if(reviveItemInstance == null)
+            if (reviveItemInstance == null)
             {
                 reviveItemInstance = NetworkManager.SpawnManager.InstantiateAndSpawn(reviveItemPrefab, OwnerClientId, position: lastPos);
             }
@@ -228,8 +261,8 @@ namespace Opus
 
             currentSpectateIndex += indexChange;
             currentSpectateIndex %= MatchManager.Instance.playersOnTeam[(int)teamIndex.Value];
-            PlayerManager target = playersByID[(uint)currentSpectateIndex];
-            if(target.Character == null)
+            PlayerManager target = playersByID.ToArray()[currentSpectateIndex].Value;
+            if (target.Character == null)
             {
                 return;
             }
@@ -266,7 +299,13 @@ namespace Opus
             {
                 MatchManager.Instance.RequestSpawn_RPC(OwnerClientId, primaryWeaponIndex, gadget1Index, gadget2Index, gadget3Index, specialIndex);
             }
+            if (Character)
+            {
+                Character.SetCollidersEnabledState_RPC(true);
+                Character.SetRenderersEnabledState_RPC(true);
+            }
             Spectate_RPC(false, 0);
+            PauseMenu.Instance.FreeCursor(false);
             if (reviveItemInstance)
             {
                 reviveItemInstance.Despawn();
@@ -279,11 +318,21 @@ namespace Opus
             hud.PlayHitmarker(dt);
         }
 
-
-        void SpecialPercentageChanged(float previous, float current)
+        public void ClientDied()
         {
-            specialPercentage_noSync = current;
+            PauseMenu.Instance.FreeCursor(true);
+            PlayerDied_RPC();
+            Character.SetRenderersEnabledState_RPC(false);
+            Spectate_RPC(true, 0);
         }
+        [Rpc(SendTo.Server)]
+        public void PlayerDied_RPC()
+        {
+            SendSpawnCooldown();
+            Character.SetCollidersEnabledState_RPC(false);
+            SpawnReviveItem(Character.LastGroundedPosition);
+        }
+
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
@@ -321,6 +370,12 @@ namespace Opus
                 hud.InitialiseHUD();
             }
             print("spawn complete");
+            ResetCanSpawn_RPC();
+        }
+        [Rpc(SendTo.Server)]
+        void ResetCanSpawn_RPC()
+        {
+            tryingToRespawn = false;
         }
         public void ReadyUpPressed()
         {
@@ -336,12 +391,11 @@ namespace Opus
         {
             if (IsServer)
             {
-                if(Character != null)
+                if (Character != null)
                 {
-                    if(Character.transform.position.y < -40 && Character.CurrentHealth > 0)
+                    if (Character.transform.position.y < -40 && Character.CurrentHealth > 0)
                     {
                         Character.currentHealth.Value = 0;
-                        SpawnReviveItem(Character.LastGroundedPosition);
                     }
                 }
             }
@@ -350,10 +404,20 @@ namespace Opus
             {
                 readyButton.interactable = canRespawn;
             }
+            
+        }
+
+        bool tryingToRespawn;
+        public void SendSpawnCooldown()
+        {
+            if(!tryingToRespawn)
+                StartCoroutine(SpawnCountdown());
         }
 
         IEnumerator SpawnCountdown()
         {
+            tryingToRespawn = true;
+            yield return null;
             while (timeUntilSpawn.Value > 0)
             {
                 yield return new WaitForSeconds(1);

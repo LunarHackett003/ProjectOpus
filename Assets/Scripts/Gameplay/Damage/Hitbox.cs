@@ -29,7 +29,7 @@ namespace Opus
                     if(damageType == DamageType.Regular && criticalBox)
                         damageType = DamageType.Critical;
 
-                    parentEntity.ReceiveDamage(damageIn * (criticalBox ? incomingCritMultiply : 1) * transmitDamageMultiplier, OwnerClientId, 1, damageType);
+                    parentEntity.ReceiveDamage(damageIn * (criticalBox ? incomingCritMultiply : 1) * transmitDamageMultiplier, sourceClientID, 1, damageType);
                 }
             }
         }

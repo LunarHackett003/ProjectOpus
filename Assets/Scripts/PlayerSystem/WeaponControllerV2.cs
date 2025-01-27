@@ -18,9 +18,28 @@ namespace Opus
         public NetworkAnimator networkAnimator;
         public PlayerMotorV2 Controller;
         public bool cancellingReload;
-
         public bool Reloading => slots[weaponIndex.Value] is RangedWeapon rw && rw.reloading;
 
+
+        [Tooltip("The point where held items will hover")]
+        public Transform grabPoint;
+        public float grabLerpToHandSpeed;
+        float currentGrabLerpTime;
+        bool lerpingGrab;
+        public LayerMask grabLayermask;
+        [Tooltip("How far can the player reach to grab something?")]
+        public float grabDistance;
+        [Tooltip("The thickness of the ray used to try and grab things.")]
+        public float grabRadius;
+        public BaseCarriable currentCarriable;
+        public BaseCarriable currentCarriableTargeted;
+        public float carriableThrowForce;
+
+        public LayerMask interactLayermask;
+        public float interactDistance, interactRadius;
+        public BaseInteractable currentInteractableTargeted;
+
+        public bool Grabbing => currentCarriable != null;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -64,18 +83,18 @@ namespace Opus
                     {
                         if(e is RangedWeapon rw)
                         {
-                            if (pm.reloadInput && !rw.reloading && rw.CurrentAmmo < rw.maxAmmo)
+                            if (pm.reloadInput && !rw.reloading && rw.CurrentAmmo < rw.maxAmmo && currentCarriable == null)
                             {
                                 pm.reloadInput = false;
                                 TryReload(rw);
                             }
-                            if ((pm.fireInput || pm.secondaryInput) && rw.reloading && (accumulatedReloadTime >= rw.reloadCancelTime))
+                            if ((pm.fireInput || pm.secondaryInput) && rw.reloading && (accumulatedReloadTime >= rw.reloadCancelTime) || currentCarriable != null)
                             {
                                 cancellingReload = true;
                             }
                         }
-                        e.fireInput = pm.fireInput;
-                        e.secondaryInput = pm.secondaryInput;
+                        e.fireInput = pm.fireInput && currentCarriable == null;
+                        e.secondaryInput = pm.secondaryInput && currentCarriable == null;
                     }
                 }
                 else
@@ -89,7 +108,101 @@ namespace Opus
                 }
             }
         }
+        private void FixedUpdate()
+        {
+            if (IsOwner)
+            {
+                CheckCarriable();
+                CheckInteractable();
+            }
+        }
 
+        void CheckCarriable()
+        {
+            if (currentCarriable == null)
+            {
+                bool hitSomething = false;
+                if (Physics.SphereCast(pm.Character.headTransform.position, grabRadius, pm.Character.headTransform.forward, out RaycastHit hit, grabDistance, grabLayermask, QueryTriggerInteraction.Ignore))
+                {
+                    if (hit.rigidbody && hit.rigidbody.TryGetComponent(out BaseCarriable b) && !b.grabbed.Value)
+                    {
+                        //This may be a carriable, check the rigidbody.
+                        if (currentCarriableTargeted == null || b != currentCarriableTargeted)
+                        {
+                            if (currentCarriableTargeted != null)
+                            {
+                                currentCarriableTargeted.HoverOver(false);
+                            }
+                            currentCarriableTargeted = b;
+                            b.HoverOver(true);
+                        }
+
+                        if (pm.pickupInput)
+                        {
+                            PickUpCarriable(b);   
+                        }
+                        hitSomething = true;
+                    }
+                }
+                if (!hitSomething && currentCarriableTargeted != null)
+                {
+                    currentCarriableTargeted.HoverOver(false);
+                    currentCarriableTargeted = null;
+                }
+            }
+            else
+            {
+                if (!lerpingGrab)
+                {
+                    currentCarriable.rb.Move(grabPoint.position, grabPoint.rotation * currentCarriable.grabOffset);
+                }
+                if (currentCarriable.canReleaseHere)
+                {
+                    if (pm.fireInput)
+                    {
+                        currentCarriable.rb.isKinematic = false;
+                        currentCarriable.rb.AddForce(grabPoint.forward * carriableThrowForce, ForceMode.Impulse);
+                        currentCarriable.Released_RPC(true);
+                        pm.fireInput = false;
+                        currentCarriable = null;
+                    }
+                }
+                if (pm.secondaryInput)
+                {
+                    currentCarriable.Released_RPC(false);
+                    currentCarriable = null;
+                    pm.secondaryInput = false;
+                }
+            }
+        }
+        void PickUpCarriable(BaseCarriable carriable)
+        {
+            currentCarriable = carriable;
+            carriable.rb.isKinematic = true;
+            carriable.OnGrab_RPC((uint)OwnerClientId);
+            StartCoroutine(GrabLerp());
+        }
+
+        IEnumerator GrabLerp()
+        {
+            WaitForFixedUpdate wff = new();
+            lerpingGrab = true;
+            Vector3 startPos = currentCarriable.transform.position;
+            Quaternion startRot = currentCarriable.transform.rotation;
+            while (currentGrabLerpTime < 1 && currentCarriable != null)
+            {
+                currentGrabLerpTime += Time.fixedDeltaTime * grabLerpToHandSpeed;
+                currentCarriable.rb.Move(Vector3.Lerp(startPos, grabPoint.position, currentGrabLerpTime), Quaternion.Slerp(startRot, grabPoint.rotation * currentCarriable.grabOffset, currentGrabLerpTime));
+                yield return wff;
+            }
+            currentGrabLerpTime = 0;
+            lerpingGrab = false;
+        }
+        void CheckInteractable()
+        {
+
+        }
+        
         public void ReceiveShot()
         {
 
@@ -122,7 +235,7 @@ namespace Opus
                 yield return wff;
             }
             if(!cancellingReload)
-                weapon.RefillAmmo();
+                weapon.RefillAmmo_RPC();
             weapon.reloading = false;
             cancellingReload = false;
 

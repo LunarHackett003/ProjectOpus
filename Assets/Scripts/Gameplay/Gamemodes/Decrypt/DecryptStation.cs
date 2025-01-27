@@ -14,23 +14,19 @@ namespace Opus
 
         public NetworkVariable<float> decryptTime = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-
-        public override void InteractStart_RPC(uint clientID = 0)
+        protected override void InteractStart(uint clientID = 0)
         {
-            base.InteractStart_RPC(clientID);
-
+            base.InteractStart(clientID);
             if (!isDecrypting.Value || decryptingTeam.Value != PlayerManager.playersByID[clientID].teamIndex.Value)
             {
                 TrySteal_RPC(clientID, true);
             }
         }
-        public override void InteractEnd_RPC(uint clientID = 0)
+        protected override void InteractEnd(uint clientID = 0)
         {
-            base.InteractEnd_RPC(clientID);
-
+            base.InteractEnd(clientID);
             TrySteal_RPC(clientID, false);
         }
-
 
         [Rpc(SendTo.Everyone)]
         public void TrySteal_RPC (uint team = 0, bool state = true)

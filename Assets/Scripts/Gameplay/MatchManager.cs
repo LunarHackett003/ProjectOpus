@@ -27,12 +27,10 @@ namespace Opus
             NetworkManager.OnConnectionEvent += ConnectionEvent;
             NetworkManager.SceneManager.OnSceneEvent += SceneManager_OnSceneEvent;
 
-            TeamsChanged(new(), clientsOnTeams.Value);
-
-
             if (IsServer)
             {
 
+                TeamsChanged(new(), clientsOnTeams.Value);
                 var n = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(SessionManager.Instance.selectedGameModePrefab, 0, false, false, false, default, default);
 
 
@@ -96,6 +94,12 @@ namespace Opus
                 if (!revived)
                 {
                     (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint(p.teamIndex.Value);
+
+                    for (int i = 0; i < p.Character.wc.slots.Length; i++)
+                    {
+                        if (p.Character.wc.slots[i] != null)
+                            p.Character.wc.slots[i].NetworkObject.Despawn();
+                    }
 
                     SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, gadgetThreeIndex, specialIndex);
                     p.Character.Teleport_RPC(pos, Quaternion.identity);

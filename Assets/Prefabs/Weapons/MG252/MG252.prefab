@@ -180,24 +180,11 @@ MonoBehaviour:
   animationSet: {fileID: 0}
   fireParticleSystem: {fileID: 0}
   fireVFX: {fileID: 7535112267649372479}
-  roundsPerMinute: 600
-  timeBetweenBursts: 0
-  chargeSpeed: 20
-  chargeDecay: 15
-  clearChargeOnShot: 0
-  burstFireRounds: 0
-  recoilPos: {x: 0, y: 0, z: 0}
-  recoilEuler: {x: 0, y: 0, z: 0}
   weaponFireType: 8
   fireBehaviour: 1
-  maxAmmo: 80
-  syncedAmmo:
-    m_InternalValue: -1
-  reloading: 0
-  muzzle: {fileID: 7982700122240318136}
   damageLayermask:
     serializedVersion: 2
-    m_Bits: 663553
+    m_Bits: 720897
   useDamageRanging: 1
   maxRange: 150
   minRange: 10
@@ -238,6 +225,19 @@ MonoBehaviour:
     m_RotationOrder: 4
   critMultiplier: 1.7
   fireIterations: 1
+  recoilPos: {x: 0, y: 0, z: 0}
+  recoilEuler: {x: 0, y: 0, z: 0}
+  roundsPerMinute: 600
+  timeBetweenBursts: 0
+  chargeSpeed: 20
+  chargeDecay: 15
+  clearChargeOnShot: 0
+  burstFireRounds: 0
+  maxAmmo: 80
+  syncedAmmo:
+    m_InternalValue: -1
+  reloading: 0
+  muzzle: {fileID: 7982700122240318136}
   useSingleReload: 0
   firstReloadDelay: 1.2
   reloadTime: 2

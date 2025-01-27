@@ -39,13 +39,11 @@ namespace Opus
                 UpdateAmmo();
             }
         }
-        public void RefillAmmo()
+        [Rpc(SendTo.Server)]
+        public void RefillAmmo_RPC()
         {
-            if (IsServer)
-            {
-                CurrentAmmo = maxAmmo;
-                SendAmmo_RPC(CurrentAmmo);
-            }
+            CurrentAmmo = maxAmmo;
+            SendAmmo_RPC(CurrentAmmo);
         }
 
         public override void OnNetworkSpawn()
