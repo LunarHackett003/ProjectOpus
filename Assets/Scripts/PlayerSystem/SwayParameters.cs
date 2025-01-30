@@ -12,5 +12,7 @@ namespace Opus
         public float moveSwayPosDampTime, moveSwayEulerDampTime, maxMoveSwayPos, maxMoveSwayEuler;
 
         public float verticalVelocitySwayScale, verticalVelocityEulerScale, verticalVelocitySwayPosTime, verticalVelocitySwayEulerTime, verticalVelocityPosClamp, verticalVelocityEulerClamp;
+
+        public float jumpLerpSpeed, jumpPosLerpSpeed;
     }
 }

@@ -14,19 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lookSwayPosScale: {x: 0.01, y: 0.01, z: 0}
   lookSwayEulerScale: {x: 2, y: -1, z: 1}
-  lookSwayPosDampTime: 0.13
-  lookSwayEulerDampTime: 0.13
+  lookSwayPosDampTime: 8
+  lookSwayEulerDampTime: 8
   maxLookSwayPos: 0.034
   maxLookSwayEuler: 5
   moveSwayPosScale: {x: -0.01, y: -0.02, z: 0}
   moveSwayEulerScale: {x: 90, y: 2, z: 90}
-  moveSwayPosDampTime: 0.2
-  moveSwayEulerDampTime: 0.1
+  moveSwayPosDampTime: 8
+  moveSwayEulerDampTime: 8
   maxMoveSwayPos: 0.05
   maxMoveSwayEuler: 90
-  verticalVelocitySwayScale: -0.005
-  verticalVelocityEulerScale: 0.5
-  verticalVelocitySwayPosTime: 0.05
-  verticalVelocitySwayEulerTime: 0.02
+  verticalVelocitySwayScale: 0.01
+  verticalVelocityEulerScale: -1
+  verticalVelocitySwayPosTime: 5
+  verticalVelocitySwayEulerTime: 15
   verticalVelocityPosClamp: 0.05
   verticalVelocityEulerClamp: 5
+  jumpLerpSpeed: 0.1
+  jumpPosLerpSpeed: 15

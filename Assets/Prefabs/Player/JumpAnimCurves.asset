@@ -151,14 +151,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.0012741089
+      time: 0
       value: 0
-      inSlope: -7.182692
-      outSlope: -7.182692
+      inSlope: -13.634152
+      outSlope: -13.634152
       tangentMode: 0
       weightedMode: 2
       inWeight: 0
-      outWeight: 0.40788844
+      outWeight: 0.23639604
     - serializedVersion: 3
       time: 0.10353039
       value: -0.6169967
@@ -213,5 +213,5 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  maxYVelocityOnLand: 1
+  maxYVelocityOnLand: 15
   endWaitTime: 0.5
