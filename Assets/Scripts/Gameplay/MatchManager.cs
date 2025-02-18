@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Opus
 {
-    public class MatchManager : NetworkBehaviour
+    public class MatchManager : ONetBehaviour
     {
 
         public static MatchManager Instance;
@@ -20,9 +20,16 @@ namespace Opus
         public int maxRespawnTime = 10;
         public bool[] lockedSlots = new bool[5];
         public float stunMoveSpeedMultiplier, stunLookSpeedMultiplier;
+        Texture2D tex;
+
+        public NetworkVariable<bool> GameInProgress = new(true, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+        public float burnDamagePerStack = 1, burnDamageTickTime = 0.33f;
+
         public override void OnNetworkSpawn()
         {
             Instance = this;
+
             base.OnNetworkSpawn();
             NetworkManager.OnConnectionEvent += ConnectionEvent;
             NetworkManager.SceneManager.OnSceneEvent += SceneManager_OnSceneEvent;
@@ -33,11 +40,9 @@ namespace Opus
                 TeamsChanged(new(), clientsOnTeams.Value);
                 var n = NetworkManager.Singleton.SpawnManager.InstantiateAndSpawn(SessionManager.Instance.selectedGameModePrefab, 0, false, false, false, default, default);
 
-
-                teamScores.Value = new();
                 for (uint i = 0; i < numberOfTeamsAllowed; i++)
                 {
-                    teamScores.Value.Add(i, 0);
+                    teamScores.Value.TryAdd(i, 0);
                 }
             }
         }
@@ -250,10 +255,22 @@ namespace Opus
                 return smallestTeamIndex;
             }
         }
-        private void FixedUpdate()
+        public override void OFixedUpdate()
         {
             if (!IsHost && !IsServer)
                 return;
+        }
+
+        private void OnGUI()
+        {
+            GUILayout.BeginVertical();
+            foreach (var item in teamScores.Value)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Box($"{item.Key} --- {item.Value}");
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndVertical();
         }
 
         public void SetScoreForTeam(uint teamIndex = 0, uint teamScore = 10, bool additive = false, uint clientID = 0, uint extraPlayerScore = 0)
@@ -280,7 +297,8 @@ namespace Opus
             }
             else
             {
-                Debug.LogWarning($"Invalid team index given!\nTeam Index {teamIndex} does not exist!");
+                Debug.LogWarning($"Invalid team index given!\nTeam Index {teamIndex} does not exist, adding this team to the scores!");
+                teamScores.Value.TryAdd(teamIndex, teamScore);
             }
         }
     }

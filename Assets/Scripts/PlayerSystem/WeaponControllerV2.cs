@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Opus
 {
-    public class WeaponControllerV2 : NetworkBehaviour
+    public class WeaponControllerV2 : ONetBehaviour
     {
         [Tooltip("The player's currently equipped weapon")]
         public NetworkVariable<int> weaponIndex = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -68,7 +68,7 @@ namespace Opus
             return false;
         }
 
-        private void Update()
+        public override void OUpdate()
         {
             for (int i = 0; i < slots.Length; i++)
             {
@@ -78,12 +78,12 @@ namespace Opus
                 if(i == weaponIndex.Value)
                 {
                     e.transform.SetPositionAndRotation(weaponPoint.position, weaponPoint.rotation);
-                    e.transform.localScale = Vector3.one;
+                    e.transform.localScale = pm.Character.Alive ? Vector3.one : Vector3.zero;
                     if (IsOwner)
                     {
                         if(e is RangedWeapon rw)
                         {
-                            if (pm.reloadInput && !rw.reloading && rw.CurrentAmmo < rw.maxAmmo && currentCarriable == null)
+                            if (pm.reloadInput && !rw.reloading && rw.CurrentAmmo < rw.maxAmmo && currentCarriable == null && pm.Character.Alive)
                             {
                                 pm.reloadInput = false;
                                 TryReload(rw);
@@ -93,8 +93,8 @@ namespace Opus
                                 cancellingReload = true;
                             }
                         }
-                        e.fireInput = pm.fireInput && currentCarriable == null;
-                        e.secondaryInput = pm.secondaryInput && currentCarriable == null;
+                        e.fireInput = pm.fireInput && currentCarriable == null && pm.Character.Alive;
+                        e.secondaryInput = pm.secondaryInput && currentCarriable == null && pm.Character.Alive;
                     }
                 }
                 else
@@ -108,7 +108,7 @@ namespace Opus
                 }
             }
         }
-        private void FixedUpdate()
+        public override void OFixedUpdate()
         {
             if (IsOwner)
             {
@@ -137,7 +137,7 @@ namespace Opus
                             b.HoverOver(true);
                         }
 
-                        if (pm.pickupInput)
+                        if (pm.pickupInput && pm.Character.Alive)
                         {
                             PickUpCarriable(b);   
                         }
@@ -167,7 +167,7 @@ namespace Opus
                         currentCarriable = null;
                     }
                 }
-                if (pm.secondaryInput)
+                if (pm.secondaryInput || !pm.Character.Alive)
                 {
                     currentCarriable.Released_RPC(false);
                     currentCarriable = null;
@@ -187,9 +187,8 @@ namespace Opus
         {
             WaitForFixedUpdate wff = new();
             lerpingGrab = true;
-            Vector3 startPos = currentCarriable.transform.position;
-            Quaternion startRot = currentCarriable.transform.rotation;
-            while (currentGrabLerpTime < 1 && currentCarriable != null)
+            currentCarriable.transform.GetPositionAndRotation(out Vector3 startPos, out Quaternion startRot);
+            while (currentGrabLerpTime < 1 && currentCarriable != null && pm.Character.Alive)
             {
                 currentGrabLerpTime += Time.fixedDeltaTime * grabLerpToHandSpeed;
                 currentCarriable.rb.Move(Vector3.Lerp(startPos, grabPoint.position, currentGrabLerpTime), Quaternion.Slerp(startRot, grabPoint.rotation * currentCarriable.grabOffset, currentGrabLerpTime));
@@ -200,9 +199,64 @@ namespace Opus
         }
         void CheckInteractable()
         {
+            bool hitSomething = false;
+            if (Physics.SphereCast(pm.Character.headTransform.position, interactRadius, pm.Character.headTransform.forward, out RaycastHit hit, interactDistance, interactLayermask, QueryTriggerInteraction.Ignore))
+            {
+                BaseInteractable b = hit.collider.GetComponentInParent<BaseInteractable>();
+                if(b != null && b.CanInteract(OwnerClientId))
+                {
+                    hitSomething = true;
+                    if (currentInteractableTargeted != null && currentInteractableTargeted != b)
+                    {
+                        currentInteractableTargeted.HoverOver(false);
+                        currentInteractableTargeted = null;
+                        b.HoverOver(true);
+                    }
+                    if(currentInteractableTargeted == null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(b.interactText))
+                        {
+                            pm.hud.SetInteractText(b.interactText, true);
+                        }
+                        else
+                        {
+                            pm.hud.SetInteractText("E to Interact", true);
+                        }
+                    }
 
+
+
+                    currentInteractableTargeted = b;
+
+                    if (pm.interactInput)
+                    {
+                        if (!b.holdInteract)
+                        {
+                            pm.interactInput = false;
+                        }
+                        b.InteractStart_RPC((uint)OwnerClientId);
+                    }
+                    else
+                    {
+                        if(b.holdInteract)
+                            b.InteractEnd_RPC((uint)OwnerClientId);
+                    }
+                }
+            }
+            if (!hitSomething)
+            {
+                if(pm.hud.interactCG.alpha > 0)
+                {
+                    pm.hud.SetInteractText("", false);
+                }
+                if(currentInteractableTargeted != null)
+                {
+                    currentInteractableTargeted.HoverOver(false);
+                    currentInteractableTargeted = null;
+                }
+            }
         }
-        
+
         public void ReceiveShot()
         {
 

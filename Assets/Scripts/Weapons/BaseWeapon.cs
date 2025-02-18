@@ -83,7 +83,7 @@ namespace Opus
     public class BaseWeapon : BaseEquipment
     {
 
-        protected virtual void FixedUpdate()
+        public override void OFixedUpdate()
         {
 
         }
@@ -223,7 +223,10 @@ namespace Opus
         protected virtual void ProcessFire()
         {
             if (FireBlocked)
+            {
+                fireInputPressed = false;
                 return;
+            }
             switch (weaponFireType)
             {
                 case WeaponFireType.onPress:

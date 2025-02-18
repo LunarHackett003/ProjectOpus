@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Opus
 {
-    public class PlayerHUD : NetworkBehaviour
+    public class PlayerHUD : ONetBehaviour
     {
         public PlayerManager manager;
         public PlayerEntity entity;
@@ -38,6 +38,9 @@ namespace Opus
 
         public CanvasGroup[] hitmarkerCGs;
         public float hitmarkerFadeSpeed = 3;
+
+        public CanvasGroup interactCG;
+        public TMP_Text interactText;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -98,7 +101,7 @@ namespace Opus
         }
 
 
-        private void Update()
+        public override void OUpdate()
         {
             if (manager == null || !IsOwner)
                 return;
@@ -171,6 +174,15 @@ namespace Opus
                 t -= Time.fixedDeltaTime * hitmarkerFadeSpeed;
                 hitmarkerCGs[damageType].alpha = t;
                 yield return new WaitForFixedUpdate();
+            }
+        }
+
+        public void SetInteractText(string value = "do a thing!", bool show = false)
+        {
+            interactCG.alpha = show ? 1 : 0;
+            if (show)
+            {
+                interactText.text = value;
             }
         }
     }

@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e23d85afbfda9443a74ad57724da6f6, type: 3}
+  m_Name: KappaRitual_Item
+  m_EditorClassIdentifier: 
+  equipmentPrefab: {fileID: -7144776333239896497, guid: 50cb3a165ff1e874684547ca0017c474, type: 3}
+  displayName: Kappa Ritual .357
+  description: 
+  be: {fileID: 2154019110749814117, guid: 50cb3a165ff1e874684547ca0017c474, type: 3}

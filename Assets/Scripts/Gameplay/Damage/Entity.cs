@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Opus
 {
-    public class Entity : NetworkBehaviour
+    public class Entity : ONetBehaviour
     {
         public ScoreAwardingBehaviour scoreBehaviour;
 

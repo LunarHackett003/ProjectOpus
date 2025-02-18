@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Opus
 {
-    public class BaseEquipment : NetworkBehaviour
+    public class BaseEquipment : ONetBehaviour
     {
         public bool fireInput;
         public bool secondaryInput;

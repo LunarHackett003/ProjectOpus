@@ -89,14 +89,12 @@ namespace Opus
             base.OnNetworkDespawn();
             TracerPool?.Clear();
         }
-        protected override void FixedUpdate()
+        public override void OFixedUpdate()
         {
             UpdateTracers();
 
-            base.FixedUpdate();
+            base.OFixedUpdate();
         }
-
-
 
         void UpdateTracers()
         {
@@ -150,6 +148,13 @@ namespace Opus
                 endArr.Dispose();
             if (timeArr.IsCreated)
                 timeArr.Dispose();
+
+
+            for (int i = tracers.Count - 1; i >= 0; i--)
+            {
+                Destroy(tracers[i].t.gameObject);
+            }
+            TracerPool.Clear();
         }
 
         Tracer[] tracerWorkingArray;

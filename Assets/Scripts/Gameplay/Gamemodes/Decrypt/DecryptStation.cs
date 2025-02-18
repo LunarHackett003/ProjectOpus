@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -14,18 +15,68 @@ namespace Opus
 
         public NetworkVariable<float> decryptTime = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-        protected override void InteractStart(uint clientID = 0)
+        public ObjectiveUI objectiveUI;
+
+
+        public override bool CanInteract(ulong clientID)
+        {
+            return (!isDecrypting.Value) || (decryptingTeam.Value != MatchManager.Instance.clientsOnTeams.Value[clientID]);
+        }
+
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            if(objectiveUI != null)
+            {
+                if (IsServer && GameMode.CurrentGameMode is DecryptGameMode dgm)
+                {
+                    objectiveUI.dynamicText.Value = objectiveUI.useLetter ? ObjectiveUI.alphabet[(dgm.objectiveIndex - 1) % 26].ToString() : dgm.objectiveIndex.ToString();
+                }
+            }
+            isDecrypting.OnValueChanged += ObjectiveStateChanged;
+            isStealing.OnValueChanged += ObjectiveStateChanged;
+
+            ObjectiveStateChanged(false, isStealing.Value);
+
+        }
+
+        protected override void InteractStart(ulong clientID = 0)
         {
             base.InteractStart(clientID);
-            if (!isDecrypting.Value || decryptingTeam.Value != PlayerManager.playersByID[clientID].teamIndex.Value)
+            uint teamindex = PlayerManager.playersByID[clientID].teamIndex.Value;
+            if (!isDecrypting.Value || decryptingTeam.Value != teamindex)
             {
-                TrySteal_RPC(clientID, true);
+                TrySteal_RPC(teamindex, true);
             }
         }
-        protected override void InteractEnd(uint clientID = 0)
+        protected override void InteractEnd(ulong clientID = 0)
         {
             base.InteractEnd(clientID);
-            TrySteal_RPC(clientID, false);
+            TrySteal_RPC(PlayerManager.playersByID[clientID].teamIndex.Value, false);
+        }
+
+        void ObjectiveStateChanged(bool previous, bool current)
+        {
+            if (objectiveUI != null)
+            {
+                objectiveUI.progressImage.enabled = isDecrypting.Value;
+                if (!isStealing.Value)
+                {
+                    objectiveUI.progressImage.color = PlayerSettings.Instance.teamColours[decryptingTeam.Value];
+                }
+
+                if (isDecrypting.Value)
+                {
+                    interactText = "E - Steal!";
+                }
+                else
+                {
+                    interactText = "E - Start Decrpytion";
+                }
+                holdInteract = isDecrypting.Value;
+            }
         }
 
         [Rpc(SendTo.Everyone)]
@@ -33,6 +84,7 @@ namespace Opus
         {
             if (!IsServer)
             {
+
             }
             else
             {
@@ -45,15 +97,18 @@ namespace Opus
                 isStealing.Value = state;
             }
             stealingTeam = team;
+
+
         }
 
-        bool decryptFlipFlop;
-        private void FixedUpdate()
+        [SerializeField] bool decryptFlipFlop;
+        public override void OFixedUpdate()
         {
 
-
             if (!isDecrypting.Value || GameMode.CurrentGameMode is not DecryptGameMode dgm)
+            {
                 return;
+            }
 
             if (isStealing.Value)
             {
@@ -77,9 +132,20 @@ namespace Opus
                 if(decryptTime.Value > dgm.timeToDecrypt)
                 {
                     isDecrypting.Value = false;
-                    dgm.DecryptionCompleted(decryptingTeam.Value, NetworkObject);
+                    dgm.DecryptionCompleted(decryptingTeam.Value, this);
                 }
+            }
 
+            if (objectiveUI != null)
+            {
+                if (isStealing.Value)
+                {
+                    objectiveUI.progressImage.color = Color.Lerp(PlayerSettings.Instance.teamColours[decryptingTeam.Value], PlayerSettings.Instance.teamColours[stealingTeam], Mathf.Sin(currentStealTime * 5));
+                }
+                if (isDecrypting.Value)
+                {
+                    objectiveUI.progressImage.fillAmount = Mathf.InverseLerp(0, dgm.timeToDecrypt, decryptTime.Value);
+                }
             }
         }
     }

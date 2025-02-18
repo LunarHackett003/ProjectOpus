@@ -26,7 +26,7 @@ namespace Opus
             print("Tried to throw grapple");
             if (!Grappling.Value)
             {
-                ThrowGrapple_RPC();
+                ThrowGrapple_RPC(myController.pm.Character.headTransform.position, myController.pm.Character.headTransform.forward);
             }
             else
             {
@@ -44,12 +44,12 @@ namespace Opus
                 grapplingInteral = value;
             }
         }
-        [Rpc(SendTo.Server)]
-        public void ThrowGrapple_RPC()
+        [Rpc(SendTo.Everyone)]
+        public void ThrowGrapple_RPC(Vector3 origin, Vector3 direction)
         {
-            StartCoroutine(TryGrapple());
+            StartCoroutine(TryGrapple(origin, direction));
         }
-        IEnumerator TryGrapple()
+        IEnumerator TryGrapple(Vector3 origin, Vector3 startdirection)
         {
             if (myController)
             {
@@ -63,7 +63,7 @@ namespace Opus
                 print("No controller, cannot grapple!");
                 yield break;
             }
-            grappleTargetPos = (grappleThrowSpeed * grappleThrowTime * myController.Controller.headTransform.forward) + myController.Controller.headTransform.position;
+            grappleTargetPos = (grappleThrowSpeed * grappleThrowTime * startdirection) + origin;
             yield return null;
             //myController.PlayGesture("Grapple");
             //Do everything between here...
@@ -77,7 +77,7 @@ namespace Opus
                     print("Grapple hit!");
                     grappleTargetPos = hit.point;
                     grappleTime = grappleThrowTime;
-                    myController.networkAnimator.SetTrigger("PullGrapple");
+                    //myController.networkAnimator.SetTrigger("PullGrapple");
                     grappleHit = true;
                 }
                 grappleTransform.position = Vector3.Lerp(grappleStartPos, grappleTargetPos, Mathf.InverseLerp(0, grappleThrowTime, grappleTime));
@@ -87,9 +87,12 @@ namespace Opus
             {
                 while (Vector3.Distance(grappleTargetPos, myController.transform.position) > grappleReleaseDistance && !myController.pm.jumpInput && Grappling.Value)
                 {
-                    myController.Controller.rb.AddForce(((grappleTargetPos- myController.transform.position).normalized * grappleReelDirectForce) 
-                        + (myController.Controller.headTransform.forward * grappleReelAimDirForce), ForceMode.Acceleration);
-                    grappleTransform.position = grappleTargetPos;
+                    if (IsOwner)
+                    {
+                        myController.Controller.rb.AddForce(((grappleTargetPos - myController.transform.position).normalized * grappleReelDirectForce)
+                            + (myController.Controller.headTransform.forward * grappleReelAimDirForce), ForceMode.Acceleration);
+                        grappleTransform.position = grappleTargetPos;
+                    }
                     yield return wff;
                 }
             }

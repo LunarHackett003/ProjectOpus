@@ -15,6 +15,8 @@ namespace Opus
         public NetworkVariable<int> syncedAmmo = new(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         public bool reloading;
+        
+
 
         public Transform muzzle;
         public bool useSingleReload;
@@ -66,7 +68,7 @@ namespace Opus
             
         }
 
-        protected override void FixedUpdate()
+        public override void OFixedUpdate()
         {
             //if (fireInput)
             //{

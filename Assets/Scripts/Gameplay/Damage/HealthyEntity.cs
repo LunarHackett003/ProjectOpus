@@ -1,7 +1,10 @@
 using Opus;
 using System.Collections;
+using Unity.Cinemachine;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
 
@@ -31,6 +34,9 @@ namespace Opus
 
         public bool useDamageTypeOverride;
         public DamageType damageTypeOverride;
+        public bool Burning => burnStacks.Value > 0;
+        public float burnTime, stunTime;
+        public NetworkVariable<int> burnStacks = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         public override void OnNetworkSpawn()
         {
@@ -90,7 +96,7 @@ namespace Opus
             }
         }
 
-        private void Update()
+        public override void OUpdate()
         {
             if (useWorldHealthBar && (!hideBarOnOwner || !IsOwner))
             {
@@ -114,14 +120,14 @@ namespace Opus
 
             if (scoreBehaviour != 0)
             {
-                uint value = (uint)Mathf.RoundToInt(damageIn * 10);
+                uint value = (uint)Mathf.RoundToInt(damageIn);
                 PlayerManager target;
                 switch (scoreBehaviour)
                 {
                     case ScoreAwardingBehaviour.sourceCombat:
                         if(PlayerManager.playersByID.TryGetValue(sourceClientID, out target))
                         {
-                            target.combatPoints.Value += (uint)Mathf.RoundToInt(value);
+                            target.combatPoints.Value += value;
                             print($"Awarded {value} combat points to {target.name}//{sourceClientID}");
                             return;
                         }
@@ -133,7 +139,7 @@ namespace Opus
                     case ScoreAwardingBehaviour.sourceSupport:
                         if (PlayerManager.playersByID.TryGetValue(sourceClientID, out target))
                         {
-                            target.combatPoints.Value += (uint)Mathf.RoundToInt(value);
+                            target.combatPoints.Value += value;
                             print($"Awarded {value} support points to {target.name}//{sourceClientID}");
                             return;
                         }
@@ -145,7 +151,7 @@ namespace Opus
                     case ScoreAwardingBehaviour.ownerCombat:
                         if (PlayerManager.playersByID.TryGetValue(OwnerClientId, out target))
                         {
-                            target.combatPoints.Value += (uint)Mathf.RoundToInt(value);
+                            target.combatPoints.Value += value;
                             print($"Awarded {value} combat points to {target.name}//{OwnerClientId}");
                             return;
                         }
@@ -157,7 +163,7 @@ namespace Opus
                     case ScoreAwardingBehaviour.ownerSupport:
                         if (PlayerManager.playersByID.TryGetValue(OwnerClientId, out target))
                         {
-                            target.supportPoints.Value += (uint)Mathf.RoundToInt(value);
+                            target.supportPoints.Value += value;
                             print($"Awarded {value} support points to {target.name}//{OwnerClientId}");
                             return;
                         }
@@ -186,6 +192,56 @@ namespace Opus
                 print($"Awarded {value} support points to {source.name}//{OwnerClientId}");
                 return;
             }
+        }
+
+
+        Coroutine BurnCoroutine;
+
+        public NetworkVariable<bool> stunned = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        [Rpc(SendTo.Everyone)]
+        public void ReceiveDebuff_RPC(ulong sourceClientID, float duration, DebuffToApply debuff)
+        {
+            if (IsServer)
+            {
+                switch (debuff)
+                {
+                    case DebuffToApply.none:
+                        
+                        break;
+                    case DebuffToApply.burn:
+                        if(burnStacks.Value < 8)
+                        {
+                            burnStacks.Value++;
+                        }
+                        if (Burning)
+                        {
+                            BurnCoroutine ??= StartCoroutine(BurnDamage());
+                        }
+                        break;
+                    case DebuffToApply.stun:
+                        
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public IEnumerator BurnDamage()
+        {
+            var wfs = new WaitForSeconds(MatchManager.Instance.burnDamageTickTime);
+            while (burnTime > 0)
+            {
+                burnTime -= MatchManager.Instance.burnDamageTickTime;
+                currentHealth.Value -= burnStacks.Value * MatchManager.Instance.burnDamagePerStack;
+                yield return wfs;
+            }
+            burnStacks.Value = 0;
+            BurnCoroutine = null;
+        }
+        public virtual IEnumerator Stunned()
+        {
+            yield break;
         }
     }
 }

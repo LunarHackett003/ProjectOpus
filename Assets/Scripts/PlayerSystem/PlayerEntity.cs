@@ -25,9 +25,6 @@ namespace Opus
 
         public Vector3 LastGroundedPosition;
 
-        public NetworkVariable<bool> stunned = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public NetworkVariable<bool> burning = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-
         public bool Alive => CurrentHealth > 0;
 
         public override void ReceiveDamage(float damageIn, float incomingCritMultiply)
@@ -101,7 +98,7 @@ namespace Opus
         [Rpc(SendTo.Everyone)]
         public void SetRenderersEnabledState_RPC(bool isEnabled)
         {
-            if(allRenderers.Length > 0)
+            if (allRenderers.Length > 0)
             {
                 for (int i = 0; i < allRenderers.Length; i++)
                 {

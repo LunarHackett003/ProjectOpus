@@ -32,116 +32,19 @@ namespace Opus
         {
             base.OnNetworkSpawn();
         }
-        protected override void FixedUpdate()
+        public override void OFixedUpdate()
         {
-            base.FixedUpdate();
-            if (fireInput)
-            {
-                TryPrimary();
-            }
-            else
-            {
-                currentAttackResetTime += Time.fixedDeltaTime;
-                if(currentAttackResetTime >= attackResetTime)
-                {
-                    resettingAttack = false;
-                    netAnimator.ResetTrigger(PrimaryKey);
-                }
-                else
-                {
-                    resettingAttack = true;
-                }
-                primaryPressed = false;
-            }
-            
-            if (secondaryInput)
-            {
-                TrySecondary();
-            }
-            else
-            {
-                currentSecondaryCharge -= Time.fixedDeltaTime;
-                currentSecondaryCharge = Mathf.Clamp(currentSecondaryCharge, 0, secondaryChargeTime);
-                float charge = Mathf.InverseLerp(0, secondaryChargeTime, currentSecondaryCharge);
-                netAnimator.Animator.SetFloat(SecondaryKey, charge);
-                myController.networkAnimator.Animator.SetFloat(SecondaryKey, charge);
-            }
-            if (attackSweeping)
-            {
-                RaycastHit[] hits = Physics.BoxCastAll(meleeSweepOrigin.TransformPoint(meleeSweepOffset), meleeSweepBounds/2, lastSweepPos - currentSweepPos, meleeSweepOrigin.rotation, 1, meleeLayermask);
-                if(hits.Length > 0)
-                {
-                    for(int i = 0; i < hits.Length; i++)
-                    {
-                        RaycastHit hit = hits[i];
-                        if (hit.rigidbody)
-                        {
-                            if(hit.rigidbody.TryGetComponent(out Entity ent))
-                            {
-                                ent.ReceiveDamage(attackDamages[currentAttackIndex], OwnerClientId);
-                            }
-                        }
-                    }
-                }
-            }
+            base.OFixedUpdate();
+
         }
 
         protected virtual void TryPrimary()
         {
-            switch (primaryBehaviour)
-            {
-                case MeleeBehaviour.none:
 
-                    break;
-                case MeleeBehaviour.pressAttack:
-                    if (!primaryPressed)
-                    {
-
-                        primaryPressed = true;
-                    }
-                    break;
-                case MeleeBehaviour.holdAttack:
-                    netAnimator.SetTrigger("PrimaryAttack");
-                    myController.networkAnimator.SetTrigger("PrimaryAttack");
-                    break;
-                case MeleeBehaviour.chargeAttack:
-                    //Ignore this one. There are currently no charged primary attacks.
-                    break;
-                default:
-                    break;
-            }
         }
         protected virtual void TrySecondary()
         {
-            if (secondaryBehaviour == MeleeBehaviour.chargeAttack)
-            {
-                if (currentSecondaryCharge >= secondaryChargeTime)
-                {
-                    netAnimator.SetTrigger(SecondaryKey+"Fire");
-                }
-            }
-        }
-        public void TryAttack()
-        {
-            if (!IsServer)
-                return;
 
-        }
-        public void TrySecondaryAttack()
-        {
-            if (!IsServer)
-                return;
-        }
-
-        public void StartAttackSweep(int attackIndex)
-        {
-            lastSweepPos = meleeSweepOrigin.position;
-            currentSweepPos = lastSweepPos;
-            attackSweeping = true;
-        }
-        public void EndAttackSweep()
-        {
-            attackSweeping = false;
         }
 
         private void OnDrawGizmosSelected()

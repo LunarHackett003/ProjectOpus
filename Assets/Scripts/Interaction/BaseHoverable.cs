@@ -4,12 +4,13 @@ using UnityEngine;
 
 namespace Opus
 {
-    public class BaseHoverable : NetworkBehaviour
+    public class BaseHoverable : ONetBehaviour
     {
         public MeshRenderer grabbedOutline;
         public virtual void HoverOver(bool hovered)
         {
-            grabbedOutline.enabled = hovered;
+            if(grabbedOutline != null)
+                grabbedOutline.enabled = hovered;
         }
 
     }

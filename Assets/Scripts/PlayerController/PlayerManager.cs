@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace Opus
 {
-    public class PlayerManager : NetworkBehaviour
+    public class PlayerManager : ONetBehaviour
     {
 
         public static Dictionary<ulong, PlayerManager> playersByID = new();
@@ -387,7 +387,7 @@ namespace Opus
 
             originalTrackingTarget = Character.worldCineCam.Target.TrackingTarget;
         }
-        private void FixedUpdate()
+        public override void OFixedUpdate()
         {
             if (IsServer)
             {

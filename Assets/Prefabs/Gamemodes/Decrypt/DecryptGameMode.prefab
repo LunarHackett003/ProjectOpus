@@ -48,11 +48,14 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   gameModeDisplayName: DECRYPT
   gameModeDescription: SECURE. DECRYPT. DEFEND.
-  objectives: []
-  timeToDecrypt: 30
-  timeToSteal: 5
+  endGameSlowSpeed: 2
+  timeToDecrypt: 90
+  timeToSteal: 7
   scoreOnDecrypt: 10000
+  scoreToWin: 30000
+  objectives: []
   timeToSpawnNewStation: 10
+  objectiveIndex: 0
   decryptStationPrefab: {fileID: 1154171316275900216, guid: 366b47f1a7b6ad140809822871bc4f50, type: 3}
 --- !u!114 &4447775633492038755
 MonoBehaviour:
@@ -66,7 +69,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1750552473
+  GlobalObjectIdHash: 3826602078
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1

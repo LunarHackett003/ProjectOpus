@@ -104,4 +104,20 @@ namespace Opus
         airborne = 3
     }
 
+    public enum DebuffToApply
+    {
+        /// <summary>
+        /// Invalid debuff applied.
+        /// </summary>
+        none = 0,
+        /// <summary>
+        /// Applies a stack of burn to the player
+        /// </summary>
+        burn = 1,
+        /// <summary>
+        /// Applies stun to the player
+        /// </summary>
+        stun = 2,
+    }
+
 }

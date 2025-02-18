@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Opus
 {
-    public class PlayerMotorV2 : NetworkBehaviour
+    public class PlayerMotorV2 : ONetBehaviour
     {
         public Rigidbody rb;
         public Transform headTransform;
@@ -98,7 +98,7 @@ namespace Opus
 
         }
 
-        private void Update()
+        public override void OUpdate()
         {
             if (entity.Alive)
             {
@@ -110,7 +110,7 @@ namespace Opus
             }
 
         }
-        private void FixedUpdate()
+        public override void OFixedUpdate()
         {
             if(IsOwner)
             {
