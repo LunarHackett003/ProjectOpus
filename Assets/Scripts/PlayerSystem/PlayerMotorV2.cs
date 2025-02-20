@@ -100,6 +100,10 @@ namespace Opus
 
         public override void OUpdate()
         {
+            if (!MatchManager.Instance.GameInProgress.Value)
+                return;
+
+
             if (entity.Alive)
             {
                 if (IsOwner)
@@ -112,6 +116,9 @@ namespace Opus
         }
         public override void OFixedUpdate()
         {
+            if (!MatchManager.Instance.GameInProgress.Value)
+                return;
+
             if(IsOwner)
             {
                 if (entity.Alive)
@@ -410,12 +417,13 @@ namespace Opus
             print($"Started vault from {vaultStart} to {vaultEnd}");
             WaitForFixedUpdate wff = new();
             Vector2 latPos;
+            
             while (vaultTime < 1 && vaulting)
             {
                 vaultTime += Time.fixedDeltaTime * vaultSpeed;
                 latPos = Vector2.Lerp(new(vaultStart.x, vaultStart.z), new(vaultEnd.x, vaultEnd.z), vaultParams.lateralPath.Evaluate(vaultTime));
                 float vertPos = Mathf.Lerp(vaultStart.y, vaultEnd.y, vaultTime);
-                rb.MovePosition(new(latPos.x, vertPos, latPos.y));
+                transform.position = new(latPos.x, vertPos, latPos.y);
                 yield return wff;
             }
 

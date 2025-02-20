@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Weapons
   m_EditorClassIdentifier: 
   equipment:
+  - {fileID: 11400000, guid: 16a77b3ead8a2a44289cf4761f1d3110, type: 2}
   - {fileID: 11400000, guid: c177bd2cbac47be479eb8b0bb146762c, type: 2}
   - {fileID: 11400000, guid: b5c2e3097b8554741ada4214adbe6f9b, type: 2}

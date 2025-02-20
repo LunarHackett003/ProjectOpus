@@ -173,7 +173,7 @@ namespace Opus
         {
             if (IsOwner)
             {
-                SendFireToServer_RPC(owningPlayer.Character.headTransform.forward, owningPlayer.Character.headTransform.position);
+                SendFireToServer_RPC(myController.fireOrigin.forward, myController.fireOrigin.position);
             }
             if (IsClient)
             {

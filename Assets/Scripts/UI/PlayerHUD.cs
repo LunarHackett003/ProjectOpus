@@ -97,7 +97,7 @@ namespace Opus
         void HealthUpdated(float prev, float curr)
         {
             healthBar.value = curr;
-            healthValue.text = $"{curr}/{entity.MaxHealth}";
+            healthValue.text = $"{curr:0}/{entity.MaxHealth}";
         }
 
 

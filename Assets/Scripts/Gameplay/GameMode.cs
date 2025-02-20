@@ -48,6 +48,7 @@ namespace Opus
             if (IsServer)
             {
                 EndGameActions_RPC();
+                MatchManager.Instance.GameInProgress.Value = false;
                 yield return new WaitForSecondsRealtime(15);
                 yield return new WaitForFixedUpdate();
                 SessionManager.Instance.CloseConnection();

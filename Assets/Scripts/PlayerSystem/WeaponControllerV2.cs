@@ -39,6 +39,8 @@ namespace Opus
         public float interactDistance, interactRadius;
         public BaseInteractable currentInteractableTargeted;
 
+        public Transform fireOrigin;
+
         public bool Grabbing => currentCarriable != null;
         public override void OnNetworkSpawn()
         {
@@ -234,12 +236,12 @@ namespace Opus
                         {
                             pm.interactInput = false;
                         }
-                        b.InteractStart_RPC((uint)OwnerClientId);
+                        b.InteractStart_RPC(OwnerClientId);
                     }
                     else
                     {
                         if(b.holdInteract)
-                            b.InteractEnd_RPC((uint)OwnerClientId);
+                            b.InteractEnd_RPC(OwnerClientId);
                     }
                 }
             }
@@ -252,6 +254,8 @@ namespace Opus
                 if(currentInteractableTargeted != null)
                 {
                     currentInteractableTargeted.HoverOver(false);
+                    if (currentInteractableTargeted.holdInteract)
+                        currentInteractableTargeted.InteractEnd_RPC(OwnerClientId);
                     currentInteractableTargeted = null;
                 }
             }

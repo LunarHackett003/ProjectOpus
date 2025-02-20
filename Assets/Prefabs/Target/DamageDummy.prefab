@@ -64,6 +64,14 @@ MonoBehaviour:
   worldHealthBarDisplayTime: 5
   displayingBar: 0
   worldHealthBarCG: {fileID: 2157704473573413440}
+  useDamageTypeOverride: 0
+  damageTypeOverride: 0
+  burnTime: 0
+  stunTime: 0
+  burnStacks:
+    m_InternalValue: 0
+  stunned:
+    m_InternalValue: 0
   deathParticle: {fileID: 0}
   restoreParticle: {fileID: 0}
   dummyMeshes:
@@ -111,7 +119,7 @@ GameObject:
   - component: {fileID: 7069702009824457418}
   - component: {fileID: 5650944396269240100}
   - component: {fileID: 1009701365973788898}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: Base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,7 +246,7 @@ GameObject:
   - component: {fileID: 8447895418585748650}
   - component: {fileID: 2778225445756844701}
   - component: {fileID: 5964791789668973873}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -365,7 +373,7 @@ GameObject:
   - component: {fileID: 6393021023521420826}
   - component: {fileID: 1818602122581710142}
   - component: {fileID: 6660906191345720977}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -492,7 +500,7 @@ GameObject:
   - component: {fileID: 6550017252915539133}
   - component: {fileID: 8275059552392360244}
   - component: {fileID: 3687698281248490704}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: Stand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -619,7 +627,7 @@ GameObject:
   - component: {fileID: 8632018121881551580}
   - component: {fileID: 6119374805917306121}
   - component: {fileID: 9042250711629238412}
-  m_Layer: 0
+  m_Layer: 16
   m_Name: Neck
   m_TagString: Untagged
   m_Icon: {fileID: 0}

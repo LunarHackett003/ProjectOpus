@@ -49,10 +49,10 @@ MonoBehaviour:
   gameModeDisplayName: DECRYPT
   gameModeDescription: SECURE. DECRYPT. DEFEND.
   endGameSlowSpeed: 2
-  timeToDecrypt: 90
+  timeToDecrypt: 10
   timeToSteal: 7
   scoreOnDecrypt: 10000
-  scoreToWin: 30000
+  scoreToWin: 10000
   objectives: []
   timeToSpawnNewStation: 10
   objectiveIndex: 0

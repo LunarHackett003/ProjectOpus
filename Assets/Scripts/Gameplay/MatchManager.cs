@@ -55,6 +55,8 @@ namespace Opus
             base.OnNetworkDespawn();
         }
 
+        
+
         public void TeamsChanged(Dictionary<ulong, uint> previous, Dictionary<ulong, uint> current)
         {
             playersOnTeam.Clear();
@@ -299,6 +301,7 @@ namespace Opus
             {
                 Debug.LogWarning($"Invalid team index given!\nTeam Index {teamIndex} does not exist, adding this team to the scores!");
                 teamScores.Value.TryAdd(teamIndex, teamScore);
+                teamScores.SetDirty(true);
             }
         }
     }
