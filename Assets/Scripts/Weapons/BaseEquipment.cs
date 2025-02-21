@@ -28,9 +28,9 @@ namespace Opus
 
         protected bool lastFireInput;
 
-        protected override void OnNetworkPostSpawn()
+        public override void OnNetworkSpawn()
         {
-            base.OnNetworkPostSpawn();
+            base.OnNetworkSpawn();
             StartCoroutine(DelayInitialise());
         }
         protected virtual IEnumerator DelayInitialise()

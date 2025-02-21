@@ -16,5 +16,10 @@ namespace Opus
         {
             print($"Received {damageIn} damage from client {sourceClientID}");
         }
+
+        public virtual void ApplyDebuff(ulong sourceClientID, float duration, DebuffToApply debuff)
+        {
+
+        }
     }
 }

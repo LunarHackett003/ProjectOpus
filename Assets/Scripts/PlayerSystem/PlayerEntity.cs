@@ -65,20 +65,20 @@ namespace Opus
                 viewCineCam.enabled = false;
                 viewmodelCamera.enabled = false;
             }
-
+            StartCoroutine(DelayedInitialise());
         }
         protected virtual IEnumerator DelayedInitialise()
         {
             yield return new WaitForFixedUpdate();
-            cr.InitialiseViewable(this);
+            cr.InitialiseViewable();
         }
         protected override void HealthUpdated(float prev, float curr)
         {
             base.HealthUpdated(prev, curr);
-            if(IsOwner && curr <= 0)
+            if(IsOwner)
             {
                 wc.Controller.rb.isKinematic = curr <= 0;
-                if(prev > 0)
+                if(prev > 0 && curr <= 0)
                 {
                     playerManager.ClientDied();
                 }

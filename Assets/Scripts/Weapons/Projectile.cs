@@ -40,7 +40,11 @@ namespace Opus
         public DamageType damageType;
         public float critMultiplier;
 
-        public bool useDamageRadius => maxDamageRadius > 0 || minDamageRadius > 0;
+        public DebuffToApply debuffToApply = DebuffToApply.none;
+        public float debuffTime = 0;
+
+
+        public bool UseDamageRadius => maxDamageRadius > 0 || minDamageRadius > 0;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -48,6 +52,13 @@ namespace Opus
             {
                 rb.isKinematic = false;
                 rb.linearVelocity = transform.forward * launchSpeed;
+            }
+            else
+            {
+                for (int i = 0; i < colliders.Length; i++)
+                {
+                    colliders[i].enabled = false;
+                }
             }
             
         }
@@ -94,15 +105,18 @@ namespace Opus
         private void OnCollisionEnter(Collision collision)
         {
             bool hit = false;
-            numberOfBounces--;
-            if(useBounces && numberOfBounces <= 0)
+            if (IsServer)
             {
-                transform.up = collision.GetContact(0).normal;
-                hit = true;
-            }
-            if (hit)
-            {
-                DoHitEffect(collision);
+                numberOfBounces--;
+                if(useBounces && numberOfBounces <= 0)
+                {
+                    transform.up = collision.GetContact(0).normal;
+                    hit = true;
+                }
+                if (hit)
+                {
+                    DoHitEffect(collision);
+                }
             }
         }
         void DoHitEffect(Collision collision)
@@ -113,7 +127,7 @@ namespace Opus
                 StartCoroutine(DestroyHitPrefab(hitEffect));
             }
             DoHitEffect_RPC();
-            if (useDamageRadius)
+            if (UseDamageRadius)
             {
                 Collider[] array = Physics.OverlapSphere(transform.position, minDamageRadius, damageLayermask, QueryTriggerInteraction.Ignore);
                 HashSet<Rigidbody> bodies = new();
@@ -127,6 +141,14 @@ namespace Opus
                         {
                             entity.ReceiveDamage(Mathf.Lerp(maxDamage, minDamage,
                                 Mathf.InverseLerp(maxDamageRadius, minDamageRadius, Vector3.Distance(item.ClosestPoint(transform.position), transform.position))), OwnerClientId, critMultiplier, damageType);
+
+                            if(debuffToApply != DebuffToApply.none)
+                            {
+                                if(entity is HealthyEntity h)
+                                {
+                                    h.ReceiveDebuff_RPC(OwnerClientId, debuffTime, debuffToApply);
+                                }
+                            }
                         }
                     }
                 }
@@ -139,12 +161,19 @@ namespace Opus
                     {
                         entity.ReceiveDamage(Mathf.Lerp(maxDamage, minDamage,
                             Mathf.InverseLerp(maxDamageRadius, minDamageRadius, Vector3.Distance(collision.collider.ClosestPoint(transform.position), transform.position))), OwnerClientId, critMultiplier, damageType);
+
+                        if (debuffToApply != DebuffToApply.none)
+                        {
+                            if (entity is HealthyEntity h)
+                            {
+                                h.ReceiveDebuff_RPC(OwnerClientId, debuffTime, debuffToApply);
+                            }
+                        }
                     }
                 }
             }
             projectileAlive.Value = false;
-            if(NetworkObject.IsSpawned)
-                NetworkObject.Despawn(true);
+            StartCoroutine(DespawnProjectileAfterTime());
         }
         [Rpc(SendTo.ClientsAndHost)]
         void DoHitEffect_RPC()
@@ -166,6 +195,14 @@ namespace Opus
             yield return new WaitForSeconds(hitPrefabDestroyTime);
             hitObject.Despawn();
             yield break;
+        }
+        IEnumerator DespawnProjectileAfterTime()
+        {
+            yield return new WaitForSeconds(hitPrefabDestroyTime + 1);
+            if (NetworkObject.IsSpawned)
+            {
+                NetworkObject.Despawn();
+            }
         }
     }
 }

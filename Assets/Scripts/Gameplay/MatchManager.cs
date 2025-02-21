@@ -101,13 +101,12 @@ namespace Opus
                 if (!revived)
                 {
                     (Vector3 pos, Quaternion rot) = spawnpointHolder.FindSpawnpoint(p.teamIndex.Value);
-
-                    for (int i = 0; i < p.Character.wc.slots.Length; i++)
+                    for (int i = 0; i < p.Character.wc.netSlots.Count; i++)
                     {
                         if (p.Character.wc.slots[i] != null)
                             p.Character.wc.slots[i].NetworkObject.Despawn();
                     }
-
+                    p.Character.wc.netSlots.Clear();
                     SpawnWeaponsForPlayer(clientID, p, primaryWeaponIndex, gadgetOneIndex, gadgetTwoIndex, gadgetThreeIndex, specialIndex);
                     p.Character.Teleport_RPC(pos, Quaternion.identity);
 
@@ -126,7 +125,7 @@ namespace Opus
             {
                 if(p.Character != null)
                 {
-                    p.Character.wc.slots[0] = SpawnWeapon(clientID, weapons.equipment[primaryWeaponIndex].equipmentPrefab, Slot.primary);
+                    p.Character.wc.netSlots.Add(SpawnWeapon(clientID, weapons.equipment[primaryWeaponIndex].equipmentPrefab, Slot.primary));
                 }
             }
             else
@@ -142,11 +141,11 @@ namespace Opus
             else
             {
             }
-            if (gadgetOneIndex > -1 && gadgetOneIndex < gadgets.equipment.Length)
+            if (gadgetOneIndex > -1 && gadgetOneIndex < weapons.equipment.Length)
             {
                 if (p.Character != null)
                 {
-                    //p.LivingPlayer.wc.gadget1Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetOneIndex].equipmentPrefab, Slot.gadget1);
+                    p.Character.wc.netSlots.Add(SpawnWeapon(clientID, weapons.equipment[gadgetOneIndex].equipmentPrefab, Slot.gadget1));
                 }
             }
             else

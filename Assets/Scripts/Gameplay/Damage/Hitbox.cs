@@ -33,5 +33,11 @@ namespace Opus
                 }
             }
         }
+
+        public override void ApplyDebuff(ulong sourceClientID, float duration, DebuffToApply debuff)
+        {
+            parentEntity.ApplyDebuff(sourceClientID, duration, debuff);
+        }
+
     }
 }

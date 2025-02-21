@@ -170,7 +170,10 @@ namespace Opus
         {
             if (Character != null)
             {
-
+                int index = (Character.wc.weaponIndex.Value + Mathf.RoundToInt(obj.ReadValue<float>())) % Character.wc.slots.Count;
+                if (index < 0)
+                    index = Character.wc.slots.Count + index;
+                Character.wc.TrySwitchWeapon(index);
             }
         }
         private void Reload_performed(InputAction.CallbackContext obj)

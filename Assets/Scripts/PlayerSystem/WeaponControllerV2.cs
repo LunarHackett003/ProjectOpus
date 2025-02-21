@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -9,7 +10,8 @@ namespace Opus
     {
         [Tooltip("The player's currently equipped weapon")]
         public NetworkVariable<int> weaponIndex = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        public BaseEquipment[] slots = new BaseEquipment[4];
+        public List<BaseEquipment> slots = new List<BaseEquipment>();
+        public NetworkList<NetworkBehaviourReference> netSlots = new(new List<NetworkBehaviourReference>(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public BaseEquipment specialEquipment;
         public NetworkVariable<bool> usingSpecial = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public Transform weaponPoint;
@@ -20,6 +22,7 @@ namespace Opus
         public bool cancellingReload;
         public bool Reloading => slots[weaponIndex.Value] is RangedWeapon rw && rw.reloading;
 
+        CharacterAnimationV2 charAnim;
 
         [Tooltip("The point where held items will hover")]
         public Transform grabPoint;
@@ -49,30 +52,103 @@ namespace Opus
             {
                 Controller = GetComponent<PlayerMotorV2>();
             }
+            if(charAnim == null)
+            {
+                charAnim = GetComponent<CharacterAnimationV2>();
+            }
             pm = PlayerManager.playersByID[OwnerClientId];
+
+            netSlots.OnListChanged += NetSlots_OnListChanged;
+            StartCoroutine(DelayInitialise());
         }
+        IEnumerator DelayInitialise()
+        {
+            yield return null;
+            if (netSlots.Count > 0)
+                NetSlots_OnListChanged(new() { });
+        }
+
+        private void NetSlots_OnListChanged(NetworkListEvent<NetworkBehaviourReference> changeEvent)
+        {
+
+            print(changeEvent.Type);
+
+            for (int i = 0; i < netSlots.Count; i++)
+            {
+                if (netSlots[i].TryGet(out BaseEquipment be))
+                {
+                    if(i < slots.Count)
+                    {
+                        slots[i] = be;
+                        Debug.Log($"Assigning object to existing slot {i}", be);
+                    }
+                    else
+                    {
+                        Debug.Log($"Creating slot {i} and assigning object to new slot {i}", be);
+                        slots.Add(be);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Failed to get Network Behaviour. Behaviour is either not of type [BaseEquipment] OR it is not a valid Network Behaviour.");
+                }
+            }
+
+            if(slots.Count > 0)
+            {
+                if(IsOwner)
+                    charAnim.UpdateAnimations((Slot)weaponIndex.Value);
+
+                while (slots.Count > netSlots.Count)
+                {
+                    int index = Mathf.Max(0, slots.Count - 1);
+                    Debug.Log($"Removing redundant object from slot {index}", this);
+                    slots.RemoveAt(index);
+                }
+            }
+        }
+
         [Rpc(SendTo.ClientsAndHost)]
         public void SetEquipmentSlot_RPC(NetworkBehaviourReference nbr, int index)
         {
             if (nbr.TryGet(out BaseEquipment equip))
             {
-                slots[index] = equip;
-                equip.cr.InitialiseViewable(pm.Character);
+                if (index >= slots.Count)
+                {
+                    slots.Add(equip);
+                }
+                else
+                {
+                    slots[index] = equip;
+                }
+                equip.cr.InitialiseViewable();
+                if(index == weaponIndex.Value)
+                {
+                    charAnim.UpdateAnimations((Slot)index);
+                }
             }
         }
         public bool TrySwitchWeapon(int index)
         {
-            if (slots[index] != null)
+            if (slots[index % slots.Count] != null)
             {
+                if (slots[weaponIndex.Value] is RangedWeapon bw)
+                {
+                    bw.reloading = false;
+                }
                 weaponIndex.Value = index;
+                if(charAnim != null)
+                {
+                    charAnim.UpdateAnimations((Slot)index);
+                }
                 return true;
             }
             return false;
         }
 
-        public override void OUpdate()
+        public override void OLateUpdate()
         {
-            for (int i = 0; i < slots.Length; i++)
+            for (int i = 0; i < slots.Count; i++)
             {
                 if (slots[i] == null)
                     continue;
@@ -101,9 +177,9 @@ namespace Opus
                 }
                 else
                 {
+                    e.transform.localScale = Vector3.zero;
                     if (IsOwner)
                     {
-                        e.transform.localScale = Vector3.zero;
                         e.fireInput = false;
                         e.secondaryInput = false;
                     }

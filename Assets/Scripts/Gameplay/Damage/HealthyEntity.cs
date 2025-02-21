@@ -198,18 +198,18 @@ namespace Opus
         Coroutine BurnCoroutine;
 
         public NetworkVariable<bool> stunned = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        [Rpc(SendTo.Everyone)]
-        public void ReceiveDebuff_RPC(ulong sourceClientID, float duration, DebuffToApply debuff)
+
+        public override void ApplyDebuff(ulong sourceClientID, float duration, DebuffToApply debuff)
         {
             if (IsServer)
             {
                 switch (debuff)
                 {
                     case DebuffToApply.none:
-                        
+
                         break;
                     case DebuffToApply.burn:
-                        if(burnStacks.Value < 8)
+                        if (burnStacks.Value < 8)
                         {
                             burnStacks.Value++;
                         }
@@ -219,12 +219,18 @@ namespace Opus
                         }
                         break;
                     case DebuffToApply.stun:
-                        
+
                         break;
                     default:
                         break;
                 }
             }
+        }
+
+        [Rpc(SendTo.Everyone)]
+        public void ReceiveDebuff_RPC(ulong sourceClientID, float duration, DebuffToApply debuff)
+        {
+            ApplyDebuff(sourceClientID, duration, debuff);
         }
 
         public IEnumerator BurnDamage()

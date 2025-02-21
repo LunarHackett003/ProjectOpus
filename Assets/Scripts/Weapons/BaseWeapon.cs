@@ -127,7 +127,8 @@ namespace Opus
         [Tooltip("How much charge the weapon currently has")]
         public float CurrentCharge { get; private set; }
 
-
+        public DebuffToApply debuffToApply = DebuffToApply.none;
+        public float debuffTime = 0;
 
 
         protected override void OnNetworkPostSpawn()
@@ -224,7 +225,6 @@ namespace Opus
         {
             if (FireBlocked)
             {
-                fireInputPressed = false;
                 return;
             }
             switch (weaponFireType)

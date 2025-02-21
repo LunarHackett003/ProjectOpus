@@ -14,11 +14,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e2a3659dd19ebde4c9b3af77b409941b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.065
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e2a3659dd19ebde4c9b3af77b409941b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.043
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e2a3659dd19ebde4c9b3af77b409941b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -238,8 +238,8 @@ MonoBehaviour:
   cr: {fileID: 2105486121736150598}
   netAnimator: {fileID: 0}
   acpp: {fileID: 0}
-  hasAnimations: 0
-  animationSet: {fileID: 0}
+  hasAnimations: 1
+  animationSet: {fileID: 11400000, guid: 2043c160f799752458f17350dd2e8e3a, type: 2}
   fireParticleSystem: {fileID: 0}
   fireVFX: {fileID: 7535112267649372479}
   weaponFireType: 0
@@ -319,7 +319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1531424143
+  GlobalObjectIdHash: 2417606972
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
