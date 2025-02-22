@@ -120,4 +120,9 @@ namespace Opus
         stun = 2,
     }
 
+    public enum ConsumeCharge
+    {
+        none = 0,
+        fired = 1
+    }
 }

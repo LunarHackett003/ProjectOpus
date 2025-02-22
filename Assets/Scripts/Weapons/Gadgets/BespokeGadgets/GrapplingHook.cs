@@ -18,19 +18,31 @@ namespace Opus
         float grappleTime;
         public Vector3 grappleStartPos, grappleTargetPos;
         public float grappleReleaseDistance, grappleCastRadius;
+        public float grappleDrag = 3;
         WaitForFixedUpdate wff = new();
         bool grapplingInteral;
+
+        public override bool FireBlocked => base.FireBlocked || Grappling.Value;
+
+        public LineRenderer grappleRope;
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            grappleTransform.localScale = Vector3.zero;
+        }
+
         public override void TrySelect()
         {
             base.TrySelect();
             print("Tried to throw grapple");
-            if (!Grappling.Value)
+            if (!FireBlocked)
             {
                 ThrowGrapple_RPC(myController.pm.Character.headTransform.position, myController.pm.Character.headTransform.forward);
             }
             else
             {
-                if (grappleHit)
+                if (Grappling.Value && grappleHit)
                 {
                     SetGrappling(false);
                 }
@@ -47,6 +59,7 @@ namespace Opus
         [Rpc(SendTo.Everyone)]
         public void ThrowGrapple_RPC(Vector3 origin, Vector3 direction)
         {
+            grappleTransform.localScale = Vector3.one;
             StartCoroutine(TryGrapple(origin, direction));
         }
         IEnumerator TryGrapple(Vector3 origin, Vector3 startdirection)
@@ -90,8 +103,9 @@ namespace Opus
                     if (IsOwner)
                     {
                         myController.Controller.rb.AddForce(((grappleTargetPos - myController.transform.position).normalized * grappleReelDirectForce)
-                            + (myController.Controller.headTransform.forward * grappleReelAimDirForce), ForceMode.Acceleration);
+                            + (myController.Controller.headTransform.forward * grappleReelAimDirForce), ForceMode.Force);
                         grappleTransform.position = grappleTargetPos;
+                        myController.Controller.rb.linearDamping = grappleDrag;
                     }
                     yield return wff;
                 }
@@ -105,6 +119,8 @@ namespace Opus
             //...And here
             if (IsServer)
                 Grappling.Value = false;
+            grappleHit = false;
+            grappleTransform.localScale = Vector3.zero;
             yield break;
         }
 
@@ -120,6 +136,25 @@ namespace Opus
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawWireSphere(grappleTargetPos, .5f);
             }
+        }
+
+        public override void OLateUpdate()
+        {
+            base.OLateUpdate();
+
+            if(grappleRope != null)
+            {
+                if(grappleRope.enabled != Grappling.Value)
+                {
+                    grappleRope.enabled = Grappling.Value;
+                }
+                if (grappleRope.enabled)
+                {
+                    grappleRope.SetPositions(new Vector3[]{transform.position, grappleTransform.position});
+                }
+            }
+            if (myController != null)
+                myController.Controller.specialMovement = grappleHit;
         }
     }
 }

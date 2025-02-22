@@ -162,7 +162,10 @@ namespace Opus
         {
             if (Character != null)
             {
-
+                if (Character.wc.specialEquipment != null)
+                {
+                    Character.wc.TrySwitchWeapon((int)Slot.special, true);
+                }
             }
         }
 
@@ -170,7 +173,7 @@ namespace Opus
         {
             if (Character != null)
             {
-                int index = (Character.wc.weaponIndex.Value + Mathf.RoundToInt(obj.ReadValue<float>())) % Character.wc.slots.Count;
+                int index = (Character.wc.weaponIndex.Value + Mathf.RoundToInt(obj.ReadValue<float>())) % Mathf.Min(Character.wc.slots.Count, 4);
                 if (index < 0)
                     index = Character.wc.slots.Count + index;
                 Character.wc.TrySwitchWeapon(index);

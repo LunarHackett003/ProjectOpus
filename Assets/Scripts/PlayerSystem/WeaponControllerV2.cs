@@ -12,6 +12,7 @@ namespace Opus
         public NetworkVariable<int> weaponIndex = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public List<BaseEquipment> slots = new List<BaseEquipment>();
         public NetworkList<NetworkBehaviourReference> netSlots = new(new List<NetworkBehaviourReference>(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        public NetworkVariable<NetworkBehaviourReference> netSpecial = new(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public BaseEquipment specialEquipment;
         public NetworkVariable<bool> usingSpecial = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         public Transform weaponPoint;
@@ -57,7 +58,10 @@ namespace Opus
                 charAnim = GetComponent<CharacterAnimationV2>();
             }
             pm = PlayerManager.playersByID[OwnerClientId];
-
+            if (IsOwner)
+            {
+                weaponIndex.Value = 0;
+            }
             netSlots.OnListChanged += NetSlots_OnListChanged;
             StartCoroutine(DelayInitialise());
         }
@@ -66,6 +70,15 @@ namespace Opus
             yield return null;
             if (netSlots.Count > 0)
                 NetSlots_OnListChanged(new() { });
+            NetSpecialUpdated(null, netSpecial.Value);
+        }
+
+        private void NetSpecialUpdated(NetworkBehaviourReference previous, NetworkBehaviourReference current)
+        {
+            if(current.TryGet(out BaseEquipment be))
+            {
+                specialEquipment = be;
+            }
         }
 
         private void NetSlots_OnListChanged(NetworkListEvent<NetworkBehaviourReference> changeEvent)
@@ -113,34 +126,61 @@ namespace Opus
         {
             if (nbr.TryGet(out BaseEquipment equip))
             {
-                if (index >= slots.Count)
+                if(index == 4)
                 {
-                    slots.Add(equip);
+                    specialEquipment = equip;
                 }
                 else
                 {
-                    slots[index] = equip;
-                }
-                equip.cr.InitialiseViewable();
-                if(index == weaponIndex.Value)
-                {
-                    charAnim.UpdateAnimations((Slot)index);
+                    if (index >= slots.Count)
+                    {
+                        slots.Add(equip);
+                    }
+                    else
+                    {
+                        slots[index] = equip;
+                    }
+                    equip.cr.InitialiseViewable();
+                    if(index == weaponIndex.Value)
+                    {
+                        charAnim.UpdateAnimations((Slot)index);
+                    }
                 }
             }
         }
-        public bool TrySwitchWeapon(int index)
+        public bool TrySwitchWeapon(int index, bool special = false)
         {
-            if (slots[index % slots.Count] != null)
+            index %= slots.Count;
+            BaseEquipment be;
+            if (slots[weaponIndex.Value] is RangedWeapon cw)
             {
-                if (slots[weaponIndex.Value] is RangedWeapon bw)
+                cw.reloading = false;
+            }
+            if (special)
+            {
+                be = specialEquipment;
+            }
+            else
+            {
+                be = slots[index];
+            }
+
+            if (be != null)
+            {
+
+                if (be.hasAnimations)
                 {
-                    bw.reloading = false;
+                    if(!special)
+                        weaponIndex.Value = index;
+
+                    if (charAnim != null)
+                        charAnim.UpdateAnimations((Slot)index);
                 }
-                weaponIndex.Value = index;
-                if(charAnim != null)
+                else
                 {
-                    charAnim.UpdateAnimations((Slot)index);
+                    be.TrySelect();
                 }
+            
                 return true;
             }
             return false;
@@ -148,41 +188,46 @@ namespace Opus
 
         public override void OLateUpdate()
         {
+            UpdateEquipment(4, specialEquipment);
             for (int i = 0; i < slots.Count; i++)
             {
                 if (slots[i] == null)
                     continue;
                 BaseEquipment e = slots[i];
-                if(i == weaponIndex.Value)
+                UpdateEquipment(i, e);
+            }
+        }
+        void UpdateEquipment(int i, BaseEquipment e)
+        {
+            if ((i == weaponIndex.Value && e != specialEquipment) || i == 4)
+            {
+                e.transform.SetPositionAndRotation(weaponPoint.position, weaponPoint.rotation);
+                e.transform.localScale = pm.Character.Alive ? Vector3.one : Vector3.zero;
+                if (IsOwner)
                 {
-                    e.transform.SetPositionAndRotation(weaponPoint.position, weaponPoint.rotation);
-                    e.transform.localScale = pm.Character.Alive ? Vector3.one : Vector3.zero;
-                    if (IsOwner)
+                    if (e is RangedWeapon rw)
                     {
-                        if(e is RangedWeapon rw)
+                        if (pm.reloadInput && !rw.reloading && rw.CurrentAmmo < rw.maxAmmo && currentCarriable == null && pm.Character.Alive)
                         {
-                            if (pm.reloadInput && !rw.reloading && rw.CurrentAmmo < rw.maxAmmo && currentCarriable == null && pm.Character.Alive)
-                            {
-                                pm.reloadInput = false;
-                                TryReload(rw);
-                            }
-                            if ((pm.fireInput || pm.secondaryInput) && rw.reloading && (accumulatedReloadTime >= rw.reloadCancelTime) || currentCarriable != null)
-                            {
-                                cancellingReload = true;
-                            }
+                            pm.reloadInput = false;
+                            TryReload(rw);
                         }
-                        e.fireInput = pm.fireInput && currentCarriable == null && pm.Character.Alive;
-                        e.secondaryInput = pm.secondaryInput && currentCarriable == null && pm.Character.Alive;
+                        if ((pm.fireInput || pm.secondaryInput) && rw.reloading && (accumulatedReloadTime >= rw.reloadCancelTime) || currentCarriable != null)
+                        {
+                            cancellingReload = true;
+                        }
                     }
+                    e.fireInput = pm.fireInput && currentCarriable == null && pm.Character.Alive;
+                    e.secondaryInput = pm.secondaryInput && currentCarriable == null && pm.Character.Alive;
                 }
-                else
+            }
+            else
+            {
+                e.transform.localScale = Vector3.zero;
+                if (IsOwner)
                 {
-                    e.transform.localScale = Vector3.zero;
-                    if (IsOwner)
-                    {
-                        e.fireInput = false;
-                        e.secondaryInput = false;
-                    }
+                    e.fireInput = false;
+                    e.secondaryInput = false;
                 }
             }
         }

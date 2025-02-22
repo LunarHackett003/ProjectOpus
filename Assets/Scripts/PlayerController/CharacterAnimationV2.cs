@@ -39,9 +39,9 @@ namespace Opus
                 aoc = new(animator.runtimeAnimatorController);
                 animator.runtimeAnimatorController = aoc;
             }
+            BaseEquipment be = equipmentSlot == Slot.special ? wc.specialEquipment : wc.slots[Mathf.Clamp((int)equipmentSlot, 0, wc.slots.Count)];
             if (wc.slots.Count > 0 && (int)equipmentSlot < wc.slots.Count)
             {
-                BaseEquipment be = wc.slots[(int)equipmentSlot];
                 if (be == null || !be.hasAnimations)
                 {
                     return;

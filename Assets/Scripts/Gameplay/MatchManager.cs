@@ -15,8 +15,7 @@ namespace Opus
         public NetworkVariable<Dictionary<uint, uint>> teamScores = new(new(), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkList<int> playersOnTeam = new(new int[20], NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public SpawnpointHolder spawnpointHolder;
-        public EquipmentList weapons;
-        public EquipmentList gadgets;
+        public EquipmentList weapons, gadgets, specials;
         public int maxRespawnTime = 10;
         public bool[] lockedSlots = new bool[5];
         public float stunMoveSpeedMultiplier, stunLookSpeedMultiplier;
@@ -135,7 +134,8 @@ namespace Opus
             {
                 if (p.Character != null)
                 {
-                    //p.LivingPlayer.wc.gadget3Ref.Value = SpawnWeapon(clientID, gadgets.equipment[gadgetThreeIndex].equipmentPrefab, Slot.gadget3);
+                    p.Character.wc.netSlots.Add(SpawnWeapon(clientID, weapons.equipment[gadgetOneIndex].equipmentPrefab, Slot.gadget3));
+
                 }
             }
             else
@@ -155,7 +155,7 @@ namespace Opus
             {
                 if (p.Character != null)
                 {
-                    //p.LivingPlayer.wc.gadget2Ref.Value = SpawnWeapon(clientID, weapons.equipment[gadgetTwoIndex].equipmentPrefab, Slot.gadget2);
+                    p.Character.wc.netSlots.Add(SpawnWeapon(clientID, weapons.equipment[gadgetOneIndex].equipmentPrefab, Slot.gadget2));
                 }
             }
             else
@@ -165,7 +165,7 @@ namespace Opus
             {
                 if (p.Character != null)
                 {
-                    //p.LivingPlayer.wc.specialRef.Value = SpawnWeapon(clientID, gadgets.equipment[specialIndex].equipmentPrefab, Slot.special);
+                    p.Character.wc.netSpecial.Value = SpawnWeapon(clientID, specials.equipment[specialIndex].equipmentPrefab, Slot.special);
                 }
             }
             else
@@ -177,7 +177,14 @@ namespace Opus
             netPrefab = NetworkManager.SpawnManager.InstantiateAndSpawn(netPrefab, clientID, false, false, false, Vector3.zero, Quaternion.identity);
             if (netPrefab.TryGetComponent(out BaseEquipment be))
             {
-                PlayerManager.playersByID[clientID].Character.wc.SetEquipmentSlot_RPC(be, (int)weaponSlot);
+                if(weaponSlot == Slot.special)
+                {
+                    PlayerManager.playersByID[clientID].Character.wc.SetEquipmentSlot_RPC(be, 4);
+                }
+                else
+                {
+                    PlayerManager.playersByID[clientID].Character.wc.SetEquipmentSlot_RPC(be, (int)weaponSlot);
+                }
                 return be;
             }
             else

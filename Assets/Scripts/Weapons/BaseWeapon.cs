@@ -83,10 +83,7 @@ namespace Opus
     public class BaseWeapon : BaseEquipment
     {
 
-        public override void OFixedUpdate()
-        {
 
-        }
         protected PlayerManager owningPlayer;
         public ParticleSystem fireParticleSystem;
         public VisualEffect fireVFX;
@@ -169,6 +166,10 @@ namespace Opus
             }
             if (clearChargeOnShot)
                 CurrentCharge = 0;
+            if (HasLimitedCharges)
+            {
+
+            }
         }
         protected virtual void Fire()
         {
@@ -218,9 +219,7 @@ namespace Opus
             yield return new WaitForSeconds(timeBetweenRounds);
             fired = false;
         }
-
-        public virtual bool FireBlocked => fired;
-
+        public override bool FireBlocked => base.FireBlocked || fired;
         protected virtual void ProcessFire()
         {
             if (FireBlocked)

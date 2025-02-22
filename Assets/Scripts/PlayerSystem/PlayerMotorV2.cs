@@ -31,6 +31,8 @@ namespace Opus
         public float jumpAnimCameraInfluence, animTimeLerpSpeed;
         float velocityLastAirTick;
 
+        public bool specialMovement;
+
         public float groundMoveForce, airMoveForce, jumpForce, sprintMultiplier;
         public float groundDrag, airDrag;
         #region Ground Checking
@@ -280,21 +282,25 @@ namespace Opus
                 case MovementState.none:
                     break;
                 case MovementState.walking:
-                    rb.linearDamping = groundDrag;
+                    if (!specialMovement)
+                    {
+                        rb.linearDamping = groundDrag;
 
 
-                    moveVec = (entity.playerManager.sprintInput && !entity.stunned.Value ? sprintMultiplier : 1)
-                        * (entity.stunned.Value ? MatchManager.Instance.stunMoveSpeedMultiplier : 1)
-                        * groundMoveForce * ((right * entity.playerManager.moveInput.x)
-                        + (forward * entity.playerManager.moveInput.y)).normalized;
-
+                        moveVec = (entity.playerManager.sprintInput && !entity.stunned.Value ? sprintMultiplier : 1)
+                            * (entity.stunned.Value ? MatchManager.Instance.stunMoveSpeedMultiplier : 1)
+                            * groundMoveForce * ((right * entity.playerManager.moveInput.x)
+                            + (forward * entity.playerManager.moveInput.y)).normalized;
+                    }
                     rb.AddForce(Vector3.ProjectOnPlane(-Physics.gravity, groundNormal));
                     break;
                 case MovementState.sliding:
-                    rb.linearDamping = airDrag;
+                    if (!specialMovement)
+                        rb.linearDamping = airDrag;
                     break;
                 case MovementState.airborne:
-                    rb.linearDamping = airDrag;
+                    if (!specialMovement)
+                        rb.linearDamping = airDrag;
                     moveVec = airMoveForce * ((right * entity.playerManager.moveInput.x) + (forward * entity.playerManager.moveInput.y)).normalized;
 
                     break;
