@@ -15,4 +15,6 @@ MonoBehaviour:
   equipmentPrefab: {fileID: 6964468865100035314, guid: 6f001a466dbd41c49a3e674b92c485ae, type: 3}
   displayName: Proto GL
   description: PROTOTYPE GRENADE LAUNCHER
+  hotbarIcon: {fileID: 3520348647216029873, guid: 74d47142c6accec41804df2d701a7225, type: 3}
+  loadoutIcon: {fileID: 0}
   be: {fileID: 4822958491362134634, guid: 6f001a466dbd41c49a3e674b92c485ae, type: 3}

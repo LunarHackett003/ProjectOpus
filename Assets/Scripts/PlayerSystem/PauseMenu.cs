@@ -48,9 +48,9 @@ namespace Opus
         }
         public void FreeCursor(bool input)
         {
-            cursorFreed = input;
-            Cursor.lockState = input ? CursorLockMode.None : CursorLockMode.Locked;
-            Cursor.visible = input;
+            cursorFreed = input || MatchManager.Instance == null;
+            Cursor.lockState = input || MatchManager.Instance == null ? CursorLockMode.None : CursorLockMode.Locked;
+            Cursor.visible = input || MatchManager.Instance == null;
         }
     }
 }

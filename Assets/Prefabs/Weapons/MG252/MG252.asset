@@ -15,4 +15,6 @@ MonoBehaviour:
   equipmentPrefab: {fileID: -7144776333239896497, guid: 0f346edfeb9008c4bb766f4fe30e6304, type: 3}
   displayName: MG252
   description: 
+  hotbarIcon: {fileID: -5039259425093796299, guid: 4bca9151c8e669045b595dce0e81433b, type: 3}
+  loadoutIcon: {fileID: 0}
   be: {fileID: 2154019110749814117, guid: 0f346edfeb9008c4bb766f4fe30e6304, type: 3}

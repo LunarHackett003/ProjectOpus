@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -16,8 +16,6 @@ namespace Opus
 
         public int hudUpdateInterval;
         int updateTicks;
-
-        public TMP_Text ammoCountText;
 
         public bool playerAlive;
         int cachedAmmoCount;
@@ -41,6 +39,11 @@ namespace Opus
 
         public CanvasGroup interactCG;
         public TMP_Text interactText;
+
+
+        public EquipmentBarIcon[] equipmentBarIcons;
+        public EquipmentBarIcon specialIcon;
+        public EquipmentBarHeader equipmentBarHeader;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -120,26 +123,21 @@ namespace Opus
                 if(wc.slots[wc.weaponIndex.Value] is RangedWeapon w)
                 {
                     UpdateWeaponHud(w);
+                    equipmentBarHeader.UpdateEquipment($"{w.CurrentAmmo}/{w.maxAmmo}");
                 }
                 else
                 {
-                    if (ammoCountText.gameObject.activeInHierarchy)
-                    {
-                        ammoCountText.gameObject.SetActive(false);
-                    }
+                    equipmentBarHeader.UpdateEquipment(wc.slots[wc.weaponIndex.Value].HasLimitedCharges ? wc.slots[wc.weaponIndex.Value].currentCharges.ToString() : "∞");
                 }
+                for (int i = 0; i < equipmentBarIcons.Length; i++)
+                {
+                    equipmentBarIcons[i].UpdateIcon();
+                }
+                specialIcon.UpdateIcon();
             }
         }
         void UpdateWeaponHud(RangedWeapon w)
         {
-            if (ammoCountText)
-            {
-                if (!ammoCountText.gameObject.activeInHierarchy)
-                {
-                    ammoCountText.gameObject.SetActive(true);
-                }
-                ammoCountText.text = $"{w.CurrentAmmo}/{w.maxAmmo}";
-            }
             if (chargeSliderCG)
             {
                 chargeSliderCG.alpha = w.chargeSpeed > 0 ? 1 : 0;

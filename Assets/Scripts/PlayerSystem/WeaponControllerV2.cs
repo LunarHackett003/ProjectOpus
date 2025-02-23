@@ -78,6 +78,7 @@ namespace Opus
             if(current.TryGet(out BaseEquipment be))
             {
                 specialEquipment = be;
+                pm.hud.specialIcon.AssignIcon(be);
             }
         }
 
@@ -90,6 +91,7 @@ namespace Opus
             {
                 if (netSlots[i].TryGet(out BaseEquipment be))
                 {
+                    pm.hud.equipmentBarIcons[i].AssignIcon(be);
                     if(i < slots.Count)
                     {
                         slots[i] = be;
@@ -144,6 +146,7 @@ namespace Opus
                     if(index == weaponIndex.Value)
                     {
                         charAnim.UpdateAnimations((Slot)index);
+                        pm.hud.equipmentBarHeader.AssignEquipment(equip);
                     }
                 }
             }
@@ -165,6 +168,10 @@ namespace Opus
                 be = slots[index];
             }
 
+            if (be.HasLimitedCharges && be.currentCharges <= 0)
+                return false;
+
+
             if (be != null)
             {
 
@@ -175,12 +182,15 @@ namespace Opus
 
                     if (charAnim != null)
                         charAnim.UpdateAnimations((Slot)index);
+
+                    pm.hud.equipmentBarHeader.AssignEquipment(be);
                 }
                 else
                 {
                     be.TrySelect();
                 }
-            
+
+
                 return true;
             }
             return false;

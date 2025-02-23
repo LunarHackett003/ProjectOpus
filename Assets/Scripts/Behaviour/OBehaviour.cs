@@ -32,20 +32,5 @@ namespace Opus
         {
 
         }
-
-        void IOpusScript.OUpdate()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        void IOpusScript.OFixedUpdate()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        void IOpusScript.OLateUpdate()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

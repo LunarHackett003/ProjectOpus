@@ -64,6 +64,7 @@ namespace Opus
         }
         IEnumerator TryGrapple(Vector3 origin, Vector3 startdirection)
         {
+
             if (myController)
             {
                 print("Controller found, grappling!");
@@ -98,6 +99,8 @@ namespace Opus
             }
             if (grappleHit)
             {
+                if (IsOwner)
+                    currentCharges--;
                 while (Vector3.Distance(grappleTargetPos, myController.transform.position) > grappleReleaseDistance && !myController.pm.jumpInput && Grappling.Value)
                 {
                     if (IsOwner)

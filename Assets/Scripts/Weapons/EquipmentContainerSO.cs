@@ -13,8 +13,8 @@ namespace Opus
 
         public Sprite hotbarIcon, loadoutIcon;
 
-        [SerializeField, HideInInspector]
-        BaseEquipment be;
+        [HideInInspector]
+        public BaseEquipment be;
         private void OnValidate()
         {
             if(equipmentPrefab != null)

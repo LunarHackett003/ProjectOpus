@@ -16,4 +16,6 @@ MonoBehaviour:
   displayName: Grappling Hook
   description: The Grappling Hook allows players to manoeuver faster whilst airborne,
     and to reach places they previously couldn't.
+  hotbarIcon: {fileID: 8606319817518707174, guid: d7d386da376e0974ab26f442718e65fc, type: 3}
+  loadoutIcon: {fileID: 0}
   be: {fileID: 8375089625735723800, guid: cae08c6eb061dc041abada528819766c, type: 3}

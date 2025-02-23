@@ -525,6 +525,7 @@ MonoBehaviour:
   - {fileID: 9013129046829774367}
   - {fileID: 6246187127988752703}
   hideOnHostRenderers: []
+  outlineComponent: {fileID: 0}
   localRender: 6
 --- !u!114 &6964468865100035314
 MonoBehaviour:
@@ -567,12 +568,17 @@ MonoBehaviour:
   fireInput: 0
   secondaryInput: 0
   swayContainer: {fileID: 0}
+  equipmentContainer: {fileID: 11400000, guid: 16a77b3ead8a2a44289cf4761f1d3110, type: 2}
   myController: {fileID: 0}
   cr: {fileID: 8621159556804191739}
   netAnimator: {fileID: 0}
   acpp: {fileID: 0}
   hasAnimations: 1
   animationSet: {fileID: 11400000, guid: b27b5112703935e4685d23c19c93c788, type: 2}
+  maxCharges: 0
+  currentCharges: 0
+  rechargeTime: 0
+  whenToConsumeCharge: 1
   fireParticleSystem: {fileID: 0}
   fireVFX: {fileID: 8684709277549846318}
   weaponFireType: 0
@@ -601,6 +607,8 @@ MonoBehaviour:
   chargeDecay: 0
   clearChargeOnShot: 0
   burstFireRounds: 0
+  debuffToApply: 0
+  debuffTime: 0
   maxAmmo: 4
   syncedAmmo:
     m_InternalValue: -1

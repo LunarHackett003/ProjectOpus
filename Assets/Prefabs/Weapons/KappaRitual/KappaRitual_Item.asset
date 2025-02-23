@@ -15,4 +15,6 @@ MonoBehaviour:
   equipmentPrefab: {fileID: -7144776333239896497, guid: 50cb3a165ff1e874684547ca0017c474, type: 3}
   displayName: Kappa Ritual .357
   description: 
+  hotbarIcon: {fileID: -723643596607567771, guid: 6fccecba8fee7764dbc7fde7c1eee800, type: 3}
+  loadoutIcon: {fileID: 0}
   be: {fileID: 2154019110749814117, guid: 50cb3a165ff1e874684547ca0017c474, type: 3}

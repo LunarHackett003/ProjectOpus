@@ -172,12 +172,17 @@ MonoBehaviour:
   fireInput: 0
   secondaryInput: 0
   swayContainer: {fileID: 0}
+  equipmentContainer: {fileID: 11400000, guid: b5c2e3097b8554741ada4214adbe6f9b, type: 2}
   myController: {fileID: 0}
   cr: {fileID: 2105486121736150598}
   netAnimator: {fileID: 0}
   acpp: {fileID: 0}
   hasAnimations: 0
   animationSet: {fileID: 0}
+  maxCharges: 0
+  currentCharges: 0
+  rechargeTime: 0
+  whenToConsumeCharge: 1
   fireParticleSystem: {fileID: 0}
   fireVFX: {fileID: 7535112267649372479}
   weaponFireType: 8
@@ -233,6 +238,8 @@ MonoBehaviour:
   chargeDecay: 15
   clearChargeOnShot: 0
   burstFireRounds: 0
+  debuffToApply: 0
+  debuffTime: 0
   maxAmmo: 80
   syncedAmmo:
     m_InternalValue: -1
@@ -257,7 +264,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2539525527
+  GlobalObjectIdHash: 3524168899
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -299,6 +306,7 @@ MonoBehaviour:
   - {fileID: 5686397936765547388}
   - {fileID: 5096592246378798894}
   hideOnHostRenderers: []
+  outlineComponent: {fileID: 0}
   localRender: 6
 --- !u!114 &7313256858211175898
 MonoBehaviour:
