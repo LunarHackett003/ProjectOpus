@@ -11,6 +11,13 @@
 
 namespace AK
 {
+    namespace EVENTS
+    {
+        static const AkUniqueID PLAY_357REVOLVERSFX = 917563653U;
+        static const AkUniqueID PLAY_GRENADELAUNCHER = 1100206660U;
+        static const AkUniqueID PLAY_PORTAL_RADIO_LOOP = 2317660073U;
+    } // namespace EVENTS
+
     namespace BANKS
     {
         static const AkUniqueID INIT = 1355168291U;
@@ -22,6 +29,11 @@ namespace AK
     {
         static const AkUniqueID MASTER_AUDIO_BUS = 3803692087U;
     } // namespace BUSSES
+
+    namespace AUX_BUSSES
+    {
+        static const AkUniqueID DEFAULTROOMBUS = 2206092185U;
+    } // namespace AUX_BUSSES
 
     namespace AUDIO_DEVICES
     {

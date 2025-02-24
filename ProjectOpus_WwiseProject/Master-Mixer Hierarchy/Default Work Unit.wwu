@@ -9,6 +9,27 @@
 							<ObjectRef Name="System" ID="{5A21D2A2-6E76-495C-9C08-10B0C46F1990}" WorkUnitID="{06BEC08E-2147-4973-A225-D355EBF2B111}"/>
 						</Reference>
 					</ReferenceList>
+					<ChildrenList>
+						<AuxBus Name="DefaultRoomBus" ID="{1E0AA5DD-36B1-4CA6-9B4B-B3055BEEAF5B}">
+							<ObjectLists>
+								<ObjectList Name="Effects">
+									<Reference>
+										<Local>
+											<EffectSlot Name="" ID="{2110B6DB-0443-430F-BC30-9867876A6F8B}" ShortID="1049865412">
+												<ReferenceList>
+													<Reference Name="Effect">
+														<Custom>
+															<Effect Name="Resonance Audio Renderer (Custom)" ID="{D8466F51-50C9-478B-9C29-BA553B2F172E}" ShortID="916646494" PluginName="Resonance Audio Renderer" CompanyID="272" PluginID="100" PluginType="3"/>
+														</Custom>
+													</Reference>
+												</ReferenceList>
+											</EffectSlot>
+										</Local>
+									</Reference>
+								</ObjectList>
+							</ObjectLists>
+						</AuxBus>
+					</ChildrenList>
 				</Bus>
 			</ChildrenList>
 		</WorkUnit>

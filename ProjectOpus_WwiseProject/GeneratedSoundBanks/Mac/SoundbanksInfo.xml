@@ -26,10 +26,32 @@
 				<Bus Id="3803692087" Name="Master Audio Bus"/>
 			</Busses>
 		</SoundBank>
-		<SoundBank Id="1467963052" Type="User" Language="SFX" Hash="{DE647F22-96E4-6305-4844-281982ED6215}">
+		<SoundBank Id="1467963052" Type="User" Language="SFX" Hash="{40C4AB5D-18D0-B699-CB10-211774E5DE25}">
 			<ShortName>Weapons</ShortName>
 			<Path>Weapons.bnk</Path>
+			<Media>
+				<File Id="324838356" Language="SFX" Streaming="false" Location="Memory">
+					<ShortName>GrenadeLauncher.wav</ShortName>
+					<CachePath>SFX/GrenadeLauncher_818F3B66.wem</CachePath>
+				</File>
+				<File Id="1063990640" Language="SFX" Streaming="false" Location="Memory">
+					<ShortName>357revolversfx.wav</ShortName>
+					<CachePath>SFX/357revolversfx_E87E0A34.wem</CachePath>
+				</File>
+			</Media>
+			<Events>
+				<Event Id="917563653" Name="Play_357revolversfx" DurationType="OneShot" DurationMin="0.49135464" DurationMax="0.49135464">
+					<MediaRefs>
+						<MediaRef Id="1063990640"/>
+					</MediaRefs>
+				</Event>
+				<Event Id="1100206660" Name="Play_GrenadeLauncher" DurationType="OneShot" DurationMin="0.4702041" DurationMax="0.4702041">
+					<MediaRefs>
+						<MediaRef Id="324838356"/>
+					</MediaRefs>
+				</Event>
+			</Events>
 		</SoundBank>
 	</SoundBanks>
-	<FileHash>{CD6FF72C-804E-A49F-463C-4BE8A303BB98}</FileHash>
+	<FileHash>{AD74B87B-A20F-B07C-F706-66B51083C848}</FileHash>
 </SoundBanksInfo>

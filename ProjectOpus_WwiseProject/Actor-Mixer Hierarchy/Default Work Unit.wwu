@@ -1,6 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WwiseDocument Type="WorkUnit" ID="{87A4EAC0-1104-4166-A0F0-09818136296E}" SchemaVersion="119">
 	<AudioObjects>
-		<WorkUnit Name="Default Work Unit" ID="{87A4EAC0-1104-4166-A0F0-09818136296E}" PersistMode="Standalone"/>
+		<WorkUnit Name="Default Work Unit" ID="{87A4EAC0-1104-4166-A0F0-09818136296E}" PersistMode="Standalone">
+			<ChildrenList>
+				<Folder Name="Source" ID="{D30E4F56-8B09-4126-9B58-E10D2BE363F4}" ShortID="682917133">
+					<ChildrenList>
+						<Sound Name="357revolversfx" ID="{407AD5CF-8ECA-42A4-AFDC-37F5BC6AE511}" ShortID="740436768">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{57693335-DDAB-4E1E-B80F-A61F685006DD}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{D87A8E55-56DA-4EC0-BDAD-8CBD87D3C7BD}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="357revolversfx" ID="{AC186D03-7BD4-4D28-A3AB-443018FEDEFE}">
+									<PropertyList>
+										<Property Name="FadeOutDuration" Type="Real64" Value="0.289424257054979"/>
+										<Property Name="FadeOutShape" Type="int16" Value="4"/>
+										<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+										<Property Name="TrimBegin" Type="Real64" Value="9.41537287413933"/>
+										<Property Name="TrimEnd" Type="Real64" Value="9.90672753319424"/>
+									</PropertyList>
+									<Language>SFX</Language>
+									<AudioFile>357revolversfx.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="1063990640"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="357revolversfx" ID="{AC186D03-7BD4-4D28-A3AB-443018FEDEFE}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="GrenadeLauncher" ID="{5F7995A7-B24D-4643-B26A-588650E5CD94}" ShortID="357069914">
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{57693335-DDAB-4E1E-B80F-A61F685006DD}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{D87A8E55-56DA-4EC0-BDAD-8CBD87D3C7BD}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="GrenadeLauncher" ID="{924558A5-9F6C-49D4-B733-611764022F34}">
+									<Language>SFX</Language>
+									<AudioFile>GrenadeLauncher.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="324838356"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="GrenadeLauncher" ID="{924558A5-9F6C-49D4-B733-611764022F34}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+						<Sound Name="portal-radio-loop" ID="{EF1476B6-AA5B-4AAE-B4EC-765AD890CCFA}" ShortID="219223223">
+							<PropertyList>
+								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+								<Property Name="Volume" Type="Real64">
+									<ValueList>
+										<Value>-33</Value>
+									</ValueList>
+								</Property>
+							</PropertyList>
+							<ReferenceList>
+								<Reference Name="Conversion">
+									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{57693335-DDAB-4E1E-B80F-A61F685006DD}"/>
+								</Reference>
+								<Reference Name="OutputBus">
+									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{D87A8E55-56DA-4EC0-BDAD-8CBD87D3C7BD}"/>
+								</Reference>
+							</ReferenceList>
+							<ChildrenList>
+								<AudioFileSource Name="portal-radio-loop" ID="{A22D61C8-397E-4330-8CF0-0B540F12D01D}">
+									<PropertyList>
+										<Property Name="OverrideWavLoop" Type="bool" Value="True"/>
+									</PropertyList>
+									<Language>SFX</Language>
+									<AudioFile>portal-radio-loop.wav</AudioFile>
+									<MediaIDList>
+										<MediaID ID="1060534966"/>
+									</MediaIDList>
+								</AudioFileSource>
+							</ChildrenList>
+							<ActiveSourceList>
+								<ActiveSource Name="portal-radio-loop" ID="{A22D61C8-397E-4330-8CF0-0B540F12D01D}" Platform="Linked"/>
+							</ActiveSourceList>
+						</Sound>
+					</ChildrenList>
+				</Folder>
+			</ChildrenList>
+		</WorkUnit>
 	</AudioObjects>
 </WwiseDocument>

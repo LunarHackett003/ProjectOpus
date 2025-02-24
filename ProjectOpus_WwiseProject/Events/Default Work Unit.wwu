@@ -1,6 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WwiseDocument Type="WorkUnit" ID="{BDE58DC8-88FB-4AAC-A003-226B35F4223B}" SchemaVersion="119">
 	<Events>
-		<WorkUnit Name="Default Work Unit" ID="{BDE58DC8-88FB-4AAC-A003-226B35F4223B}" PersistMode="Standalone"/>
+		<WorkUnit Name="Default Work Unit" ID="{BDE58DC8-88FB-4AAC-A003-226B35F4223B}" PersistMode="Standalone">
+			<ChildrenList>
+				<Event Name="Play_357revolversfx" ID="{9B621579-30DA-4E2A-9191-FA3683FE4D13}">
+					<ChildrenList>
+						<Action Name="" ID="{0447C5AF-E916-4237-A556-D9C12106D6B1}" ShortID="399286566">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="357revolversfx" ID="{407AD5CF-8ECA-42A4-AFDC-37F5BC6AE511}" WorkUnitID="{87A4EAC0-1104-4166-A0F0-09818136296E}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_GrenadeLauncher" ID="{09BDB73B-7A9A-497C-820A-44F1A5100976}">
+					<ChildrenList>
+						<Action Name="" ID="{205D2614-7A69-42E7-B842-AAFD5647DBF8}" ShortID="1043400665">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="GrenadeLauncher" ID="{5F7995A7-B24D-4643-B26A-588650E5CD94}" WorkUnitID="{87A4EAC0-1104-4166-A0F0-09818136296E}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+				<Event Name="Play_portal_radio_loop" ID="{26896D99-2776-4236-964E-E477E9C233F8}">
+					<ChildrenList>
+						<Action Name="" ID="{65388EBB-7C4A-4DFE-808C-35B61798120E}" ShortID="634367771">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="portal-radio-loop" ID="{EF1476B6-AA5B-4AAE-B4EC-765AD890CCFA}" WorkUnitID="{87A4EAC0-1104-4166-A0F0-09818136296E}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+			</ChildrenList>
+		</WorkUnit>
 	</Events>
 </WwiseDocument>

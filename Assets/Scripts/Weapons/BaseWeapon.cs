@@ -82,6 +82,10 @@ namespace Opus
 
     public class BaseWeapon : BaseEquipment
     {
+        public bool playSoundOnFire;
+        public bool loopFireSound;
+        bool playingFireSound;
+        public AK.Wwise.Event fireEvent, endFireEvent;
 
 
         protected PlayerManager owningPlayer;
@@ -307,9 +311,40 @@ namespace Opus
                     break;
             }
         }
+        [Rpc(SendTo.ClientsAndHost)]
+        public void SendAudio_RPC(bool play)
+        {
+            if (play)
+            {
+                fireEvent.Post(gameObject);
+            }
+            else
+            {
+                endFireEvent.Post(gameObject);
+            }
+        }
+
+
+
         public virtual void FireOnClient()
         {
-
+            if (playSoundOnFire)
+            {
+                if (!loopFireSound)
+                {
+                    fireEvent.Post(gameObject);
+                }
+                else if (IsOwner && !playingFireSound)
+                {
+                    SendAudio_RPC(true);
+                    playingFireSound = true;
+                }
+            }
+        }
+        [Rpc(SendTo.NotOwner)]
+        public void SendFireToNonOwner_RPC()
+        {
+            FireOnClient();
         }
 
         [Rpc(SendTo.Server)]

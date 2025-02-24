@@ -38,8 +38,25 @@ MonoBehaviour:
     ParentPath: Master-Mixer Hierarchy\Default Work Unit
     guid: 558e7ad8da56c04ebdad8cbd87d3c7bd
     GuidInternal: 
-    m_lastTime: -8584612101318956051
+    m_lastTime: -8584611960043878836
     List:
+    - name: DefaultRoomBus
+      guid: dda50a1eb136a64c9b4bb3055beeaf5b
+      id: 2206092185
+      PathAndIcons:
+      - ElementName: Master-Mixer Hierarchy
+        ObjectType: 5
+        guid: 00000000000000000000000000000000
+      - ElementName: Default Work Unit
+        ObjectType: 12
+        guid: 558e7ad8da56c04ebdad8cbd87d3c7bd
+      - ElementName: Master Audio Bus
+        ObjectType: 2
+        guid: d8a41415a61d2a41a17e75ca0c2149f3
+      - ElementName: DefaultRoomBus
+        ObjectType: 1
+        guid: dda50a1eb136a64c9b4bb3055beeaf5b
+      Path: Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus\DefaultRoomBus
     - name: Master Audio Bus
       guid: d8a41415a61d2a41a17e75ca0c2149f3
       id: 3803692087
@@ -66,8 +83,36 @@ MonoBehaviour:
     ParentPath: SoundBanks\Default Work Unit
     guid: 8b8500b4d5ce104e9216d4d6808f1129
     GuidInternal: 
-    m_lastTime: -8584612101318324507
-    List: []
+    m_lastTime: -8584611938013654263
+    List:
+    - name: General
+      guid: 1476eecc1e7f634893861aeef1f16368
+      id: 133642231
+      PathAndIcons:
+      - ElementName: SoundBanks
+        ObjectType: 5
+        guid: 00000000000000000000000000000000
+      - ElementName: Default Work Unit
+        ObjectType: 12
+        guid: 8b8500b4d5ce104e9216d4d6808f1129
+      - ElementName: General
+        ObjectType: 7
+        guid: 1476eecc1e7f634893861aeef1f16368
+      Path: SoundBanks\Default Work Unit\General
+    - name: Weapons
+      guid: 0d15b52bd7fcb049aa180c09bfcd4480
+      id: 1467963052
+      PathAndIcons:
+      - ElementName: SoundBanks
+        ObjectType: 5
+        guid: 00000000000000000000000000000000
+      - ElementName: Default Work Unit
+        ObjectType: 12
+        guid: 8b8500b4d5ce104e9216d4d6808f1129
+      - ElementName: Weapons
+        ObjectType: 7
+        guid: 0d15b52bd7fcb049aa180c09bfcd4480
+      Path: SoundBanks\Default Work Unit\Weapons
   EventWwu:
   - PhysicalPath: Events\Default Work Unit.wwu
     PathAndIcons:
@@ -80,8 +125,59 @@ MonoBehaviour:
     ParentPath: Events\Default Work Unit
     guid: c88de5bdfb88ac4aa003226b35f4223b
     GuidInternal: 
-    m_lastTime: -8584612101318745014
-    List: []
+    m_lastTime: -8584611938633000736
+    List:
+    - name: Play_357revolversfx
+      guid: 7915629bda302a4e9191fa3683fe4d13
+      id: 917563653
+      PathAndIcons:
+      - ElementName: Events
+        ObjectType: 5
+        guid: 00000000000000000000000000000000
+      - ElementName: Default Work Unit
+        ObjectType: 12
+        guid: c88de5bdfb88ac4aa003226b35f4223b
+      - ElementName: Play_357revolversfx
+        ObjectType: 3
+        guid: 7915629bda302a4e9191fa3683fe4d13
+      Path: Events\Default Work Unit\Play_357revolversfx
+      maxAttenuation: 0
+      maxDuration: 0.49135464
+      minDuration: 0.49135464
+    - name: Play_GrenadeLauncher
+      guid: 3bb7bd099a7a7c49820a44f1a5100976
+      id: 1100206660
+      PathAndIcons:
+      - ElementName: Events
+        ObjectType: 5
+        guid: 00000000000000000000000000000000
+      - ElementName: Default Work Unit
+        ObjectType: 12
+        guid: c88de5bdfb88ac4aa003226b35f4223b
+      - ElementName: Play_GrenadeLauncher
+        ObjectType: 3
+        guid: 3bb7bd099a7a7c49820a44f1a5100976
+      Path: Events\Default Work Unit\Play_GrenadeLauncher
+      maxAttenuation: 0
+      maxDuration: 0.4702041
+      minDuration: 0.4702041
+    - name: Play_portal_radio_loop
+      guid: 996d892676273642964ee477e9c233f8
+      id: 2317660073
+      PathAndIcons:
+      - ElementName: Events
+        ObjectType: 5
+        guid: 00000000000000000000000000000000
+      - ElementName: Default Work Unit
+        ObjectType: 12
+        guid: c88de5bdfb88ac4aa003226b35f4223b
+      - ElementName: Play_portal_radio_loop
+        ObjectType: 3
+        guid: 996d892676273642964ee477e9c233f8
+      Path: Events\Default Work Unit\Play_portal_radio_loop
+      maxAttenuation: 0
+      maxDuration: -1
+      minDuration: -1
   RtpcWwu:
   - PhysicalPath: Game Parameters\Default Work Unit.wwu
     PathAndIcons:
@@ -139,7 +235,7 @@ MonoBehaviour:
     m_lastTime: -8584612101317610357
     List: []
   ExpandedFileSystemItemIds: 
-  ExpandedWaapiItemIds: 
+  ExpandedWaapiItemIds: 020000000300000005000000060000000a0000000b0000001000000011000000
   AutoSyncSelection: 0
   autoPopulateEnabled: 1
   currentDataSource: 0

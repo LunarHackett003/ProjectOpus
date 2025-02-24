@@ -4,12 +4,17 @@
 		<WorkUnit Name="Default Work Unit" ID="{B400858B-CED5-4E10-9216-D4D6808F1129}" PersistMode="Standalone">
 			<ChildrenList>
 				<SoundBank Name="Weapons" ID="{2BB5150D-FCD7-49B0-AA18-0C09BFCD4480}">
-					<ObjectInclusionList/>
+					<ObjectInclusionList>
+						<ObjectRef Name="Play_GrenadeLauncher" ID="{09BDB73B-7A9A-497C-820A-44F1A5100976}" WorkUnitID="{BDE58DC8-88FB-4AAC-A003-226B35F4223B}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_357revolversfx" ID="{9B621579-30DA-4E2A-9191-FA3683FE4D13}" WorkUnitID="{BDE58DC8-88FB-4AAC-A003-226B35F4223B}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
 					<ObjectExclusionList/>
 					<GameSyncExclusionList/>
 				</SoundBank>
 				<SoundBank Name="General" ID="{CCEE7614-7F1E-4863-9386-1AEEF1F16368}">
-					<ObjectInclusionList/>
+					<ObjectInclusionList>
+						<ObjectRef Name="portal-radio-loop" ID="{EF1476B6-AA5B-4AAE-B4EC-765AD890CCFA}" WorkUnitID="{87A4EAC0-1104-4166-A0F0-09818136296E}" Origin="Manual" Filter="7"/>
+					</ObjectInclusionList>
 					<ObjectExclusionList/>
 					<GameSyncExclusionList/>
 				</SoundBank>

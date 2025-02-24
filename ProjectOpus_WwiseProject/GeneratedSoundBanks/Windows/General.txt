@@ -1,0 +1,6 @@
+Event	ID	Name			Wwise Object Path	Notes
+	2317660073	Play_portal_radio_loop			\Default Work Unit\Play_portal_radio_loop	
+
+In Memory Audio	ID	Name	Audio source file		Wwise Object Path	Notes	Data Size
+	1060534966	portal-radio-loop	E:\UNITY\ProjectOpus\ProjectOpus_WwiseProject\.cache\Windows\SFX\portal-radio-loop_11A93380.wem		\Actor-Mixer Hierarchy\Default Work Unit\Source\portal-radio-loop		8644704
+

@@ -1,0 +1,8 @@
+Event	ID	Name			Wwise Object Path	Notes
+	917563653	Play_357revolversfx			\Default Work Unit\Play_357revolversfx	
+	1100206660	Play_GrenadeLauncher			\Default Work Unit\Play_GrenadeLauncher	
+
+In Memory Audio	ID	Name	Audio source file		Wwise Object Path	Notes	Data Size
+	324838356	GrenadeLauncher	E:\UNITY\ProjectOpus\ProjectOpus_WwiseProject\.cache\Windows\SFX\GrenadeLauncher_818F3B66.wem		\Actor-Mixer Hierarchy\Default Work Unit\Source\GrenadeLauncher		83040
+	1063990640	357revolversfx	E:\UNITY\ProjectOpus\ProjectOpus_WwiseProject\.cache\Windows\SFX\357revolversfx_81608871.wem		\Actor-Mixer Hierarchy\Default Work Unit\Source\357revolversfx		86772
+
