@@ -400,7 +400,7 @@ namespace Opus
                 {
                     ""name"": """",
                     ""id"": ""cd75a3e9-0956-45a4-ac5a-46137dfc1113"",
-                    ""path"": ""<Keyboard>/escape"",
+                    ""path"": ""<Keyboard>/p"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",

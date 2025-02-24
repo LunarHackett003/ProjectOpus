@@ -19,6 +19,12 @@ namespace Opus
         public int maxRespawnTime = 10;
         public bool[] lockedSlots = new bool[5];
         public float stunMoveSpeedMultiplier, stunLookSpeedMultiplier;
+
+        public static float StunnedMoveMultiplier { get
+            {
+                return Instance != null ? Instance.stunMoveSpeedMultiplier : 0.5f;
+            } 
+        }
         Texture2D tex;
 
         public NetworkVariable<bool> GameInProgress = new(true, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);

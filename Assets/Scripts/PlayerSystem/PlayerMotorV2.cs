@@ -102,7 +102,7 @@ namespace Opus
 
         public override void OUpdate()
         {
-            if (!MatchManager.Instance.GameInProgress.Value)
+            if (MatchManager.Instance && !MatchManager.Instance.GameInProgress.Value)
                 return;
 
 
@@ -118,7 +118,7 @@ namespace Opus
         }
         public override void OFixedUpdate()
         {
-            if (!MatchManager.Instance.GameInProgress.Value)
+            if (MatchManager.Instance && !MatchManager.Instance.GameInProgress.Value)
                 return;
 
             if(IsOwner)

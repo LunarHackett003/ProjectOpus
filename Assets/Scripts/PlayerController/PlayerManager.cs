@@ -122,8 +122,8 @@ namespace Opus
 
                 timeUntilSpawn.OnValueChanged += RespawnTimeChanged;
 
-                PauseMenu.Instance.PauseGame(false);
-                PauseMenu.Instance.FreeCursor(true);
+                PauseMenu.Instance.paused = false;
+                PauseMenu.Instance.cursorFree = true;
 
             }
             else
@@ -132,12 +132,13 @@ namespace Opus
             }
             UpdateAllPlayerColours();
         }
+        
 
         private void Pause_performed(InputAction.CallbackContext obj)
         {
-            PauseMenu.Instance.gamePaused = !PauseMenu.Instance.gamePaused;
-
-            if (PauseMenu.Instance.gamePaused)
+            PauseMenu.Instance.paused = !PauseMenu.Instance.paused;
+            Debug.Log("Attempted to pause!");
+            if (PauseMenu.Instance.paused)
             {
                 moveInput = lookInput = Vector2.zero;
                 jumpInput = crouchInput = sprintInput = fireInput = secondaryInput = interactInput = reloadInput = pickupInput = false;
@@ -146,12 +147,12 @@ namespace Opus
 
         private void Interact_performed(InputAction.CallbackContext obj)
         {
-            interactInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+            interactInput = obj.ReadValueAsButton();
         }
 
         private void PickUp_performed(InputAction.CallbackContext obj)
         {
-            pickupInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+            pickupInput = obj.ReadValueAsButton();
         }
 
         void RespawnTimeChanged(int previous, int current)
@@ -181,22 +182,22 @@ namespace Opus
         }
         private void Reload_performed(InputAction.CallbackContext obj)
         {
-            reloadInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+            reloadInput = obj.ReadValueAsButton() && !PauseMenu.Instance.paused;
         }
         private void Sprint_performed(InputAction.CallbackContext obj)
         {
-            sprintInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+            sprintInput = obj.ReadValueAsButton() && !PauseMenu.Instance.paused;
 
         }
         private void Crouch_performed(InputAction.CallbackContext obj)
         {
-            crouchInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+            crouchInput = obj.ReadValueAsButton() && !PauseMenu.Instance.paused;
 
         }
 
         private void Jump_performed(InputAction.CallbackContext obj)
         {
-            jumpInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+            jumpInput = obj.ReadValueAsButton() && !PauseMenu.Instance.paused;
 
         }
 
@@ -204,17 +205,17 @@ namespace Opus
 
         private void Look_performed(InputAction.CallbackContext obj)
         {
-            lookInput = PauseMenu.Instance.IsPaused ? Vector2.zero : obj.ReadValue<Vector2>();
+            lookInput = PauseMenu.Instance.paused ? Vector2.zero : obj.ReadValue<Vector2>();
         }
 
         private void Move_performed(InputAction.CallbackContext obj)
         {
-            moveInput = PauseMenu.Instance.IsPaused ? Vector2.zero : obj.ReadValue<Vector2>();
+            moveInput = PauseMenu.Instance.paused ? Vector2.zero : obj.ReadValue<Vector2>();
 
         }
         private void SecondaryInput_performed(InputAction.CallbackContext obj)
         {
-            secondaryInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+            secondaryInput = obj.ReadValueAsButton() && !PauseMenu.Instance.paused;
 
             if (Character != null && spectating)
             {
@@ -224,7 +225,7 @@ namespace Opus
 
         private void Fire_performed(InputAction.CallbackContext obj)
         {
-            fireInput = obj.ReadValueAsButton() && !PauseMenu.Instance.IsPaused;
+            fireInput = obj.ReadValueAsButton() && !PauseMenu.Instance.paused;
             if (Character != null && spectating)
             {
                 Spectate_RPC(true, 1);
@@ -311,7 +312,6 @@ namespace Opus
                 Character.SetRenderersEnabledState_RPC(true);
             }
             Spectate_RPC(false, 0);
-            PauseMenu.Instance.FreeCursor(false);
             if (reviveItemInstance)
             {
                 reviveItemInstance.Despawn();
@@ -326,7 +326,6 @@ namespace Opus
 
         public void ClientDied()
         {
-            PauseMenu.Instance.FreeCursor(true);
             PlayerDied_RPC();
             Character.SetRenderersEnabledState_RPC(false);
             Spectate_RPC(true, 0);
@@ -344,6 +343,52 @@ namespace Opus
             base.OnNetworkDespawn();
             if (playersByID.ContainsKey(OwnerClientId))
                 playersByID.Remove(OwnerClientId);
+
+
+            #region Input Subscription
+
+            controls.Player.Pause.performed -= Pause_performed;
+
+            controls.Player.Move.performed -= Move_performed;
+            controls.Player.Move.canceled -= Move_performed;
+
+            controls.Player.Look.performed -= Look_performed;
+            controls.Player.Look.canceled -= Look_performed;
+
+            controls.Player.Jump.performed -= Jump_performed;
+            controls.Player.Jump.canceled -= Jump_performed;
+
+            controls.Player.Crouch.performed -= Crouch_performed;
+            controls.Player.Crouch.canceled -= Crouch_performed;
+
+            controls.Player.Sprint.performed -= Sprint_performed;
+            controls.Player.Sprint.canceled -= Sprint_performed;
+
+            controls.Player.Fire.performed -= Fire_performed;
+            controls.Player.Fire.canceled -= Fire_performed;
+
+            controls.Player.Reload.performed -= Reload_performed;
+            controls.Player.Reload.canceled -= Reload_performed;
+
+            controls.Player.SecondaryInput.performed -= SecondaryInput_performed;
+            controls.Player.SecondaryInput.canceled -= SecondaryInput_performed;
+
+            controls.Player.CycleWeapon.performed -= CycleWeapon_performed;
+
+            controls.Player.Special.performed -= Special_performed;
+
+            controls.Player.PickUp.performed -= PickUp_performed;
+            controls.Player.PickUp.canceled -= PickUp_performed;
+
+            controls.Player.Interact.performed -= Interact_performed;
+            controls.Player.Interact.canceled -= Interact_performed;
+
+            controls.Dispose();
+            #endregion
+
+
+
+
         }
         public void UpdateTeamIndex(uint previous, uint current)
         {
@@ -377,6 +422,8 @@ namespace Opus
             }
             print("spawn complete");
             ResetCanSpawn_RPC();
+
+            PauseMenu.Instance.cursorFree = false;
         }
         [Rpc(SendTo.Server)]
         void ResetCanSpawn_RPC()

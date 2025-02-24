@@ -107,6 +107,9 @@ namespace Opus
         {
             StartCoroutine(QuitGameRoutine());
             sessionUI.gameObject.SetActive(false);
+            MatchManager.Instance = null;
+            PauseMenu.Instance.paused = false;
+            PauseMenu.Instance.cursorFree = true;
         }
         IEnumerator QuitGameRoutine()
         {
