@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WwiseDocument Type="WorkUnit" ID="{66019DC4-196F-430B-AA0F-E235AE498F6C}" SchemaVersion="119">
 	<Effects>
-		<WorkUnit Name="Default Work Unit" ID="{66019DC4-196F-430B-AA0F-E235AE498F6C}" PersistMode="Standalone"/>
+		<WorkUnit Name="Default Work Unit" ID="{66019DC4-196F-430B-AA0F-E235AE498F6C}" PersistMode="Standalone">
+			<ChildrenList>
+				<Effect Name="ResonanceAudio" ID="{DE0D786C-BFE0-45C0-A959-2849C909E16B}" PluginName="Resonance Audio Renderer" CompanyID="272" PluginID="100" PluginType="3"/>
+				<Effect Name="New_Resonance_Audio_Renderer" ID="{96ABAAD0-88BF-4813-B293-651477F13A31}" PluginName="Resonance Audio Renderer" CompanyID="272" PluginID="100" PluginType="3"/>
+				<Effect Name="New_RoomVerb" ID="{6704127D-4311-411C-9E16-B4194CD6DE86}" PluginName="Wwise RoomVerb" CompanyID="0" PluginID="118" PluginType="3"/>
+			</ChildrenList>
+		</WorkUnit>
 	</Effects>
 </WwiseDocument>

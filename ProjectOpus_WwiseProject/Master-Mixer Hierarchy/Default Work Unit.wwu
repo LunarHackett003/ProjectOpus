@@ -10,16 +10,61 @@
 						</Reference>
 					</ReferenceList>
 					<ChildrenList>
-						<AuxBus Name="DefaultRoomBus" ID="{1E0AA5DD-36B1-4CA6-9B4B-B3055BEEAF5B}">
+						<Bus Name="Room Effects Bus" ID="{E965CD3F-718C-47F5-BBAA-B7EEF829987E}">
+							<PropertyList>
+								<Property Name="BusChannelConfig" Type="int32">
+									<ValueList>
+										<Value>548</Value>
+									</ValueList>
+								</Property>
+							</PropertyList>
+						</Bus>
+						<AuxBus Name="DefaultRoomBus" ID="{19BCAE0F-4D1A-4DC9-AB0B-F7518BFE4D18}">
 							<ObjectLists>
 								<ObjectList Name="Effects">
 									<Reference>
 										<Local>
-											<EffectSlot Name="" ID="{2110B6DB-0443-430F-BC30-9867876A6F8B}" ShortID="1049865412">
+											<EffectSlot Name="" ID="{5137BC61-D96C-473F-B0EB-92EAAA0148F7}" ShortID="202106082">
 												<ReferenceList>
 													<Reference Name="Effect">
-														<Custom>
-															<Effect Name="Resonance Audio Renderer (Custom)" ID="{D8466F51-50C9-478B-9C29-BA553B2F172E}" ShortID="916646494" PluginName="Resonance Audio Renderer" CompanyID="272" PluginID="100" PluginType="3"/>
+														<Custom CreatedFrom="{6704127D-4311-411C-9E16-B4194CD6DE86}">
+															<Effect Name="New_RoomVerb (Custom)" ID="{77A577B3-5ED1-4C44-B580-E8E0C76CE13A}" ShortID="288707076" PluginName="Wwise RoomVerb" CompanyID="0" PluginID="118" PluginType="3"/>
+														</Custom>
+													</Reference>
+												</ReferenceList>
+											</EffectSlot>
+										</Local>
+									</Reference>
+								</ObjectList>
+							</ObjectLists>
+						</AuxBus>
+						<AuxBus Name="OutsideRoomBus" ID="{CC370542-31AD-4788-B9F4-96E4D0F1E685}">
+							<ObjectLists>
+								<ObjectList Name="Effects">
+									<Reference>
+										<Local>
+											<EffectSlot Name="" ID="{55ACF41E-42EE-4F0E-A481-7D20541A55FD}" ShortID="1021483835">
+												<ReferenceList>
+													<Reference Name="Effect">
+														<Custom CreatedFrom="{6704127D-4311-411C-9E16-B4194CD6DE86}">
+															<Effect Name="New_RoomVerb (Custom)" ID="{6C005966-1B16-43FF-99B9-863A43E2B3BC}" ShortID="922760238" PluginName="Wwise RoomVerb" CompanyID="0" PluginID="118" PluginType="3">
+																<PropertyList>
+																	<Property Name="DecayTime" Type="Real32" Value="0.9"/>
+																	<Property Name="DryLevel" Type="Real32" Value="-76.3"/>
+																	<Property Name="ERPattern" Type="int32" Value="16"/>
+																	<Property Name="EnableToneControls" Type="bool" Value="True"/>
+																	<Property Name="Filter1Freq" Type="Real32" Value="190"/>
+																	<Property Name="Filter1Gain" Type="Real32" Value="-1.5"/>
+																	<Property Name="Filter2Gain" Type="Real32" Value="-1"/>
+																	<Property Name="HFDamping" Type="Real32" Value="1.6"/>
+																	<Property Name="InputLFELevel" Type="Real32" Value="-32.3"/>
+																	<Property Name="PreDelay" Type="Real32" Value="20"/>
+																	<Property Name="Quality" Type="int32" Value="6"/>
+																	<Property Name="ReverbLevel" Type="Real32" Value="-24"/>
+																	<Property Name="RoomSize" Type="Real32" Value="47"/>
+																	<Property Name="StereoWidth" Type="Real32" Value="176"/>
+																</PropertyList>
+															</Effect>
 														</Custom>
 													</Reference>
 												</ReferenceList>

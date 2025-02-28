@@ -257,7 +257,7 @@ MonoBehaviour:
   currentCharges: 0
   rechargeTime: 0
   whenToConsumeCharge: 1
-  playSoundOnFire: 0
+  playSoundOnFire: 1
   loopFireSound: 0
   fireEvent:
     idInternal: 0
@@ -348,7 +348,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1531424143
+  GlobalObjectIdHash: 2417606972
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1

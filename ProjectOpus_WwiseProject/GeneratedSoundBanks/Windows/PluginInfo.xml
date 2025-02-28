@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PluginInfo Platform="Windows" BasePlatform="Windows">
 	<PluginLibs>
-		<PluginLib LibName="Resonance Audio Renderer" LibId="6557955" Type="Effect" DLL="ResonanceAudio" StaticLib="ResonanceAudioFX"/>
+		<PluginLib LibName="Wwise RoomVerb" LibId="7733251" Type="Effect" DLL="AkRoomVerb" StaticLib="AkRoomVerbFX"/>
 		<PluginLib LibName="System" LibId="11403271" Type="AudioDevice"/>
 		<PluginLib LibName="No Output" LibId="11862023" Type="AudioDevice"/>
 	</PluginLibs>
-	<FileHash>{180AB7F6-7CD9-4D27-BC32-40ED3005A9A4}</FileHash>
+	<FileHash>{810577DD-0E12-C21B-5478-ABC5F0A241CC}</FileHash>
 </PluginInfo>

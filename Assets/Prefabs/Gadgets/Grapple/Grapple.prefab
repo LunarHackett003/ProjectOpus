@@ -133,9 +133,9 @@ MonoBehaviour:
     m_Bits: 1
   grappleStartPos: {x: 0, y: 0, z: 0}
   grappleTargetPos: {x: 0, y: 0, z: 0}
-  grappleReleaseDistance: 2
+  grappleReleaseDistance: 3
   grappleCastRadius: 0.2
-  grappleDrag: 10
+  grappleDrag: 6
   grappleRope: {fileID: 3318202737823906933}
 --- !u!114 &4263581792723208203
 MonoBehaviour:

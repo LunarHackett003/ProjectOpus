@@ -38,10 +38,10 @@ MonoBehaviour:
     ParentPath: Master-Mixer Hierarchy\Default Work Unit
     guid: 558e7ad8da56c04ebdad8cbd87d3c7bd
     GuidInternal: 
-    m_lastTime: -8584611960043878836
+    m_lastTime: -8584611735430245654
     List:
     - name: DefaultRoomBus
-      guid: dda50a1eb136a64c9b4bb3055beeaf5b
+      guid: 0faebc191a4dc94dab0bf7518bfe4d18
       id: 2206092185
       PathAndIcons:
       - ElementName: Master-Mixer Hierarchy
@@ -55,7 +55,7 @@ MonoBehaviour:
         guid: d8a41415a61d2a41a17e75ca0c2149f3
       - ElementName: DefaultRoomBus
         ObjectType: 1
-        guid: dda50a1eb136a64c9b4bb3055beeaf5b
+        guid: 0faebc191a4dc94dab0bf7518bfe4d18
       Path: Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus\DefaultRoomBus
     - name: Master Audio Bus
       guid: d8a41415a61d2a41a17e75ca0c2149f3
@@ -71,6 +71,41 @@ MonoBehaviour:
         ObjectType: 2
         guid: d8a41415a61d2a41a17e75ca0c2149f3
       Path: Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus
+    - name: OutsideRoomBus
+      guid: 420537ccad318847b9f496e4d0f1e685
+      id: 768099503
+      PathAndIcons:
+      - ElementName: Master-Mixer Hierarchy
+        ObjectType: 5
+        guid: 00000000000000000000000000000000
+      - ElementName: Default Work Unit
+        ObjectType: 12
+        guid: 558e7ad8da56c04ebdad8cbd87d3c7bd
+      - ElementName: Master Audio Bus
+        ObjectType: 2
+        guid: d8a41415a61d2a41a17e75ca0c2149f3
+      - ElementName: OutsideRoomBus
+        ObjectType: 1
+        guid: 420537ccad318847b9f496e4d0f1e685
+      Path: Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus\OutsideRoomBus
+    - name: Room Effects Bus
+      guid: 3fcd65e98c71f547bbaab7eef829987e
+      id: 297412052
+      PathAndIcons:
+      - ElementName: Master-Mixer Hierarchy
+        ObjectType: 5
+        guid: 00000000000000000000000000000000
+      - ElementName: Default Work Unit
+        ObjectType: 12
+        guid: 558e7ad8da56c04ebdad8cbd87d3c7bd
+      - ElementName: Master Audio Bus
+        ObjectType: 2
+        guid: d8a41415a61d2a41a17e75ca0c2149f3
+      - ElementName: Room Effects Bus
+        ObjectType: 2
+        guid: 3fcd65e98c71f547bbaab7eef829987e
+      Path: Master-Mixer Hierarchy\Default Work Unit\Master Audio Bus\Room Effects
+        Bus
   BankWwu:
   - PhysicalPath: SoundBanks\Default Work Unit.wwu
     PathAndIcons:
@@ -141,7 +176,7 @@ MonoBehaviour:
         ObjectType: 3
         guid: 7915629bda302a4e9191fa3683fe4d13
       Path: Events\Default Work Unit\Play_357revolversfx
-      maxAttenuation: 0
+      maxAttenuation: 100
       maxDuration: 0.49135464
       minDuration: 0.49135464
     - name: Play_GrenadeLauncher
@@ -158,7 +193,7 @@ MonoBehaviour:
         ObjectType: 3
         guid: 3bb7bd099a7a7c49820a44f1a5100976
       Path: Events\Default Work Unit\Play_GrenadeLauncher
-      maxAttenuation: 0
+      maxAttenuation: 100
       maxDuration: 0.4702041
       minDuration: 0.4702041
     - name: Play_portal_radio_loop
@@ -175,7 +210,7 @@ MonoBehaviour:
         ObjectType: 3
         guid: 996d892676273642964ee477e9c233f8
       Path: Events\Default Work Unit\Play_portal_radio_loop
-      maxAttenuation: 0
+      maxAttenuation: 100
       maxDuration: -1
       minDuration: -1
   RtpcWwu:
@@ -235,7 +270,7 @@ MonoBehaviour:
     m_lastTime: -8584612101317610357
     List: []
   ExpandedFileSystemItemIds: 
-  ExpandedWaapiItemIds: 020000000300000005000000060000000a0000000b0000001000000011000000
+  ExpandedWaapiItemIds: 0200000003000000040000000500000006000000
   AutoSyncSelection: 0
   autoPopulateEnabled: 1
   currentDataSource: 0

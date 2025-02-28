@@ -28,11 +28,13 @@ namespace AK
     namespace BUSSES
     {
         static const AkUniqueID MASTER_AUDIO_BUS = 3803692087U;
+        static const AkUniqueID ROOM_EFFECTS_BUS = 297412052U;
     } // namespace BUSSES
 
     namespace AUX_BUSSES
     {
         static const AkUniqueID DEFAULTROOMBUS = 2206092185U;
+        static const AkUniqueID OUTSIDEROOMBUS = 768099503U;
     } // namespace AUX_BUSSES
 
     namespace AUDIO_DEVICES

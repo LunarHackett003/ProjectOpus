@@ -9,7 +9,7 @@
 	</RootPaths>
 	<DialogueEvents/>
 	<SoundBanks>
-		<SoundBank Id="133642231" Type="User" Language="SFX" Hash="{63981B2D-B148-8F29-254C-FD0B5F76553F}">
+		<SoundBank Id="133642231" Type="User" Language="SFX" Hash="{19E140CE-D779-3B05-DCC7-D8638919E523}">
 			<ShortName>General</ShortName>
 			<Path>General.bnk</Path>
 			<Media>
@@ -19,19 +19,20 @@
 				</File>
 			</Media>
 			<Events>
-				<Event Id="2317660073" Name="Play_portal_radio_loop" DurationType="Infinite">
+				<Event Id="2317660073" Name="Play_portal_radio_loop" MaxAttenuation="100" DurationType="Infinite">
 					<MediaRefs>
 						<MediaRef Id="1060534966"/>
 					</MediaRefs>
 				</Event>
 			</Events>
 		</SoundBank>
-		<SoundBank Id="1355168291" Type="User" Language="SFX" Hash="{83F8A24A-CF42-BCA8-B0F4-A13AE0781FD9}">
+		<SoundBank Id="1355168291" Type="User" Language="SFX" Hash="{FA2C66D3-9E50-0906-63DC-02D843FE4E21}">
 			<ShortName>Init</ShortName>
 			<Path>Init.bnk</Path>
 			<Plugins>
 				<Custom>
-					<Plugin Id="916646494" Name="Resonance Audio Renderer (Custom)" LibName="Resonance Audio Renderer" LibId="6557955"/>
+					<Plugin Id="288707076" Name="New_RoomVerb (Custom)" LibName="Wwise RoomVerb" LibId="7733251"/>
+					<Plugin Id="922760238" Name="New_RoomVerb (Custom)" LibName="Wwise RoomVerb" LibId="7733251"/>
 				</Custom>
 				<AudioDevices>
 					<Plugin Id="2317455096" Name="No_Output" LibName="No Output" LibId="11862023"/>
@@ -39,19 +40,27 @@
 				</AudioDevices>
 			</Plugins>
 			<Busses>
+				<Bus Id="297412052" Name="Room Effects Bus"/>
 				<Bus Id="3803692087" Name="Master Audio Bus"/>
 			</Busses>
 			<AuxBusses>
+				<AuxBus Id="768099503" Name="OutsideRoomBus">
+					<PluginRefs>
+						<Custom>
+							<PluginRef Id="922760238"/>
+						</Custom>
+					</PluginRefs>
+				</AuxBus>
 				<AuxBus Id="2206092185" Name="DefaultRoomBus">
 					<PluginRefs>
 						<Custom>
-							<PluginRef Id="916646494"/>
+							<PluginRef Id="288707076"/>
 						</Custom>
 					</PluginRefs>
 				</AuxBus>
 			</AuxBusses>
 		</SoundBank>
-		<SoundBank Id="1467963052" Type="User" Language="SFX" Hash="{F534EFEB-F139-D67A-0D79-D110EEC8A524}">
+		<SoundBank Id="1467963052" Type="User" Language="SFX" Hash="{E120AC9D-9AAE-1680-2F09-A9E09ED45D8F}">
 			<ShortName>Weapons</ShortName>
 			<Path>Weapons.bnk</Path>
 			<Media>
@@ -61,16 +70,16 @@
 				</File>
 				<File Id="1063990640" Language="SFX" Streaming="false" Location="Memory">
 					<ShortName>357revolversfx.wav</ShortName>
-					<CachePath>SFX/357revolversfx_81608871.wem</CachePath>
+					<CachePath>SFX/357revolversfx_E87E0A34.wem</CachePath>
 				</File>
 			</Media>
 			<Events>
-				<Event Id="917563653" Name="Play_357revolversfx" DurationType="OneShot" DurationMin="0.49135464" DurationMax="0.49135464">
+				<Event Id="917563653" Name="Play_357revolversfx" MaxAttenuation="100" DurationType="OneShot" DurationMin="0.49135464" DurationMax="0.49135464">
 					<MediaRefs>
 						<MediaRef Id="1063990640"/>
 					</MediaRefs>
 				</Event>
-				<Event Id="1100206660" Name="Play_GrenadeLauncher" DurationType="OneShot" DurationMin="0.4702041" DurationMax="0.4702041">
+				<Event Id="1100206660" Name="Play_GrenadeLauncher" MaxAttenuation="100" DurationType="OneShot" DurationMin="0.4702041" DurationMax="0.4702041">
 					<MediaRefs>
 						<MediaRef Id="324838356"/>
 					</MediaRefs>
@@ -78,5 +87,5 @@
 			</Events>
 		</SoundBank>
 	</SoundBanks>
-	<FileHash>{CE408710-EECE-989E-EE51-6BC6B9E51A4B}</FileHash>
+	<FileHash>{0A08E59F-F7ED-3EE8-BD37-A432E17CD30F}</FileHash>
 </SoundBanksInfo>

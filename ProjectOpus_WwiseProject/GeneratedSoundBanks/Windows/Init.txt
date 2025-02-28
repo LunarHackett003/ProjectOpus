@@ -1,11 +1,14 @@
 Audio Bus	ID	Name			Wwise Object Path	Notes
+	297412052	Room Effects Bus			\Default Work Unit\Master Audio Bus\Room Effects Bus	
 	3803692087	Master Audio Bus			\Default Work Unit\Master Audio Bus	
 
 Auxiliary Bus	ID	Name			Wwise Object Path	Notes
+	768099503	OutsideRoomBus			\Default Work Unit\Master Audio Bus\OutsideRoomBus	
 	2206092185	DefaultRoomBus			\Default Work Unit\Master Audio Bus\DefaultRoomBus	
 
 Effect plug-ins	ID	Name	Type				Notes
-	916646494	Resonance Audio Renderer (Custom)	Resonance Audio Renderer			
+	288707076	New_RoomVerb (Custom)	Wwise RoomVerb			
+	922760238	New_RoomVerb (Custom)	Wwise RoomVerb			
 
 Audio Devices	ID	Name	Type				Notes
 	2317455096	No_Output	No Output			

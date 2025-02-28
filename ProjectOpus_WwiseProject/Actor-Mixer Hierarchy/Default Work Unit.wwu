@@ -6,12 +6,20 @@
 				<Folder Name="Source" ID="{D30E4F56-8B09-4126-9B58-E10D2BE363F4}" ShortID="682917133">
 					<ChildrenList>
 						<Sound Name="357revolversfx" ID="{407AD5CF-8ECA-42A4-AFDC-37F5BC6AE511}" ShortID="740436768">
+							<PropertyList>
+								<Property Name="3DSpatialization" Type="int16" Value="2"/>
+								<Property Name="EnableDiffraction" Type="bool" Value="True"/>
+								<Property Name="UseGameAuxSends" Type="bool" Value="True"/>
+							</PropertyList>
 							<ReferenceList>
+								<Reference Name="Attenuation">
+									<ObjectRef Name="New Attenuation" ID="{C796A8C5-B540-4110-BBCD-8980E621AFEE}" WorkUnitID="{0D9333E8-B76C-4049-A6F0-3C07346B2F74}"/>
+								</Reference>
 								<Reference Name="Conversion">
 									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{57693335-DDAB-4E1E-B80F-A61F685006DD}"/>
 								</Reference>
 								<Reference Name="OutputBus">
-									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{D87A8E55-56DA-4EC0-BDAD-8CBD87D3C7BD}"/>
+									<ObjectRef Name="Room Effects Bus" ID="{E965CD3F-718C-47F5-BBAA-B7EEF829987E}" WorkUnitID="{D87A8E55-56DA-4EC0-BDAD-8CBD87D3C7BD}"/>
 								</Reference>
 							</ReferenceList>
 							<ChildrenList>
@@ -35,12 +43,25 @@
 							</ActiveSourceList>
 						</Sound>
 						<Sound Name="GrenadeLauncher" ID="{5F7995A7-B24D-4643-B26A-588650E5CD94}" ShortID="357069914">
+							<PropertyList>
+								<Property Name="3DSpatialization" Type="int16" Value="2"/>
+								<Property Name="EnableDiffraction" Type="bool" Value="True"/>
+								<Property Name="UseGameAuxSends" Type="bool" Value="True"/>
+								<Property Name="Volume" Type="Real64">
+									<ValueList>
+										<Value>-12</Value>
+									</ValueList>
+								</Property>
+							</PropertyList>
 							<ReferenceList>
+								<Reference Name="Attenuation">
+									<ObjectRef Name="New Attenuation" ID="{C796A8C5-B540-4110-BBCD-8980E621AFEE}" WorkUnitID="{0D9333E8-B76C-4049-A6F0-3C07346B2F74}"/>
+								</Reference>
 								<Reference Name="Conversion">
 									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{57693335-DDAB-4E1E-B80F-A61F685006DD}"/>
 								</Reference>
 								<Reference Name="OutputBus">
-									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{D87A8E55-56DA-4EC0-BDAD-8CBD87D3C7BD}"/>
+									<ObjectRef Name="Room Effects Bus" ID="{E965CD3F-718C-47F5-BBAA-B7EEF829987E}" WorkUnitID="{D87A8E55-56DA-4EC0-BDAD-8CBD87D3C7BD}"/>
 								</Reference>
 							</ReferenceList>
 							<ChildrenList>
@@ -58,19 +79,25 @@
 						</Sound>
 						<Sound Name="portal-radio-loop" ID="{EF1476B6-AA5B-4AAE-B4EC-765AD890CCFA}" ShortID="219223223">
 							<PropertyList>
+								<Property Name="3DSpatialization" Type="int16" Value="2"/>
+								<Property Name="EnableDiffraction" Type="bool" Value="True"/>
 								<Property Name="IsLoopingEnabled" Type="bool" Value="True"/>
+								<Property Name="UseGameAuxSends" Type="bool" Value="True"/>
 								<Property Name="Volume" Type="Real64">
 									<ValueList>
-										<Value>-33</Value>
+										<Value>-14</Value>
 									</ValueList>
 								</Property>
 							</PropertyList>
 							<ReferenceList>
+								<Reference Name="Attenuation">
+									<ObjectRef Name="New Attenuation" ID="{C796A8C5-B540-4110-BBCD-8980E621AFEE}" WorkUnitID="{0D9333E8-B76C-4049-A6F0-3C07346B2F74}"/>
+								</Reference>
 								<Reference Name="Conversion">
 									<ObjectRef Name="Default Conversion Settings" ID="{6D1B890C-9826-4384-BF07-C15223E9FB56}" WorkUnitID="{57693335-DDAB-4E1E-B80F-A61F685006DD}"/>
 								</Reference>
 								<Reference Name="OutputBus">
-									<ObjectRef Name="Master Audio Bus" ID="{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}" WorkUnitID="{D87A8E55-56DA-4EC0-BDAD-8CBD87D3C7BD}"/>
+									<ObjectRef Name="Room Effects Bus" ID="{E965CD3F-718C-47F5-BBAA-B7EEF829987E}" WorkUnitID="{D87A8E55-56DA-4EC0-BDAD-8CBD87D3C7BD}"/>
 								</Reference>
 							</ReferenceList>
 							<ChildrenList>
@@ -85,6 +112,9 @@
 									</MediaIDList>
 								</AudioFileSource>
 							</ChildrenList>
+							<PositioningInfo>
+								<Position Name="" ID="{61CE7F5C-4BC4-4981-BA0B-0D524ECA97C0}"/>
+							</PositioningInfo>
 							<ActiveSourceList>
 								<ActiveSource Name="portal-radio-loop" ID="{A22D61C8-397E-4330-8CF0-0B540F12D01D}" Platform="Linked"/>
 							</ActiveSourceList>
